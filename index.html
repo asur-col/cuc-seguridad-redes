@@ -1,0 +1,308 @@
+<title>Seguridad en Redes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FBF8F3;
+    --surface: #FFFFFF;
+    --surface-2: #F4EEE3;
+    --ink: #2A2A2A;
+    --ink-soft: #6B6259;
+    --vino: #A6192E;
+    --vino-strong: #7E1223;
+    --vino-tint: #FBEBEC;
+    --dorado: #A9791C;
+    --dorado-tint: #FBF3DE;
+    --line: #E5DCCB;
+    --shadow: 0 1px 2px rgba(42,26,20,.04), 0 6px 20px rgba(42,26,20,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1613; --surface: #24201B; --surface-2: #2C2620;
+      --ink: #EFE7D9; --ink-soft: #B3A896;
+      --vino: #E2536B; --vino-strong: #F0748A; --vino-tint: #3A1E22;
+      --dorado: #E4BC5C; --dorado-tint: #3B321C; --line: #3D362B;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1613; --surface: #24201B; --surface-2: #2C2620;
+    --ink: #EFE7D9; --ink-soft: #B3A896;
+    --vino: #E2536B; --vino-strong: #F0748A; --vino-tint: #3A1E22;
+    --dorado: #E4BC5C; --dorado-tint: #3B321C; --line: #3D362B;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15.5px; line-height: 1.6;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+  a { color: var(--vino); }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px 90px; }
+
+  header.top {
+    background: var(--surface); border-bottom: 1px solid var(--line);
+    padding: 54px 24px 40px; text-align: center; margin-bottom: 8px;
+  }
+  header.top .logo { height: 64px; width: auto; margin: 0 auto 26px; display: block; }
+  header.top .eyebrow { font-size: 11.5px; text-transform: uppercase; letter-spacing: .12em; color: var(--dorado); font-weight: 700; margin: 0 0 6px; }
+  header.top h1 { color: var(--vino); font-size: clamp(28px, 4vw, 38px); margin: 0 0 8px; }
+  header.top .sub { color: var(--ink-soft); font-size: 16px; margin: 0 0 20px; }
+  .accent-bar { width: 200px; height: 4px; margin: 0 auto 20px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--vino), var(--dorado)); }
+  header.top .meta { font-size: 13.5px; color: var(--ink-soft); line-height: 1.7; }
+  header.top .meta b { color: var(--ink); font-size: 15px; }
+
+  section { margin-top: 44px; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .section-head h2 { font-size: 20px; margin: 0; }
+  .section-head .count { font-size: 12.5px; color: var(--ink-soft); font-family: 'IBM Plex Mono'; }
+  .section-note { font-size: 13.5px; color: var(--ink-soft); margin: -8px 0 18px; max-width: 62ch; }
+
+  .card-grid { display: grid; gap: 10px; }
+
+  .week-card {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow);
+    transition: border-color .15s;
+  }
+  .week-card:hover { border-color: var(--vino); }
+  .week-card .num {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--vino-tint); color: var(--vino);
+    display: grid; place-items: center; font-family: 'IBM Plex Mono'; font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .week-card .title { font-weight: 600; font-size: 15px; color: var(--ink); }
+  .week-card .desc { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .week-card .go { margin-left: auto; color: var(--ink-soft); font-size: 13px; white-space: nowrap; }
+
+  .week-card.pending { opacity: .55; }
+  .week-card.pending .num { background: var(--surface-2); color: var(--ink-soft); }
+  .week-card.pending .go { font-style: italic; }
+
+  .tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  table.calendar { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
+  table.calendar th { background: var(--vino); color: #fff; text-align: left; padding: 10px 12px; font-weight: 600; white-space: nowrap; }
+  table.calendar td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.calendar tr:last-child td { border-bottom: none; }
+  table.calendar tr:nth-child(even) td { background: var(--surface-2); }
+  table.calendar tr.receso td { background: var(--dorado-tint); font-style: italic; color: var(--ink-soft); }
+  table.calendar tr.sinnota td { color: var(--ink-soft); }
+  table.calendar .sem { font-family: 'IBM Plex Mono'; font-weight: 700; color: var(--vino); white-space: nowrap; }
+  table.calendar .fechas, table.calendar .unidad { white-space: nowrap; color: var(--ink-soft); }
+  table.calendar .act { color: var(--ink-soft); }
+
+  footer.page { max-width: 1140px; margin: 60px auto 0; padding: 20px 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-soft); text-align: center; }
+
+  .scroll-hint { display: none; font-size: 11.5px; color: var(--ink-soft); padding: 8px 12px 0; margin: 0; }
+
+  @media (max-width: 640px) {
+    body { font-size: 14.5px; }
+    .wrap { padding: 0 16px 70px; }
+    header.top { padding: 40px 16px 32px; }
+    header.top .logo { height: 52px; margin-bottom: 20px; }
+    header.top .meta { font-size: 13px; }
+
+    .week-card { flex-wrap: wrap; padding: 14px 16px; gap: 10px 14px; }
+    .week-card .go { margin-left: 56px; font-size: 12.5px; }
+
+    table.calendar { min-width: 620px; font-size: 12px; }
+    .scroll-hint { display: block; }
+  }
+
+  @media (max-width: 420px) {
+    header.top h1 { font-size: 24px; }
+    .week-card .num { width: 34px; height: 34px; font-size: 12.5px; }
+    .week-card .title { font-size: 14px; }
+  }
+</style>
+
+<header class="top">
+  <img class="logo" src="https://es.wikipedia.org/wiki/Special:FilePath/Logo_cuc.png" alt="Universidad de la Costa" />
+  <p class="eyebrow">Curso</p>
+  <h1>Seguridad en Redes</h1>
+  <p class="sub">Material del curso — Ingeniería de Sistemas</p>
+  <div class="accent-bar"></div>
+  <p class="meta"><b>Ing. Rodolfo Cañas Cervantes</b><br>Universidad de la Costa (CUC) · Ingeniería de Sistemas<br>Periodo 2026-2 · Barranquilla, Colombia</p>
+</header>
+
+<div class="wrap">
+  <section>
+    <div class="section-head"><h2>Semanas</h2><span class="count">1 de 13 publicadas</span></div>
+    <div class="card-grid">
+      <a class="week-card" href="2026-2-S01S02-seguridad-redes-fundamentos.pdf" target="_blank">
+        <div class="num">1–2</div>
+        <div>
+          <div class="title">Fundamentos: de la red tradicional al perímetro Zero Trust</div>
+          <div class="desc">Panorama de amenazas, NAT, routing, direccionamiento IPv4/IPv6, TCP/IP, firewall/NGFW/IDS conceptual</div>
+        </div>
+        <div class="go">Ver PDF →</div>
+      </a>
+      <div class="week-card pending">
+        <div class="num">3</div>
+        <div>
+          <div class="title">Segmentación de redes</div>
+          <div class="desc">VLANs, subnetting, DMZ, routing a fondo → puente a microsegmentación Zero Trust</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <div class="week-card pending">
+        <div class="num">4+</div>
+        <div>
+          <div class="title">Resto del curso</div>
+          <div class="desc">Semanas 4 a 15-16 — se publican a medida que se terminan</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Laboratorios</h2><span class="count">1 publicado</span></div>
+    <div class="card-grid">
+      <a class="week-card" href="laboratorios/lab-01-segmentacion/index.html">
+        <div class="num">🧪</div>
+        <div>
+          <div class="title">Lab 1 — Segmentación de Redes, Zero Trust y NAT/PAT (OPNsense)</div>
+          <div class="desc">VirtualBox + OPNsense + Alpine — 4 zonas, app web + MariaDB en la DMZ, NAT/PAT entrante · 10% Unidad 1 · Actividad 1</div>
+        </div>
+        <div class="go">Ver guía →</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Calendario</h2><span class="count">Periodo 2026-2</span></div>
+    <p class="section-note">Evaluación: 10% dos actividades de laboratorio por unidad (una propia + una AWS Academy) · 20% rúbrica de la unidad (se libera la semana del parcial) · 70% examen práctico en vivo.</p>
+    <div class="tbl-wrap">
+      <p class="scroll-hint">↔ Desliza para ver la tabla completa</p>
+      <table class="calendar">
+        <thead>
+          <tr><th>Semana</th><th>Fechas</th><th>Unidad</th><th>Tema</th><th>Actividad / Evaluación</th></tr>
+        </thead>
+        <tbody>
+      <tr>
+        <td class="sem">1</td>
+        <td class="fechas">5–9 ago</td>
+        <td class="unidad">U1</td>
+        <td>Encuadre + de la red tradicional al perímetro Zero Trust: panorama de amenazas 2026 (IA ofensiva, identidad como nuevo perímetro)</td>
+        <td class="act">Inicio de clases</td>
+      </tr>
+      <tr>
+        <td class="sem">2</td>
+        <td class="fechas">10–16 ago</td>
+        <td class="unidad">U1</td>
+        <td>Cómo funciona una red básica (NAT, routing estático/dinámico) + direccionamiento IPv4/IPv6 + modelo TCP/IP + firewall/NGFW/IDS conceptual</td>
+        <td class="act">—</td>
+      </tr>
+      <tr>
+        <td class="sem">3</td>
+        <td class="fechas">17–23 ago</td>
+        <td class="unidad">U1</td>
+        <td>Segmentación de redes: VLANs, subnetting, DMZ, routing a fondo → puente a microsegmentación Zero Trust</td>
+        <td class="act">10% · Actividad 1 (U1): lab de diseño de subredes y segmentación</td>
+      </tr>
+      <tr>
+        <td class="sem">4</td>
+        <td class="fechas">24–30 ago</td>
+        <td class="unidad">U1</td>
+        <td>Firewalls de host (ufw/iptables) práctico + IDS/IPS a fondo; Security Groups AWS como firewall-as-a-service</td>
+        <td class="act">10% · Actividad 2 (U1): Lab 4.1 AWS Academy</td>
+      </tr>
+      <tr>
+        <td class="sem">5</td>
+        <td class="fechas">31 ago–6 sep</td>
+        <td class="unidad">U1</td>
+        <td>Repaso Unidad 1</td>
+        <td class="act">Parcial 1 — 20% rúbrica</td>
+      </tr>
+      <tr>
+        <td class="sem">6</td>
+        <td class="fechas">7–13 sep</td>
+        <td class="unidad">U2</td>
+        <td>Cifrado en tránsito: TLS/SSL, VPN/IPsec — la nube híbrida como extensión cifrada de la red</td>
+        <td class="act">10% · Actividad 1 (U2): Lab 5.1 AWS Academy (KMS)</td>
+      </tr>
+      <tr>
+        <td class="sem">7</td>
+        <td class="fechas">14–20 sep</td>
+        <td class="unidad">U2</td>
+        <td>Identidad y acceso en red: autenticación, MFA, mínimo privilegio — identidad como perímetro (Zero Trust a fondo)</td>
+        <td class="act">Ejercicio propio de control de acceso</td>
+      </tr>
+      <tr>
+        <td class="sem">8</td>
+        <td class="fechas">21–27 sep</td>
+        <td class="unidad">U2</td>
+        <td>Monitoreo y logging de red: SIEM, IDS/IPS avanzado</td>
+        <td class="act">10% · Actividad 2 (U2): Lab 6.1 AWS Academy (CloudTrail/CloudWatch)</td>
+      </tr>
+      <tr class="sinnota">
+        <td class="sem">9</td>
+        <td class="fechas">28 sep–4 oct</td>
+        <td class="unidad">U2</td>
+        <td>Hardening y gestión de vulnerabilidades: parcheo, CVEs, escaneo de vulnerabilidades</td>
+        <td class="act">Lab formativo de escaneo (Nmap/OpenVAS), sin nota</td>
+      </tr>
+      <tr class="receso">
+        <td class="sem">Receso</td>
+        <td class="fechas">5–11 oct</td>
+        <td class="unidad">—</td>
+        <td>Sin clase</td>
+        <td class="act"></td>
+      </tr>
+      <tr>
+        <td class="sem">10</td>
+        <td class="fechas">12–18 oct</td>
+        <td class="unidad">U2</td>
+        <td>Repaso Unidad 2</td>
+        <td class="act">Parcial 2 — 20% rúbrica</td>
+      </tr>
+      <tr class="sinnota">
+        <td class="sem">11</td>
+        <td class="fechas">19–25 oct</td>
+        <td class="unidad">U3</td>
+        <td>Amenazas modernas de red: ransomware, APT, movimiento lateral</td>
+        <td class="act">Lab formativo de análisis de amenazas, sin nota</td>
+      </tr>
+      <tr>
+        <td class="sem">12</td>
+        <td class="fechas">26 oct–1 nov</td>
+        <td class="unidad">U3</td>
+        <td>Respuesta a incidentes y remediación automatizada</td>
+        <td class="act">10% · Actividad 1 (U3): Lab 7.1 AWS Academy (Config + Lambda) — 1 nov: último día retiro</td>
+      </tr>
+      <tr>
+        <td class="sem">13</td>
+        <td class="fechas">2–8 nov</td>
+        <td class="unidad">U3</td>
+        <td>IA ofensiva vs. IA defensiva en redes: NDR con machine learning, phishing/deepfakes generados por IA, SASE consciente de IA</td>
+        <td class="act">—</td>
+      </tr>
+      <tr>
+        <td class="sem">14</td>
+        <td class="fechas">9–15 nov</td>
+        <td class="unidad">U3</td>
+        <td>Ethical hacking asistido por IA: introducción, herramientas, marco legal/ético</td>
+        <td class="act">10% · Actividad 2 (U3): lab de ethical hacking asistido por IA en entorno controlado</td>
+      </tr>
+      <tr>
+        <td class="sem">15–16</td>
+        <td class="fechas">16–29 nov</td>
+        <td class="unidad">U3</td>
+        <td>Cierre de Unidad 3 + repaso general</td>
+        <td class="act">Parcial 3 — 20% rúbrica. Fin de clases: 30 nov</td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<footer class="page">
+  Seguridad en Redes · Universidad de la Costa (CUC) · Periodo 2026-2
+</footer>

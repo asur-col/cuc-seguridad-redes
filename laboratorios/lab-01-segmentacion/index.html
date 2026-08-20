@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio 1 — Segmentación de Redes, Zero Trust y NAT/PAT (OPNsense) · CUC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px;
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
+    pre {
+      position: relative;
+      background: var(--code-bg); color: var(--code-ink);
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid var(--line);
+    }
+
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
+    }
+
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .rubric-weight { font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--vino); }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin: 14px 0 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagram-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .diagram-card svg { width: 100%; height: auto; display: block; }
+
+    .diagram-caption {
+      font-size: 12.5px; color: var(--ink-soft);
+      text-align: center; margin-top: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    figure.ref {
+      margin: 14px 0 24px;
+      max-width: 640px;
+    }
+
+    figure.ref img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: block;
+      background: #fff;
+    }
+
+    figure.ref img.logo-img {
+      max-width: 180px;
+      margin: 0 auto;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    figure.ref figcaption {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.5;
+    }
+
+    figure.ref figcaption a { color: var(--ink-soft); text-decoration: underline; }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    @media print {
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
+
+<div class="shell">
+  <nav class="toc" id="toc">
+    <p class="toc-label">Contenido</p>
+    <a href="#intro"><span class="badge">·</span> Introducción</a>
+    <a href="#parteA"><span class="badge">A</span> Subredes</a>
+    <a href="#parteB"><span class="badge">B</span> Instalación</a>
+    <a href="#parteC"><span class="badge">C</span> Políticas y NAT</a>
+    <a href="#parteD"><span class="badge">D</span> App Web + BD</a>
+    <a href="#parteE"><span class="badge">E</span> NAT/PAT entrante</a>
+    <a href="#parteF"><span class="badge">F</span> Entregable</a>
+    <a href="#troubleshooting"><span class="badge">·</span> Problemas</a>
+    <a href="#rubrica"><span class="badge">·</span> Rúbrica</a>
+    <a href="#referencias"><span class="badge">·</span> Referencias</a>
+    <a href="#checklist"><span class="badge">✓</span> Checklist</a>
+  </nav>
+
+  <div>
+    <header class="top portada">
+      <img class="portada-logo"
+           src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
+           onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
+           alt="Logo Universidad de la Costa (CUC)">
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes</div>
+      <h1>Laboratorio 1: Segmentación de Redes y Zero Trust</h1>
+      <p class="sub">VirtualBox + OPNsense + Alpine Linux: tres zonas de servicio aisladas, una zona de administración con escritorio gráfico, NAT de salida, una aplicación web real con su base de datos protegida, y publicación controlada del servicio por NAT/PAT</p>
+      <div class="accent-bar"></div>
+      <div class="author-block">
+        <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
+        <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
+        <span>📅 <strong>Unidad 1 · Actividad 1 (10%) · 2026-2</strong></span>
+      </div>
+    </header>
+
+    <main>
+      <section id="intro">
+        <p class="lede">En las semanas anteriores trabajaste segmentación de forma simulada en un sandbox online. Esta vez vas a construir una infraestructura <b>real</b>: un firewall OPNsense como único punto de control entre cuatro zonas, salida a Internet por NAT, una aplicación web en la DMZ conectada a una base de datos blindada en la red interna, y la publicación del servicio hacia la red WAN mediante NAT/PAT (port forwarding) — todo bajo el principio Zero Trust: <b>todo bloqueado por defecto, solo se permite lo estrictamente necesario.</b></p>
+
+        <p>Trabajarás desde una <b>máquina de administración con escritorio gráfico</b> (zona de administración), desde donde gestionarás el firewall por HTTPS y los servidores por SSH — con copiar y pegar funcionando, como en un puesto de trabajo real. El resultado final es la misma arquitectura que encontrarás en una empresa: los usuarios solo ven la aplicación web, la aplicación solo puede hablar con la base de datos por el puerto MySQL, la base de datos es invisible para todos los demás, y desde la red externa (WAN) solo entra tráfico web al puerto publicado — nada más. Todos los procedimientos están alineados con la documentación oficial de <a href="https://docs.opnsense.org/">OPNsense</a>, el <a href="https://www.virtualbox.org/manual/">manual de VirtualBox</a> y el <a href="https://docs.alpinelinux.org/">handbook de Alpine Linux</a> (enlaces en la sección de Referencias), e incluyen imágenes de referencia tomadas de esa documentación oficial.</p>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 980 660" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="fwGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#A6192E"/>
+                <stop offset="100%" stop-color="#7E1223"/>
+              </linearGradient>
+              <linearGradient id="userGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10B981" stop-opacity="0.12"/>
+                <stop offset="100%" stop-color="#047857" stop-opacity="0.04"/>
+              </linearGradient>
+              <linearGradient id="dmzGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#B45309" stop-opacity="0.05"/>
+              </linearGradient>
+              <linearGradient id="intGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.12"/>
+                <stop offset="100%" stop-color="#6D28D9" stop-opacity="0.04"/>
+              </linearGradient>
+              <linearGradient id="admGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0E7490" stop-opacity="0.12"/>
+                <stop offset="100%" stop-color="#155E75" stop-opacity="0.04"/>
+              </linearGradient>
+              <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.08"/>
+              </filter>
+            </defs>
+
+            <rect width="980" height="660" fill="none"/>
+
+            <g transform="translate(300, 12)">
+              <rect width="380" height="92" rx="12" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5" stroke-dasharray="5,4"/>
+              <g transform="translate(150, 14)">
+                <circle cx="20" cy="22" r="16" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.8"/>
+                <circle cx="44" cy="14" r="20" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.8"/>
+                <circle cx="66" cy="22" r="15" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1.8"/>
+                <rect x="14" y="22" width="60" height="18" rx="9" fill="#FFFFFF"/>
+                <line x1="14" y1="39" x2="74" y2="39" stroke="#3B82F6" stroke-width="1.8"/>
+              </g>
+              <text x="190" y="66" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="12.5" fill="#1E40AF">ZONA WAN — Internet / Red física del laboratorio</text>
+              <text x="190" y="82" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10.5" fill="#3B82F6">Adaptador Puente · IP por DHCP (ej. 192.168.1.x)</text>
+            </g>
+
+            <line x1="490" y1="104" x2="490" y2="168" stroke="#3B82F6" stroke-width="2.5"/>
+            <circle cx="490" cy="104" r="4" fill="#3B82F6"/>
+            <circle cx="490" cy="168" r="4" fill="#3B82F6"/>
+
+            <rect x="507" y="112" width="168" height="20" rx="4" fill="#FFFFFF" stroke="#3B82F6" stroke-width="1"/>
+            <text x="591" y="126" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#1E40AF">↑ NAT saliente (masquerade)</text>
+            <rect x="507" y="138" width="196" height="20" rx="4" fill="#FFFFFF" stroke="#D96514" stroke-width="1"/>
+            <text x="605" y="152" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#B45309">↓ PAT entrante: WAN:8080 → 10.20.2.10:80</text>
+
+            <g transform="translate(365, 168)" filter="url(#cardShadow)">
+              <rect width="250" height="104" rx="12" fill="url(#fwGrad)"/>
+              <g stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.4">
+                <line x1="0" y1="26" x2="250" y2="26"/>
+                <line x1="0" y1="52" x2="250" y2="52"/>
+                <line x1="0" y1="78" x2="250" y2="78"/>
+                <line x1="62" y1="0" x2="62" y2="26"/>
+                <line x1="125" y1="0" x2="125" y2="26"/>
+                <line x1="188" y1="0" x2="188" y2="26"/>
+                <line x1="31" y1="26" x2="31" y2="52"/>
+                <line x1="94" y1="26" x2="94" y2="52"/>
+                <line x1="156" y1="26" x2="156" y2="52"/>
+                <line x1="219" y1="26" x2="219" y2="52"/>
+                <line x1="62" y1="52" x2="62" y2="78"/>
+                <line x1="125" y1="52" x2="125" y2="78"/>
+                <line x1="188" y1="52" x2="188" y2="78"/>
+                <line x1="31" y1="78" x2="31" y2="104"/>
+                <line x1="94" y1="78" x2="94" y2="104"/>
+                <line x1="156" y1="78" x2="156" y2="104"/>
+                <line x1="219" y1="78" x2="219" y2="104"/>
+              </g>
+              <g transform="translate(103, 20)">
+                <path d="M22 0 L44 8 V26 C44 42 34 52 22 58 C10 52 0 42 0 26 V8 Z" fill="#FFFFFF"/>
+                <path d="M22 6 L38 12 V26 C38 38 31 46 22 51 C13 46 6 38 6 26 V12 Z" fill="#A6192E"/>
+                <path d="M15 27 L21 33 L31 21" stroke="#FFFFFF" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <text x="125" y="88" text-anchor="middle" font-family="'Fraunces', serif" font-weight="700" font-size="13.5" fill="#FFFFFF">OPNsense — Default Deny</text>
+              <text x="125" y="101" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#FDE047">LAN .0.1 · OPT1 .1.1 · OPT2 .2.1 · OPT3 .3.1</text>
+            </g>
+
+            <path d="M 420 272 L 420 310 L 130 310 L 130 350" fill="none" stroke="#10B981" stroke-width="2.5"/>
+            <path d="M 470 272 L 470 350" fill="none" stroke="#F59E0B" stroke-width="2.5"/>
+            <path d="M 520 272 L 520 310 L 610 310 L 610 350" fill="none" stroke="#8B5CF6" stroke-width="2.5"/>
+            <path d="M 555 272 L 555 322 L 850 322 L 850 350" fill="none" stroke="#0E7490" stroke-width="2.5"/>
+
+            <text x="138" y="344" text-anchor="start" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#6B6259">switch: red-usuarios</text>
+            <text x="478" y="344" text-anchor="start" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#6B6259">switch: red-dmz</text>
+            <text x="618" y="344" text-anchor="start" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#6B6259">switch: red-interna</text>
+            <text x="700" y="336" text-anchor="start" font-family="'IBM Plex Mono', monospace" font-size="8.5" fill="#6B6259">switch: red-admin</text>
+
+            <rect x="150" y="290" width="130" height="20" rx="4" fill="#FFFFFF" stroke="#10B981" stroke-width="1"/>
+            <text x="215" y="304" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#065F46">Allow TCP 80 → DMZ</text>
+
+            <rect x="540" y="290" width="150" height="20" rx="4" fill="#FFFFFF" stroke="#8B5CF6" stroke-width="1"/>
+            <text x="615" y="304" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#5B21B6">Allow 3306 solo a la BD</text>
+
+            <rect x="640" y="306" width="150" height="20" rx="4" fill="#FFFFFF" stroke="#0E7490" stroke-width="1"/>
+            <text x="715" y="320" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#155E75">Admin: HTTPS 443 + SSH 22</text>
+
+            <circle cx="275" cy="310" r="11" fill="#10B981"/>
+            <text x="275" y="314" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" font-weight="700" fill="#FFFFFF">1</text>
+            <circle cx="470" cy="316" r="11" fill="#F59E0B"/>
+            <text x="470" y="320" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" font-weight="700" fill="#FFFFFF">2</text>
+            <circle cx="565" cy="310" r="11" fill="#8B5CF6"/>
+            <text x="565" y="314" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" font-weight="700" fill="#FFFFFF">3</text>
+
+            <line x1="245" y1="450" x2="255" y2="450" stroke="#DC2626" stroke-width="2" stroke-dasharray="6,4"/>
+            <circle cx="250" cy="450" r="10" fill="#DC2626"/>
+            <text x="250" y="454" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">✗</text>
+
+            <g transform="translate(20, 350)" filter="url(#cardShadow)">
+              <rect width="220" height="190" rx="12" fill="url(#userGrad)" stroke="#10B981" stroke-width="1.5"/>
+              <rect x="0" y="0" width="220" height="32" rx="12" fill="#10B981"/>
+              <text x="110" y="21" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">USUARIOS (LAN)</text>
+              <g transform="translate(75, 44)">
+                <rect x="0" y="0" width="70" height="44" rx="5" fill="#FFFFFF" stroke="#047857" stroke-width="2"/>
+                <rect x="6" y="6" width="58" height="32" rx="2" fill="#D1FAE5"/>
+                <path d="M -10 50 L 80 50 L 72 58 L -2 58 Z" fill="#FFFFFF" stroke="#047857" stroke-width="2"/>
+              </g>
+              <text x="110" y="126" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#065F46">cliente-usuarios</text>
+              <text x="110" y="141" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#065F46">10.20.0.10/24 · GW .0.1</text>
+              <text x="110" y="166" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#065F46">Puede: DNS al FW · HTTP a la DMZ</text>
+              <text x="110" y="180" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#991B1B">Bloqueado: red interna · resto Internet</text>
+            </g>
+
+            <g transform="translate(260, 350)" filter="url(#cardShadow)">
+              <rect width="220" height="190" rx="12" fill="url(#dmzGrad)" stroke="#F59E0B" stroke-width="1.5"/>
+              <rect x="0" y="0" width="220" height="32" rx="12" fill="#F59E0B"/>
+              <text x="110" y="21" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">DMZ (OPT2)</text>
+              <g transform="translate(77, 42)">
+                <rect x="0" y="0" width="66" height="16" rx="3" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
+                <circle cx="9" cy="8" r="2.5" fill="#10B981"/>
+                <line x1="20" y1="8" x2="56" y2="8" stroke="#FDE68A" stroke-width="3"/>
+                <rect x="0" y="20" width="66" height="16" rx="3" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
+                <circle cx="9" cy="28" r="2.5" fill="#10B981"/>
+                <line x1="20" y1="28" x2="56" y2="28" stroke="#FDE68A" stroke-width="3"/>
+                <rect x="0" y="40" width="66" height="16" rx="3" fill="#FFFFFF" stroke="#B45309" stroke-width="1.8"/>
+                <circle cx="9" cy="48" r="2.5" fill="#F59E0B"/>
+                <line x1="20" y1="48" x2="56" y2="48" stroke="#FDE68A" stroke-width="3"/>
+              </g>
+              <text x="110" y="126" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#92400E">srv-web · nginx + PHP</text>
+              <text x="110" y="141" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#92400E">10.20.2.10/24 · GW .2.1</text>
+              <text x="110" y="166" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#065F46">Puede: 3306 → solo la BD · 80/443 → Int.</text>
+              <text x="110" y="180" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#991B1B">Bloqueado: → usuarios · → resto interno</text>
+            </g>
+
+            <g transform="translate(500, 350)" filter="url(#cardShadow)">
+              <rect width="220" height="190" rx="12" fill="url(#intGrad)" stroke="#8B5CF6" stroke-width="1.5"/>
+              <rect x="0" y="0" width="220" height="32" rx="12" fill="#8B5CF6"/>
+              <text x="110" y="21" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">RED INTERNA (OPT1)</text>
+              <g transform="translate(82, 42)">
+                <path d="M0 10 a28 10 0 0 1 56 0 v44 a28 10 0 0 1 -56 0 z" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2"/>
+                <ellipse cx="28" cy="10" rx="28" ry="10" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2"/>
+                <path d="M0 26 a28 10 0 0 0 56 0" fill="none" stroke="#6D28D9" stroke-width="1.4"/>
+                <path d="M0 40 a28 10 0 0 0 56 0" fill="none" stroke="#6D28D9" stroke-width="1.4"/>
+              </g>
+              <text x="110" y="126" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#5B21B6">srv-db · MariaDB :3306</text>
+              <text x="110" y="141" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#5B21B6">10.20.1.10/24 · GW .1.1</text>
+              <text x="110" y="166" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#065F46">Acepta: 3306 solo desde srv-web</text>
+              <text x="110" y="180" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#991B1B">Invisible para usuarios, WAN y resto</text>
+            </g>
+
+            <g transform="translate(740, 350)" filter="url(#cardShadow)">
+              <rect width="220" height="190" rx="12" fill="url(#admGrad)" stroke="#0E7490" stroke-width="1.5"/>
+              <rect x="0" y="0" width="220" height="32" rx="12" fill="#0E7490"/>
+              <text x="110" y="21" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="11.5" fill="#FFFFFF">ADMINISTRACIÓN (OPT3)</text>
+              <g transform="translate(72, 46)">
+                <rect x="0" y="0" width="76" height="48" rx="5" fill="#FFFFFF" stroke="#155E75" stroke-width="2"/>
+                <rect x="6" y="6" width="64" height="32" rx="2" fill="#CFFAFE"/>
+                <rect x="30" y="48" width="16" height="8" fill="#FFFFFF" stroke="#155E75" stroke-width="1.6"/>
+                <rect x="18" y="56" width="40" height="5" rx="2" fill="#FFFFFF" stroke="#155E75" stroke-width="1.6"/>
+              </g>
+              <text x="110" y="126" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#155E75">admin-gui · escritorio gráfico</text>
+              <text x="110" y="141" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#155E75">10.20.3.10/24 · GW .3.1</text>
+              <text x="110" y="166" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#065F46">Puede: HTTPS 443 al FW · SSH a las VMs</text>
+              <text x="110" y="180" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="8.8" fill="#991B1B">Bloqueado: todo lo demás</text>
+            </g>
+
+            <g transform="translate(20, 556)">
+              <rect width="940" height="92" rx="10" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1.2"/>
+              <text x="16" y="22" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="11" fill="#2A2A2A">LEYENDA</text>
+              <line x1="16" y1="42" x2="56" y2="42" stroke="#10B981" stroke-width="2.5"/>
+              <text x="64" y="46" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#4B5563">Flujo permitido (regla explícita)</text>
+              <line x1="16" y1="66" x2="56" y2="66" stroke="#DC2626" stroke-width="2" stroke-dasharray="6,4"/>
+              <text x="64" y="70" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#4B5563">Denegado por defecto: usuarios→interna · DMZ→usuarios · WAN→interna</text>
+              <line x1="400" y1="42" x2="440" y2="42" stroke="#3B82F6" stroke-width="2.5"/>
+              <text x="448" y="46" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#4B5563">WAN · NAT saliente ↑ / PAT entrante ↓</text>
+              <circle cx="418" cy="66" r="9" fill="#F59E0B"/>
+              <text x="418" y="70" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" font-weight="700" fill="#FFFFFF">n</text>
+              <text x="434" y="70" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#4B5563">Recorrido de una petición web: ① cliente → ② app DMZ → ③ BD interna</text>
+              <text x="400" y="86" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#4B5563">Las respuestas regresan solas (firewall stateful) — no necesitan reglas inversas</text>
+            </g>
+          </svg>
+          <div class="diagram-caption">Figura 1: Arquitectura del laboratorio — nube WAN, firewall OPNsense (4 interfaces internas), cliente de usuarios, servidor web en la DMZ, base de datos interna y estación de administración con GUI; con NAT saliente, PAT entrante y flujos denegados por defecto</div>
+        </div>
+      </section>
+
+      <!-- ============ PARTE A ============ -->
+      <section class="part" id="parteA">
+        <div class="part-head">
+          <span class="part-badge">A</span>
+          <h2>Subredes del Laboratorio (cómo se calculan)</h2>
+        </div>
+
+        <p>Esta sección es de referencia: <b>no es un ejercicio que debas resolver ni entregar</b>. Aquí se explica cómo se obtienen las 4 subredes que usarás en todo el laboratorio, para que entiendas de dónde salen los números que vas a configurar.</p>
+
+        <p>El bloque base es <code class="inline">10.20.0.0/22</code>. La lógica es la siguiente:</p>
+
+        <ol class="steps">
+          <li>Un prefijo <code class="inline">/22</code> equivale a la máscara <code class="inline">255.255.252.0</code>. Los primeros 22 bits son fijos; quedan 10 bits libres para hosts: 2<sup>10</sup> = 1024 direcciones, desde <code class="inline">10.20.0.0</code> hasta <code class="inline">10.20.3.255</code>.</li>
+          <li>Para crear 4 zonas del mismo tamaño se subdivide en <code class="inline">/24</code> (máscara <code class="inline">255.255.255.0</code>): cada una tiene 2<sup>8</sup> = 256 direcciones. Como 4 × 256 = 1024, el bloque se usa completo sin desperdicio ni solapamiento.</li>
+          <li>En cada <code class="inline">/24</code>: la primera dirección (<code class="inline">.0</code>) es la <b>dirección de red</b>, la última (<code class="inline">.255</code>) es el <b>broadcast</b>, y las 254 intermedias (<code class="inline">.1 – .254</code>) son hosts utilizables. Al firewall le asignamos la primera utilizable (<code class="inline">.1</code>) como gateway de cada zona.</li>
+        </ol>
+
+        <p>Estas son las 4 subredes resultantes — <b>usa exactamente estas direcciones en todas las partes del laboratorio</b>:</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Zona Funcional</th>
+                <th>Subred CIDR</th>
+                <th>Rango de Hosts Útiles</th>
+                <th>Broadcast</th>
+                <th>Gateway (OPNsense)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Red de Usuarios</td>
+                <td class="mono">10.20.0.0/24</td>
+                <td class="mono">10.20.0.1 – 10.20.0.254</td>
+                <td class="mono">10.20.0.255</td>
+                <td class="mono">10.20.0.1</td>
+              </tr>
+              <tr>
+                <td>Red Interna (Base de datos)</td>
+                <td class="mono">10.20.1.0/24</td>
+                <td class="mono">10.20.1.1 – 10.20.1.254</td>
+                <td class="mono">10.20.1.255</td>
+                <td class="mono">10.20.1.1</td>
+              </tr>
+              <tr>
+                <td>DMZ (Servidor web)</td>
+                <td class="mono">10.20.2.0/24</td>
+                <td class="mono">10.20.2.1 – 10.20.2.254</td>
+                <td class="mono">10.20.2.255</td>
+                <td class="mono">10.20.2.1</td>
+              </tr>
+              <tr>
+                <td>Red de Administración</td>
+                <td class="mono">10.20.3.0/24</td>
+                <td class="mono">10.20.3.1 – 10.20.3.254</td>
+                <td class="mono">10.20.3.255</td>
+                <td class="mono">10.20.3.1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout note">
+          <b>Si el docente te asignó un bloque distinto</b> (por ejemplo <code class="inline">10.30.0.0/22</code>): aplica la misma lógica — las 4 subredes <code class="inline">/24</code> serían <code class="inline">10.30.0.0/24</code> a <code class="inline">10.30.3.0/24</code> — y reemplaza el tercer octeto en todas las IPs de esta guía de forma consistente.
+        </div>
+      </section>
+
+      <!-- ============ PARTE B ============ -->
+      <section class="part" id="parteB">
+        <div class="part-head">
+          <span class="part-badge">B</span>
+          <h2>Instalación y Montaje (paso a paso)</h2>
+        </div>
+
+        <h3 class="sub">B.0 — Verificación de requisitos del equipo</h3>
+        <ol class="steps">
+          <li><b>Virtualización habilitada en BIOS/UEFI:</b> apaga el equipo, enciéndelo y presiona repetidamente la tecla del setup (<code class="inline">F2</code>, <code class="inline">F10</code>, <code class="inline">Del</code> o <code class="inline">Esc</code> según el fabricante). Busca en las pestañas <i>Advanced</i>, <i>CPU Configuration</i> o <i>Security</i> la opción <b>Intel VT-x</b> / <b>Intel Virtualization Technology</b> (equipos Intel) o <b>AMD-V</b> / <b>SVM Mode</b> (equipos AMD) y déjala en <b>Enabled</b>. Guarda con <code class="inline">F10</code> y reinicia.</li>
+          <li><b>RAM:</b> mínimo <b>8 GB totales</b> en tu equipo. Presupuesto del laboratorio: OPNsense (1 GB) + estación de administración con GUI (1.5 GB) + 3 VMs Alpine (512 MB c/u = 1.5 GB) ≈ <b>4 GB de VMs</b> + tu sistema operativo. Si tienes exactamente 8 GB, cierra navegadores e IDEs pesados mientras trabajas.</li>
+          <li><b>Disco:</b> al menos 35 GB libres (OPNsense ~8 GB, cada Alpine ~2 GB, la imagen de la estación de administración ~8 GB, ISOs ~1.5 GB).</li>
+          <li><b>Windows + Hyper-V:</b> si tienes Hyper-V, WSL2 o "Seguridad basada en virtualización" activos, chocan con VirtualBox (las VMs no arrancan o van extremadamente lentas). Verifica en PowerShell <b>como administrador</b> (clic derecho en el menú Inicio → <i>Terminal (Administrador)</i>):
+            <pre>Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All</pre>
+            Si el <code class="inline">State</code> aparece como <code class="inline">Enabled</code> y tus VMs fallan:
+            <pre>Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All</pre>
+            y reinicia. (Si usas WSL2 en otras materias, reactívalo después del lab con el comando inverso <code class="inline">Enable-WindowsOptionalFeature</code>.)</li>
+        </ol>
+
+        <h3 class="sub">B.1 — Instalación de VirtualBox</h3>
+        <p class="docref">Referencia oficial: <a href="https://www.virtualbox.org/manual/ch01.html">VirtualBox Manual, Cap. 1 — First Steps</a></p>
+        <ol class="steps">
+          <li>Abre tu navegador y ve a <code class="inline">virtualbox.org/wiki/Downloads</code>. Descarga el paquete de plataforma según tu sistema:
+            <ul class="plain">
+              <li><b>Windows:</b> "Windows hosts" → obtienes un <code class="inline">.exe</code>. Ejecútalo con clic derecho → <i>Ejecutar como administrador</i>. Durante la instalación, Windows preguntará varias veces si deseas instalar "software de dispositivo" de Oracle (son los adaptadores de red virtual): acepta todos. Si Windows advierte que la red se desconectará un momento, es normal.</li>
+              <li><b>macOS (Intel):</b> "macOS / Intel hosts" → abre el <code class="inline">.dmg</code> descargado y haz doble clic en <code class="inline">VirtualBox.pkg</code>. Si macOS bloquea la instalación, ve a <i>Ajustes del Sistema → Privacidad y Seguridad</i> y pulsa "Permitir" junto al mensaje sobre software de Oracle; luego reinicia el Mac.</li>
+              <li><b>macOS (Apple Silicon M1/M2/M3):</b> descarga la versión "ARM64" de VirtualBox 7.x. OPNsense y Alpine tienen imágenes ARM64. Si algo no funciona en ARM, avisa al docente el primer día.</li>
+              <li><b>Linux (Debian/Ubuntu):</b> <code class="inline">sudo apt update && sudo apt install virtualbox</code>. En Fedora: <code class="inline">sudo dnf install VirtualBox</code>. En openSUSE: <code class="inline">sudo zypper install virtualbox</code>.</li>
+            </ul>
+          </li>
+          <li>Abre VirtualBox. Debes ver la ventana del <b>VirtualBox Manager</b> vacía, sin mensajes de error en la parte inferior. Según el manual oficial, esta ventana tiene dos paneles: la lista de máquinas a la izquierda y el panel de detalles a la derecha, con los botones <b>Nueva</b>, <b>Configuración</b> e <b>Iniciar</b> en la barra superior — los usarás en toda esta parte.</li>
+        </ol>
+
+        <figure class="ref">
+          <img src="https://www.virtualbox.org/manual/images/virtualbox-main.png" alt="VirtualBox Manager, ventana principal" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Referencia oficial: VirtualBox Manager, la ventana principal desde donde crearás y configurarás todas las VMs. Fuente: <a href="https://www.virtualbox.org/manual/ch01.html">Manual de VirtualBox, Cap. 1</a></figcaption>
+        </figure>
+
+        <h3 class="sub">B.2 — Creación e instalación de la VM OPNsense</h3>
+        <p class="docref">Referencias oficiales: <a href="https://docs.opnsense.org/manual/install.html">OPNsense — Initial Installation &amp; Configuration</a> · <a href="https://docs.opnsense.org/manual/virtuals.html">OPNsense — Virtual &amp; Cloud-Based Installation</a></p>
+        <ol class="steps">
+          <li>Ve a <code class="inline">opnsense.org/download</code>. Selecciona: arquitectura <b>amd64</b>, tipo de imagen <b>dvd</b> (según la tabla oficial de tipos de imagen: <i>imagen ISO que arranca en un entorno en vivo en modo VGA con soporte UEFI</i>), y el mirror más cercano a Colombia. El archivo descargado termina en <code class="inline">.bz2</code>: debes descomprimirlo para obtener el <code class="inline">.iso</code>.
+            <ul class="plain">
+              <li><b>Windows:</b> usa 7-Zip (gratis, <code class="inline">7-zip.org</code>) → clic derecho sobre el archivo → <i>7-Zip → Extraer aquí</i>.</li>
+              <li><b>macOS:</b> doble clic sobre el <code class="inline">.bz2</code> (el sistema lo descomprime solo) o <code class="inline">bunzip2 archivo.bz2</code> en Terminal.</li>
+              <li><b>Linux:</b> <code class="inline">bunzip2 opnsense-*.bz2</code>.</li>
+            </ul>
+          </li>
+          <li><b>(Buena práctica, opcional) Verifica la integridad de la imagen</b> como indica la documentación oficial: descarga también el archivo <code class="inline">.sha256</code> del mismo mirror y compara el hash:
+            <pre>openssl sha256 OPNsense-*-dvd-amd64.iso</pre>
+            La salida debe coincidir con el valor publicado para esa imagen. Si no coincide, vuelve a descargarla.</li>
+          <li>En VirtualBox pulsa <b>Nueva</b>. En el asistente <i>Create Virtual Machine</i>: Nombre <code class="inline">OPNsense</code> → Carpeta: la que propone por defecto → en <b>ISO Image</b> selecciona la ISO de OPNsense (el asistente la montará automáticamente en la unidad DVD de la VM) → Tipo <b>BSD</b> → Versión <b>FreeBSD (64-bit)</b>. Si el asistente ofrece "unattended installation", marca <b>Skip Unattended Installation</b> — la instalación de OPNsense se hace manualmente desde su consola. Pulsa <b>Siguiente</b>.</li>
+          <li>Memoria base: <b>1024 MB (1 GB)</b> — suficiente para este laboratorio porque el firewall solo enrutará y filtrará unas pocas VMs (sin IDS/IPS ni proxies pesados). Procesadores: <b>1–2</b>. Pulsa <b>Siguiente</b>.
+            <br><span style="font-size:13px; color:var(--ink-soft);">Nota: la documentación oficial recomienda 3 GB como mínimo general para VMs; si el instalador llegara a fallar con el error conocido <i>"File copy failed during installation"</i> (problema documentado por falta de memoria), apaga la VM, súbela a 2048 MB y reintenta.</span></li>
+          <li>Disco duro: "Crear un disco duro virtual ahora" → tamaño <b>16 GB</b> (el mínimo recomendado oficialmente es 8 GB), sin marcar "Pre-Allocate Full Size" (asignación dinámica). Pulsa <b>Siguiente</b> y <b>Finalizar</b>.</li>
+          <li>Con la VM seleccionada, pulsa <b>Configuración</b> → sección <b>Red</b>. Configura los <b>5 adaptadores</b> (cada uno en su pestaña):
+            <ul class="plain">
+              <li><b>Adaptador 1 (WAN):</b> marca "Habilitar adaptador de red" → en "Conectado a:" elige <b>Adaptador puente</b> → en "Nombre:" selecciona tu tarjeta de red física activa (la que tiene Internet: tu Wi-Fi o tu Ethernet). Este adaptador recibirá una IP por DHCP de tu red real.</li>
+              <li><b>Adaptador 2 (LAN):</b> habilítalo → "Conectado a:" <b>Red interna</b> → en "Nombre:" escribe exactamente <code class="inline">red-usuarios</code>.</li>
+              <li><b>Adaptador 3 (OPT1):</b> habilítalo → "Red interna" → nombre exacto <code class="inline">red-interna</code>.</li>
+              <li><b>Adaptador 4 (OPT2):</b> habilítalo → "Red interna" → nombre exacto <code class="inline">red-dmz</code>.</li>
+              <li><b>Adaptador 5 (OPT3):</b> habilítalo → "Red interna" → nombre exacto <code class="inline">red-admin</code>. Esta es la <b>zona de administración</b>: por aquí gestionarás el firewall, sin exponer la WAN.</li>
+            </ul>
+            Los nombres de las redes internas son sensibles a mayúsculas: escríbelos tal cual, porque las VMs cliente deben usar los mismos nombres para quedar conectadas al mismo "switch virtual".</li>
+          <li>Arranca la VM (botón <b>Iniciar</b>). El sistema arranca en el <b>entorno en vivo</b> (live environment): verás texto desplazándose durante 1–2 minutos. Cuando aparezca el prompt <code class="inline">login:</code> inicia sesión con usuario <code class="inline">installer</code> y contraseña <code class="inline">opnsense</code> — según la documentación oficial, este es el usuario que invoca el instalador (si entraras como <code class="inline">root</code>, con la misma contraseña <code class="inline">opnsense</code>, solo abrirías el sistema en vivo sin instalar nada).</li>
+          <li>El instalador te guía por estas pantallas (secuencia oficial):
+            <ul class="plain">
+              <li><b>Keymap selection:</b> acepta el mapa por defecto con Enter (o busca "Latin American" si prefieres).</li>
+              <li><b>Install (UFS|ZFS):</b> elige <b>UFS</b>. (La documentación señala que ZFS es la opción más robusta, pero exige más capacidad y memoria; para este laboratorio UFS es suficiente y más liviano.)</li>
+              <li><b>Disk Selection:</b> selecciona el disco virtual (<code class="inline">ada0</code> o <code class="inline">vtbd0</code>, será el único de ~16 GB).</li>
+              <li><b>Last Chance!:</b> confirma con <b>Yes</b> — se formateará el disco virtual (está vacío, no pierdes nada).</li>
+              <li><b>Continue with recommended swap (UFS):</b> acepta con <b>Yes</b>.</li>
+              <li><b>Root Password:</b> define y confirma una contraseña de root que recuerdes — será también la de la interfaz web.</li>
+              <li><b>Complete Install:</b> al seleccionarlo, el instalador termina y reinicia la máquina.</li>
+            </ul>
+          </li>
+          <li><b>Importante:</b> mientras la VM se apaga para reiniciar, ve al menú de la ventana de VirtualBox: <i>Dispositivos → Unidades ópticas → Eliminar disco de la unidad virtual</i>. Si no lo haces, la VM volverá a arrancar el instalador.</li>
+        </ol>
+
+        <figure class="ref">
+          <img src="https://docs.opnsense.org/_images/serial_bootloader.png" alt="Gestor de arranque de OPNsense" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Referencia oficial: gestor de arranque (bootloader) de OPNsense al iniciar desde la imagen de instalación. Fuente: <a href="https://docs.opnsense.org/manual/how-tos/serial_access.html">documentación de OPNsense</a></figcaption>
+        </figure>
+
+        <figure class="ref">
+          <img src="https://www.virtualbox.org/manual/images/vm-settings-harddisk.png" alt="Configuración de almacenamiento de una VM en VirtualBox" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Referencia oficial: ventana de configuración de almacenamiento de una VM — aquí es donde se monta la ISO en la unidad óptica virtual. Fuente: <a href="https://www.virtualbox.org/manual/">Manual de VirtualBox</a></figcaption>
+        </figure>
+
+        <h3 class="sub">B.3 — Asignación de interfaces y direcciones IP en OPNsense</h3>
+        <p class="docref">Referencia oficial: <a href="https://docs.opnsense.org/manual/install.html">OPNsense — Initial Configuration (menú de consola)</a></p>
+        <p>Tras el reinicio, la consola mostrará el mensaje de bienvenida y el menú de 14 opciones. Esto es <b>exactamente</b> lo que verás al final de esta sección (texto basado en la documentación oficial):</p>
+        <pre>*** Welcome to OPNsense 25.x (amd64) on OPNsense ***
+
+ WAN  (em0) -> v4/DHCP4: 192.168.1.50/24
+ LAN  (em1) -> v4: 10.20.0.1/24
+ OPT1 (em2) -> v4: 10.20.1.1/24
+ OPT2 (em3) -> v4: 10.20.2.1/24
+ OPT3 (em4) -> v4: 10.20.3.1/24
+
+ 0) Logout                         7) Ping host
+ 1) Assign interfaces              8) Shell
+ 2) Set interface(s) IP address    9) pfTop
+ 3) Reset the root password       10) Filter logs
+ 4) Reset to factory defaults     11) Restart web interface
+ 5) Reboot system                 12) Upgrade from console
+ 6) Halt system                   13) Restore a configuration</pre>
+        <p style="font-size:13.5px; color:var(--ink-soft);"><i>Ejemplo ilustrativo basado en el menú de consola documentado oficialmente — tu IP de WAN y la versión variarán.</i></p>
+        <ol class="steps">
+          <li>Inicia sesión en la consola con usuario <code class="inline">root</code> y la contraseña que definiste en la instalación. Selecciona <b>1) Assign interfaces</b> escribiendo <code class="inline">1</code> y Enter.</li>
+          <li>Cuando pregunte <i>"Do you want to configure VLANs now?"</i> escribe <code class="inline">n</code> y Enter (la documentación oficial confirma que las VLANs son opcionales y se pueden configurar después; aquí usamos adaptadores virtuales separados).</li>
+          <li>Te pedirá el nombre de cada interfaz. Los nombres disponibles serán algo como <code class="inline">em0 em1 em2 em3 em4</code> (o <code class="inline">vtnet0..vtnet4</code>). Asigna en este orden:
+            <ul class="plain">
+              <li><b>WAN:</b> <code class="inline">em0</code> — corresponde al Adaptador 1 (puente).</li>
+              <li><b>LAN:</b> <code class="inline">em1</code> — Adaptador 2 (red-usuarios).</li>
+              <li><b>Optional 1 (OPT1):</b> <code class="inline">em2</code> — Adaptador 3 (red-interna).</li>
+              <li><b>Optional 2 (OPT2):</b> <code class="inline">em3</code> — Adaptador 4 (red-dmz).</li>
+              <li><b>Optional 3 (OPT3):</b> <code class="inline">em4</code> — Adaptador 5 (red-admin).</li>
+            </ul>
+            Cuando pregunte <i>"Do you want to proceed?"</i> responde <code class="inline">y</code>. La consola recargará y mostrará las 5 interfaces. La WAN debería mostrar una IP de tu red real (por ejemplo <code class="inline">192.168.1.50</code>) — si la WAN no tiene IP, revisa que el Adaptador 1 esté en modo puente sobre la tarjeta correcta.</li>
+          <li>Selecciona <b>2) Set interface(s) IP address</b> → escribe el número de <b>LAN</b> y responde así:
+            <pre>Enter the new LAN IPv4 address: 10.20.0.1
+Enter the new LAN IPv4 subnet bit count: 24
+Enter the new LAN IPv4 upstream gateway address: (presiona Enter — none)
+Do you want to configure IPv6: n
+Do you want to enable the DHCP server on LAN: n
+Do you want to revert to HTTP as the webConfigurator protocol: n</pre>
+          </li>
+          <li>Repite la opción 2 para las demás interfaces internas, siempre sin gateway, sin IPv6 y sin DHCP:
+            <ul class="plain">
+              <li><b>OPT1:</b> <code class="inline">10.20.1.1</code> / 24</li>
+              <li><b>OPT2:</b> <code class="inline">10.20.2.1</code> / 24</li>
+              <li><b>OPT3:</b> <code class="inline">10.20.3.1</code> / 24</li>
+            </ul>
+          </li>
+          <li>Verificación: selecciona <b>8) Shell</b>, ejecuta <code class="inline">ifconfig | grep "inet "</code> y confirma que ves las 4 IPs internas (<code class="inline">10.20.0.1</code>, <code class="inline">10.20.1.1</code>, <code class="inline">10.20.2.1</code>, <code class="inline">10.20.3.1</code>) en interfaces distintas. Escribe <code class="inline">exit</code> para volver al menú.</li>
+        </ol>
+
+        <h3 class="sub">B.4 — Estación de administración con escritorio gráfico (imagen OSBoxes)</h3>
+        <p>En lugar de exponer la administración del firewall hacia la WAN, vas a trabajar como en una empresa real: desde una <b>estación de administración</b> dentro de una zona dedicada (<code class="inline">red-admin</code>). Esta VM tiene escritorio gráfico y navegador, y además resuelve un problema práctico importante: <b>la consola cruda de VirtualBox no permite copiar y pegar</b> — desde esta VM podrás pegar comandos por SSH a los servidores Alpine y copiar archivos con <code class="inline">scp</code>.</p>
+        <p>Para no instalar un sistema desde cero, usarás una <b>imagen VDI pre-construida de OSBoxes</b> (imágenes oficiales listas para VirtualBox):</p>
+        <ol class="steps">
+          <li>Ve a <code class="inline">osboxes.org</code> → sección <b>Lubuntu</b> (escritorio LXQt, muy liviano; como alternativa equivalente sirve <b>Xubuntu</b> o <b>MX Linux</b>) → descarga la imagen para <b>VirtualBox (VDI, 64-bit)</b> de la versión más reciente. El archivo viene comprimido (<code class="inline">.7z</code> o <code class="inline">.zip</code>): extráelo hasta obtener el <code class="inline">.vdi</code> (~4–8 GB).</li>
+          <li>En VirtualBox pulsa <b>Nueva</b>: Nombre <code class="inline">admin-gui</code> → Tipo <b>Linux</b> → Versión <b>Ubuntu (64-bit)</b> → <b>Siguiente</b>.</li>
+          <li>Memoria: <b>1536 MB (1.5 GB)</b>. Procesadores: <b>2</b>. <b>Siguiente</b>.</li>
+          <li>En la pantalla de disco duro elige <b>"Usar un archivo de disco duro virtual existente"</b> → pulsa el ícono de carpeta → <b>Añadir</b> → selecciona el <code class="inline">.vdi</code> que extrajiste → <b>Elegir</b> → <b>Finalizar</b>. (No instales nada: el sistema ya viene instalado en la imagen.)</li>
+          <li>Con la VM seleccionada, entra a <b>Configuración</b>:
+            <ul class="plain">
+              <li><b>General → Avanzado:</b> pon <b>Portapapeles compartido</b> en <b>Bidireccional</b> y <b>Arrastrar y soltar</b> en <b>Bidireccional</b> — así podrás copiar comandos desde esta guía en tu equipo y pegarlos dentro de la VM.</li>
+              <li><b>Pantalla:</b> sube la memoria de vídeo a <b>64 MB</b>.</li>
+              <li><b>Red → Adaptador 1:</b> habilítalo → "Conectado a:" <b>Red interna</b> → Nombre exacto <code class="inline">red-admin</code>.</li>
+            </ul>
+          </li>
+          <li>Arranca la VM. Inicia sesión con las credenciales por defecto de OSBoxes: usuario <code class="inline">osboxes</code>, contraseña <code class="inline">osboxes.org</code>. (Para tareas de administrador usa <code class="inline">sudo</code> en la terminal; la contraseña es la misma.)</li>
+          <li>Configura la IP estática desde la interfaz gráfica: clic en el ícono de red de la barra inferior (o superior, según el escritorio) → <i>Edit Connections</i> (o "Configuración de red") → selecciona la conexión cableada → pestaña <b>IPv4</b> → Método <b>Manual</b> → <b>Add</b> y escribe: Address <code class="inline">10.20.3.10</code>, Netmask <code class="inline">24</code>, Gateway <code class="inline">10.20.3.1</code> → en DNS escribe <code class="inline">10.20.3.1</code> → <b>Save</b>. Desconecta y reconecta la red (clic en el ícono → desactivar/activar la conexión) para aplicar.</li>
+          <li>Verifica desde una terminal dentro de la VM (menú de aplicaciones → <i>Terminal</i>):
+            <pre>ip addr show | grep 10.20.3.10
+ping -c 3 10.20.3.1</pre>
+            Debes ver tu IP y recibir respuestas del firewall (el ping al gateway funciona incluso sin reglas nuevas porque la interfaz OPT3 responde a su propia red).</li>
+          <li><b>Prueba el portapapeles compartido:</b> copia un texto cualquiera en tu equipo anfitrión y pégalo en la terminal de la VM. Si no funciona, las Guest Additions no están activas: no te detengas — podrás instalarlas al final de la Parte C con <code class="inline">sudo apt update && sudo apt install virtualbox-guest-utils virtualbox-guest-x11</code> y reiniciando la VM (mientras tanto, el trabajo por SSH desde esta VM no depende del portapapeles).</li>
+        </ol>
+
+        <figure class="ref">
+          <img src="https://www.virtualbox.org/manual/images/vm-vista-running.png" alt="Máquina virtual con escritorio gráfico corriendo en VirtualBox" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Referencia oficial: una VM con sistema operativo de escritorio corriendo dentro de VirtualBox — así se verá tu estación de administración. Fuente: <a href="https://www.virtualbox.org/manual/">Manual de VirtualBox</a></figcaption>
+        </figure>
+
+        <h3 class="sub">B.5 — Acceso a la interfaz web de OPNsense (sin exponer la WAN)</h3>
+        <p>La interfaz web de OPNsense escucha en todas las interfaces, pero el firewall solo permite entrar por LAN por defecto — y tu estación de administración está en OPT3. El orden correcto y seguro es: <b>primero crear la regla de administración, y solo después reactivar el firewall</b>, verificando que nunca te bloqueas a ti mismo. Este es el flujo completo:</p>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 980 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="cardShadow2" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.08"/>
+              </filter>
+            </defs>
+            <rect width="980" height="240" fill="none"/>
+
+            <g transform="translate(20, 30)" filter="url(#cardShadow2)">
+              <rect width="280" height="150" rx="12" fill="#FFFFFF" stroke="#A6192E" stroke-width="1.5"/>
+              <rect x="0" y="0" width="280" height="30" rx="12" fill="#A6192E"/>
+              <text x="140" y="20" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">① Consola de OPNsense (VirtualBox)</text>
+              <text x="140" y="56" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10.5" fill="#2A2A2A">Opción 8) Shell</text>
+              <rect x="40" y="68" width="200" height="26" rx="5" fill="#F1EADA" stroke="#E5DCCB"/>
+              <text x="140" y="85" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" font-weight="700" fill="#4A4030">pfctl -d</text>
+              <text x="140" y="112" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#6B6259">Firewall en pausa (temporal)</text>
+              <text x="140" y="128" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#6B6259">solo para crear la regla</text>
+            </g>
+
+            <path d="M 308 105 L 348 105" stroke="#A9791C" stroke-width="2.5"/>
+            <polygon points="348,105 340,100 340,110" fill="#A9791C"/>
+
+            <g transform="translate(356, 30)" filter="url(#cardShadow2)">
+              <rect width="280" height="150" rx="12" fill="#FFFFFF" stroke="#0E7490" stroke-width="1.5"/>
+              <rect x="0" y="0" width="280" height="30" rx="12" fill="#0E7490"/>
+              <text x="140" y="20" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">② Navegador en admin-gui</text>
+              <rect x="40" y="42" width="200" height="26" rx="5" fill="#F1EADA" stroke="#E5DCCB"/>
+              <text x="140" y="59" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" font-weight="700" fill="#4A4030">https://10.20.3.1</text>
+              <text x="140" y="86" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#6B6259">Wizard inicial + crear la regla:</text>
+              <text x="140" y="104" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" font-weight="700" fill="#155E75">Pass TCP · OPT3 net → This firewall · 443</text>
+              <text x="140" y="122" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#6B6259">Firewall → Rules → OPT3 → Add → Apply</text>
+            </g>
+
+            <path d="M 644 105 L 684 105" stroke="#A9791C" stroke-width="2.5"/>
+            <polygon points="684,105 676,100 676,110" fill="#A9791C"/>
+
+            <g transform="translate(692, 30)" filter="url(#cardShadow2)">
+              <rect width="268" height="150" rx="12" fill="#FFFFFF" stroke="#1B8A5A" stroke-width="1.5"/>
+              <rect x="0" y="0" width="268" height="30" rx="12" fill="#1B8A5A"/>
+              <text x="134" y="20" text-anchor="middle" font-family="'IBM Plex Sans', sans-serif" font-weight="700" font-size="12" fill="#FFFFFF">③ Consola de OPNsense</text>
+              <rect x="36" y="42" width="196" height="26" rx="5" fill="#F1EADA" stroke="#E5DCCB"/>
+              <text x="134" y="59" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" font-weight="700" fill="#4A4030">pfctl -e</text>
+              <text x="134" y="86" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#6B6259">Firewall activo de nuevo</text>
+              <text x="134" y="106" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" font-weight="700" fill="#0a7a3d">✓ Recarga https://10.20.3.1</text>
+              <text x="134" y="124" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="9.5" fill="#0a7a3d">debe seguir funcionando</text>
+            </g>
+
+            <text x="490" y="215" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="10" fill="#6B6259">Todo el tráfico de administración viaja por la red interna red-admin (10.20.3.0/24) — la WAN nunca expone la gestión del firewall</text>
+          </svg>
+          <div class="diagram-caption">Figura 2: Secuencia segura para habilitar la administración web — primero la regla, después el firewall</div>
+        </div>
+
+        <ol class="steps">
+          <li>En la consola de OPNsense selecciona <b>8) Shell</b> y pausa temporalmente el firewall:
+            <pre>pfctl -d</pre>
+            (Como advierte la documentación oficial de NAT, desactivar <code class="inline">pf</code> también desactiva el NAT — es solo por un momento, mientras creas la regla.)</li>
+          <li>En la VM <code class="inline">admin-gui</code>, abre el navegador (Firefox o el que incluya el escritorio) y ve a <code class="inline">https://10.20.3.1</code>. Acepta la advertencia de certificado autofirmado (<i>Avanzado → Aceptar el riesgo y continuar</i>). Entra con <code class="inline">root</code> y tu contraseña.</li>
+          <li>Completa el asistente inicial (<i>System → Wizard</i>): hostname <code class="inline">fw-lab</code>, dominio <code class="inline">lab.local</code>, DNS primario <code class="inline">1.1.1.1</code> y secundario <code class="inline">9.9.9.9</code>, zona horaria <b>America/Bogota</b>. En la pantalla de la WAN <b>desmarca "Block private networks and loopback addresses"</b>: no la necesitas para administrar (la gestión entra por OPT3), pero en la Parte E publicarás un servicio hacia tu red física — que es privada RFC1918 — y con esa casilla marcada el port forward no respondería. Finaliza el wizard.</li>
+          <li><b>Crea la regla de administración ahora, antes de reactivar el firewall:</b> <b>Firewall → Rules → OPT3</b> → <b>Add</b>:
+            <ul class="plain">
+              <li><b>Action:</b> Pass · <b>Interface:</b> OPT3 · <b>TCP/IP Version:</b> IPv4 · <b>Protocol:</b> TCP</li>
+              <li><b>Source:</b> OPT3 net</li>
+              <li><b>Destination:</b> This firewall</li>
+              <li><b>Destination port range:</b> HTTPS (443)</li>
+              <li><b>Description:</b> <code class="inline">Admin web UI desde red-admin</code></li>
+            </ul>
+            <b>Save</b> → <b>Apply changes</b>.</li>
+          <li>Aprovecha para renombrar las interfaces y que todo sea legible: <b>Interfaces → [OPT1]</b> → Description <code class="inline">INTERNA</code> → Save; <b>Interfaces → [OPT2]</b> → <code class="inline">DMZ</code> → Save; <b>Interfaces → [OPT3]</b> → <code class="inline">ADMIN</code> → Save. Desde ahora los menús mostrarán esos nombres.</li>
+          <li>Vuelve a la consola de OPNsense (opción 8) y <b>reactiva el firewall</b>:
+            <pre>pfctl -e</pre>
+          </li>
+          <li><b>Verificación obligatoria:</b> recarga <code class="inline">https://10.20.3.1</code> en el navegador de admin-gui. Debe seguir cargando con el firewall activo. Si no carga, no entres en pánico: vuelve a la consola, <code class="inline">pfctl -d</code>, revisa la regla (¿Source = OPT3 net? ¿Destination = This firewall? ¿puerto 443? ¿Apply changes?), corrige y repite desde el paso 6.</li>
+          <li><b>Ajuste recomendado para VMs (documentación oficial):</b> ve a <b>Interfaces → Settings</b> y marca las casillas para deshabilitar <i>hardware checksum offloading</i>, <i>hardware TCP segmentation offloading</i> y <i>hardware large receive offload</i>. La documentación de instalación virtual de OPNsense recomienda desactivar estos off-loadings en hipervisores. Guarda y aplica.</li>
+          <li><b>Actualiza el sistema (buena práctica documentada):</b> la documentación oficial indica que las imágenes se publican con los releases de enero y julio, y recomienda actualizar después de instalar. Ve a <b>System → Firmware → Updates</b>, pulsa <b>Check for updates</b> y aplica lo que aparezca. Como tu WAN tiene salida a Internet por DHCP, la actualización funcionará directamente.</li>
+        </ol>
+
+        <figure class="ref">
+          <img src="https://docs.opnsense.org/_images/firmware-update.png" alt="Pantalla System → Firmware → Updates de OPNsense" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Referencia oficial: pantalla <i>System → Firmware → Updates</i> de OPNsense, donde aplicarás las actualizaciones posteriores a la instalación. Fuente: <a href="https://docs.opnsense.org/manual/install.html">documentación de OPNsense</a></figcaption>
+        </figure>
+
+        <div class="callout warn">
+          <b>Advertencia crítica (igual que en labs anteriores):</b> nunca reactives el firewall (<code class="inline">pfctl -e</code>) ni apliques una política restrictiva sin haber creado y aplicado primero la regla que te permite administrar. La regla "Admin web UI desde red-admin" es tu puerta de entrada — verifícala siempre antes de endurecer nada más.
+        </div>
+
+        <h3 class="sub">B.6 — Creación e instalación de las 3 VMs Alpine Linux</h3>
+        <p class="docref">Referencias oficiales: <a href="https://www.virtualbox.org/manual/ch01.html">VirtualBox Manual, Cap. 1 — Create Virtual Machine wizard</a> · <a href="https://docs.alpinelinux.org/user-handbook/0.1a/Installing/setup_alpine.html">Alpine Linux Handbook — setup-alpine</a></p>
+        <p>Vas a crear tres máquinas virtuales ligeras, una por cada zona de servicio:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>VM</th><th>Red interna (VirtualBox)</th><th>IP estática</th><th>Gateway</th><th>DNS</th><th>Rol final</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">cliente-usuarios</td><td class="mono">red-usuarios</td><td class="mono">10.20.0.10/24</td><td class="mono">10.20.0.1</td><td class="mono">10.20.0.1</td><td>Cliente que navega la app web</td></tr>
+              <tr><td class="mono">srv-db</td><td class="mono">red-interna</td><td class="mono">10.20.1.10/24</td><td class="mono">10.20.1.1</td><td class="mono">10.20.1.1</td><td>Servidor MariaDB (base de datos)</td></tr>
+              <tr><td class="mono">srv-web</td><td class="mono">red-dmz</td><td class="mono">10.20.2.10/24</td><td class="mono">10.20.2.1</td><td class="mono">10.20.2.1</td><td>Servidor nginx + PHP (aplicación)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ol class="steps">
+          <li>Ve a <code class="inline">alpinelinux.org/downloads</code> y descarga la imagen <b>Standard</b> para arquitectura <b>x86_64</b> (~200 MB; es un <code class="inline">.iso</code>, no necesita descompresión).</li>
+          <li>En VirtualBox pulsa <b>Nueva</b>: Nombre <code class="inline">cliente-usuarios</code> → en <b>ISO Image</b> selecciona la ISO de Alpine → Tipo <b>Linux</b> → Versión <b>Other Linux (64-bit)</b> → marca <b>Skip Unattended Installation</b> si aparece → <b>Siguiente</b>.</li>
+          <li>Memoria: <b>512 MB</b>. Procesadores: <b>1</b>. Disco: <b>2 GB</b> sin pre-asignación completa. Pulsa <b>Siguiente</b> y <b>Finalizar</b>.</li>
+          <li>Entra a <b>Configuración → Red → Adaptador 1</b>: habilítalo, "Conectado a:" <b>Red interna</b>, Nombre exacto <code class="inline">red-usuarios</code>. Arranca la VM.</li>
+          <li>Cuando aparezca <code class="inline">localhost login:</code> escribe <code class="inline">root</code> (Alpine en vivo no pide contraseña). Luego ejecuta:
+            <pre>setup-alpine</pre>
+          </li>
+          <li>Responde el asistente exactamente así (el handbook oficial de Alpine describe este mismo flujo):
+            <ul class="plain">
+              <li><b>Select keyboard layout:</b> escribe <code class="inline">es</code> → <b>Select variant:</b> escribe <code class="inline">es</code>.</li>
+              <li><b>Enter system hostname:</b> <code class="inline">cliente-usuarios</code>.</li>
+              <li><b>Which one do you want to initialize? (eth0):</b> presiona Enter (acepta eth0).</li>
+              <li><b>Ip address for eth0? (dhcp):</b> escribe <code class="inline">10.20.0.10</code> (¡escribe la IP, no aceptes dhcp!).</li>
+              <li><b>Netmask:</b> <code class="inline">255.255.255.0</code>.</li>
+              <li><b>Gateway:</b> <code class="inline">10.20.0.1</code>.</li>
+              <li><b>Do you want to do any manual network configuration?:</b> <code class="inline">n</code>.</li>
+              <li><b>DNS domain name:</b> presiona Enter (vacío). <b>DNS nameserver(s):</b> <code class="inline">10.20.0.1</code>.</li>
+              <li><b>New password for root:</b> escribe una contraseña de laboratorio dos veces (no se ve mientras escribes, es normal).</li>
+              <li><b>Which timezone?:</b> <code class="inline">America/Bogota</code>.</li>
+              <li><b>HTTP/FTP proxy URL:</b> Enter (ninguno).</li>
+              <li><b>Enter mirror number or URL:</b> como aún no has configurado NAT (Parte C), la detección de mirror puede fallar — no pasa nada: elige <code class="inline">none</code> si lo ofrece, o deja que falle y continúa. Lo arreglarás en la Parte C ejecutando <code class="inline">setup-apkrepos</code>.</li>
+              <li><b>Which SSH server?:</b> <code class="inline">openssh</code> ← <b>importante</b>: esto te permitirá administrar cada VM por SSH desde la estación admin-gui (copiar y pegar incluido), en lugar de teclear todo en la consola cruda de VirtualBox.</li>
+              <li><b>Which disk(s) would you like to use?:</b> <code class="inline">sda</code>.</li>
+              <li><b>How would you like to use it?:</b> <code class="inline">sys</code>.</li>
+              <li><b>Erase the above disk and continue? (y/n):</b> <code class="inline">y</code>. Espera a que copie el sistema (~1 minuto).</li>
+            </ul>
+          </li>
+          <li>Cuando vuelva el prompt, ejecuta <code class="inline">poweroff</code>. Desmonta la ISO de Alpine (<i>Dispositivos → Unidades ópticas → Eliminar disco</i>) y enciende la VM de nuevo. Entra como <code class="inline">root</code> con tu contraseña.</li>
+          <li><b>Habilita el acceso SSH de root</b> (necesario porque por defecto OpenSSH lo bloquea). Este es el <b>único comando largo que teclearás a mano</b> en la consola de cada VM:
+            <pre>sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+rc-service sshd restart</pre>
+            <b>Nota de seguridad:</b> <code class="inline">PermitRootLogin yes</code> es aceptable solo en este laboratorio aislado. En producción jamás se habilita: se crea un usuario normal con <code class="inline">sudo</code> y llaves SSH.</li>
+          <li>Verifica la red:
+            <pre>ip addr show eth0
+ip route
+cat /etc/resolv.conf</pre>
+            Debes ver tu IP <code class="inline">10.20.0.10/24</code>, una línea <code class="inline">default via 10.20.0.1</code> y <code class="inline">nameserver 10.20.0.1</code>.</li>
+          <li>Repite los pasos 2 a 9 para las otras dos VMs, cambiando nombre, red interna e IPs según la tabla: <code class="inline">srv-db</code> (red <code class="inline">red-interna</code>, IP <code class="inline">10.20.1.10</code>, GW/DNS <code class="inline">10.20.1.1</code>) y <code class="inline">srv-web</code> (red <code class="inline">red-dmz</code>, IP <code class="inline">10.20.2.10</code>, GW/DNS <code class="inline">10.20.2.1</code>).</li>
+        </ol>
+
+        <figure class="ref" style="text-align:center;">
+          <img class="logo-img" src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Alpine_Linux_logo.png" alt="Logo de Alpine Linux" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Alpine Linux — "Small. Simple. Secure." La guía sigue el flujo del asistente <code>setup-alpine</code> descrito en el <a href="https://docs.alpinelinux.org/user-handbook/0.1a/Installing/setup_alpine.html">handbook oficial</a> y en la <a href="https://wiki.alpinelinux.org/wiki/Installation">wiki oficial de instalación</a>.</figcaption>
+        </figure>
+
+        <div class="callout note">
+          <b>Tip de eficiencia:</b> en lugar de instalar Alpine tres veces, puedes instalar una vez y clonar: apaga la VM, clic derecho sobre ella → <i>Clonar</i> → <i>Clonación completa</i> → marca "Reinicializar la dirección MAC de todas las tarjetas de red". Después de clonar, en cada clon edita el hostname (<code class="inline">nano /etc/hostname</code>) y la IP (<code class="inline">nano /etc/network/interfaces</code>: cambia <code class="inline">address</code>, <code class="inline">gateway</code> y el DNS en <code class="inline">/etc/resolv.conf</code>), y ejecuta <code class="inline">rc-service networking restart</code>. Recuerda también cambiar la red interna de cada clon en VirtualBox y repetir el paso 8 (SSH) en cada clon.
+        </div>
+
+        <div class="callout note">
+          <b>Nota sobre editores de texto en Alpine:</b> cuando la guía diga "edita el archivo X", puedes usar <code class="inline">vi</code> (ya viene instalado: pulsa <code class="inline">i</code> para insertar, <code class="inline">Esc</code> luego <code class="inline">:wq</code> y Enter para guardar y salir) o instalar <code class="inline">nano</code> con <code class="inline">apk add nano</code> cuando tengas Internet (Parte C), que es más amigable: editas directo y guardas con <code class="inline">Ctrl+O</code>, <code class="inline">Enter</code>, <code class="inline">Ctrl+X</code>.
+        </div>
+
+        <h3 class="sub">B.7 — Flujo de trabajo con SSH y portapapeles (léelo antes de seguir)</h3>
+        <p>Desde este punto, <b>ya no trabajarás en las consolas crudas de VirtualBox</b>. El flujo de trabajo del laboratorio es:</p>
+        <ol class="steps">
+          <li>En tu equipo anfitrión lees esta guía y copias los comandos con <code class="inline">Ctrl+C</code>.</li>
+          <li>En la ventana de <code class="inline">admin-gui</code>, pegas en la terminal con <code class="inline">Ctrl+V</code> (el portapapeles compartido de VirtualBox lo transfiere; si no está activo todavía, igual puedes escribir los comandos — son pocos).</li>
+          <li>Para ejecutar algo en un servidor Alpine, primero entras por SSH desde la terminal de admin-gui:
+            <pre>ssh root@10.20.2.10     # srv-web
+ssh root@10.20.1.10     # srv-db
+ssh root@10.20.0.10     # cliente-usuarios</pre>
+            La primera vez acepta la huella escribiendo <code class="inline">yes</code> y escribe la contraseña de root de esa VM. Una vez dentro, todo lo que pegues se ejecuta en el servidor remoto. Para salir: <code class="inline">exit</code>.</li>
+          <li>Para copiar <b>archivos</b> (por ejemplo el código PHP de la Parte D) desde admin-gui hacia un servidor, usa <code class="inline">scp</code>:
+            <pre>scp /home/osboxes/app/index.php root@10.20.2.10:/var/www/app/</pre>
+          </li>
+        </ol>
+        <p><b>Requisito de firewall:</b> para que este flujo funcione, en la Parte C crearás una regla en la zona ADMIN que permite SSH (puerto 22) hacia las tres zonas de servicio — la estación de administración es la única que puede hacerlo, igual que un bastion host en una empresa real.</p>
+
+        <h3 class="sub">B.8 — Instantáneas (snapshots): tu red de seguridad</h3>
+        <p>Antes de empezar a tocar el firewall, toma una instantánea de cada VM recién instalada. Si algo se daña en las partes C–E, podrás volver a este punto en segundos en lugar de reinstalar:</p>
+        <ol class="steps">
+          <li>Con las VMs apagadas, en el VirtualBox Manager selecciona la VM → menú <b>Máquina → Herramientas → Instantáneas</b> (o el botón <i>Snapshots</i> en la barra derecha).</li>
+          <li>Pulsa <b>Tomar</b> (ícono de cámara) y nómbrala <code class="inline">01-instalacion-limpia</code>. Repite para las 5 VMs (OPNsense, admin-gui y las 3 Alpine).</li>
+          <li>Para restaurar más adelante: selecciona la instantánea y pulsa <b>Restaurar</b>.</li>
+        </ol>
+
+        <figure class="ref">
+          <img src="https://www.virtualbox.org/manual/images/snapshots-1.png" alt="Gestor de instantáneas de VirtualBox" loading="lazy" onerror="this.closest('figure').style.display='none'">
+          <figcaption>Referencia oficial: gestor de instantáneas de VirtualBox — tu punto de restauración antes de experimentar con las reglas. Fuente: <a href="https://www.virtualbox.org/manual/">Manual de VirtualBox</a></figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ PARTE C ============ -->
+      <section class="part" id="parteC">
+        <div class="part-head">
+          <span class="part-badge">C</span>
+          <h2>Políticas de Firewall entre Zonas y NAT de Salida</h2>
+        </div>
+
+        <h3 class="sub">C.1 — Verificar el bloqueo por defecto (evidencia Zero Trust)</h3>
+        <p>OPNsense es un firewall <b>stateful</b> cuya política de entrada por defecto es <b>bloquear todo lo que no tenga una regla explícita</b> (default deny), como documenta su manual de reglas de firewall. Sin ninguna regla creada por ti, desde la consola de <code class="inline">cliente-usuarios</code> ejecuta:</p>
+        <pre>ping -c 4 10.20.2.10</pre>
+        <p style="font-size:13.5px; color:var(--ink-soft);"><i>Salida esperada (ejemplo ilustrativo):</i> <code class="inline">4 packets transmitted, 0 packets received, 100% packet loss</code>. Captura esta pantalla: es tu primera evidencia de que el firewall bloquea por defecto.</p>
+
+        <h3 class="sub">C.2 — NAT de salida (masquerade) hacia Internet</h3>
+        <p class="docref">Referencia oficial: <a href="https://docs.opnsense.org/manual/nat.html">OPNsense — Network Address Translation (Outbound)</a></p>
+        <p>Las zonas internas usan direcciones privadas (<code class="inline">10.20.x.x</code>) que no son enrutables en Internet: cuando un servidor interno hace una petición hacia afuera, el firewall debe reescribir la IP de origen con la IP de su WAN, porque el servidor externo no sabría devolver la respuesta a una IP privada. Esto es <b>Outbound NAT</b> (también llamado Source NAT o masquerade). Para que tus servidores puedan descargar paquetes con <code class="inline">apk</code> (y la estación admin-gui con <code class="inline">apt</code>):</p>
+        <ol class="steps">
+          <li>En la interfaz web de OPNsense (trabajando desde el navegador de <code class="inline">admin-gui</code>) ve a <b>Firewall → NAT → Outbound</b>.</li>
+          <li>Selecciona el modo <b>"Hybrid outbound NAT rule generation"</b> y pulsa <b>Save</b>. Según la documentación oficial, los cuatro modos son: <i>Automatic</i> (reglas automáticas, el valor por defecto), <i>Hybrid</i> (automáticas + las manuales que agregues), <i>Manual</i> (solo manuales) y <i>Disabled</i>. El modo automático solo cubre la LAN; con hybrid conservamos las reglas automáticas y agregamos manualmente las zonas OPT.</li>
+          <li>En la sección de reglas manuales, pulsa <b>Add</b> (esquina superior derecha) y crea la primera regla:
+            <ul class="plain">
+              <li><b>Interface:</b> WAN (la documentación indica que casi siempre será WAN)</li>
+              <li><b>TCP/IP Version:</b> IPv4</li>
+              <li><b>Protocol:</b> any</li>
+              <li><b>Source address:</b> selecciona "Network" y escribe <code class="inline">10.20.0.0/24</code></li>
+              <li><b>Source port:</b> any (la documentación aclara que el puerto de origen es aleatorio y casi nunca debe restringirse)</li>
+              <li><b>Translation / target:</b> Interface address (es decir, la IP de la WAN)</li>
+              <li><b>Description:</b> <code class="inline">NAT usuarios a Internet</code></li>
+            </ul>
+            Pulsa <b>Save</b>.</li>
+          <li>Repite con tres reglas idénticas cambiando solo el origen y la descripción: <code class="inline">10.20.1.0/24</code> ("NAT interna a Internet"), <code class="inline">10.20.2.0/24</code> ("NAT DMZ a Internet") y <code class="inline">10.20.3.0/24</code> ("NAT admin a Internet"). Al final pulsa el botón naranja <b>Apply changes</b>.</li>
+        </ol>
+
+        <div class="callout warn">
+          <b>Advertencia de la documentación oficial:</b> "NAT no debe considerarse una medida de seguridad". NAT solo traduce direcciones — lo que realmente permite o bloquea el tráfico son las <b>reglas de firewall</b> que configuras a continuación. Por eso un servidor con NAT de salida sigue sin poder comunicarse hasta que exista una regla que lo permita.
+        </div>
+
+        <h3 class="sub">C.3 — Política de la DMZ (srv-web)</h3>
+        <p class="docref">Referencia oficial: <a href="https://docs.opnsense.org/manual/firewall.html">OPNsense — Firewall Rules</a></p>
+        <p>Ve a <b>Firewall → Rules → DMZ</b> y crea estas reglas <b>en este orden exacto</b>. El manual oficial explica por qué el orden manda: las reglas se procesan por interfaz, en dirección entrante (<i>inbound</i>, es decir, en la interfaz que recibe el tráfico), y por defecto cada regla es de tipo <code class="inline">quick</code> — <b>la primera regla que coincide con el paquete gana</b> y las siguientes ya no se evalúan. Para cada regla: botón <b>Add</b>, llenar los campos indicados, <b>Save</b>:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Acción</th><th>Proto</th><th>Origen</th><th>Destino</th><th>Puerto destino</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">1</td><td>Pass</td><td class="mono">TCP</td><td class="mono">DMZ net</td><td class="mono">Single host: 10.20.1.10</td><td class="mono">3306 (MySQL)</td><td>La app web habla con la BD — y solo con la BD</td></tr>
+              <tr><td class="mono">2</td><td>Block</td><td class="mono">any</td><td class="mono">DMZ net</td><td class="mono">Network 10.20.0.0/24</td><td class="mono">any</td><td>La DMZ nunca inicia conexiones hacia usuarios</td></tr>
+              <tr><td class="mono">3</td><td>Block</td><td class="mono">any</td><td class="mono">DMZ net</td><td class="mono">Network 10.20.1.0/24</td><td class="mono">any</td><td>La DMZ no ve el resto de la red interna</td></tr>
+              <tr><td class="mono">4</td><td>Pass</td><td class="mono">TCP/UDP</td><td class="mono">DMZ net</td><td class="mono">DMZ address</td><td class="mono">53 (DNS)</td><td>Consultas DNS al resolvedor Unbound de OPNsense</td></tr>
+              <tr><td class="mono">5</td><td>Pass</td><td class="mono">TCP</td><td class="mono">DMZ net</td><td class="mono">any</td><td class="mono">80, 443 (HTTP, HTTPS)</td><td>Descargas apk / actualizaciones vía NAT</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>La regla 1 va <b>antes</b> que la 3: primero se permite MySQL hacia la BD específica, y después se bloquea todo lo demás hacia la red interna. Si las pones al revés, la aplicación nunca conectará. Cuando termines las cinco, pulsa <b>Apply changes</b>.</p>
+        <p style="font-size:13.5px; color:var(--ink-soft);"><i>Detalle del manual:</i> la acción <code class="inline">Block</code> descarta el paquete en silencio (recomendada para redes no confiables), mientras <code class="inline">Reject</code> además responde al cliente con un TCP RST o ICMP unreachable (práctica en redes internas porque el cliente no espera el timeout). En este lab usamos <code class="inline">Block</code> para observar el comportamiento más estricto.</p>
+
+        <h3 class="sub">C.4 — Política de la red de usuarios (LAN)</h3>
+        <p>En <b>Firewall → Rules → LAN</b> encontrarás la regla por defecto <i>"Default allow LAN to any"</i>, que es incompatible con Zero Trust. Primero crea las reglas nuevas y al final <b>desactiva</b> la regla permisiva (ícono de ✓ verde a su izquierda para deshabilitarla — no la borres todavía, por si necesitas revertir):</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Acción</th><th>Proto</th><th>Origen</th><th>Destino</th><th>Puerto destino</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">1</td><td>Pass</td><td class="mono">TCP/UDP</td><td class="mono">LAN net</td><td class="mono">LAN address</td><td class="mono">53 (DNS)</td><td>DNS hacia OPNsense</td></tr>
+              <tr><td class="mono">2</td><td>Pass</td><td class="mono">TCP</td><td class="mono">LAN net</td><td class="mono">Network 10.20.2.0/24</td><td class="mono">80, 443</td><td>Usuarios → aplicación web en la DMZ</td></tr>
+              <tr><td class="mono">3</td><td>Block</td><td class="mono">any</td><td class="mono">LAN net</td><td class="mono">Network 10.20.1.0/24</td><td class="mono">any</td><td>Usuarios nunca tocan la red interna</td></tr>
+              <tr><td class="mono">4</td><td>Pass</td><td class="mono">TCP</td><td class="mono">LAN net</td><td class="mono">any</td><td class="mono">80, 443</td><td>(Temporal) Internet para apk del cliente — bórrala al final del lab</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">C.5 — Política de la red interna (INTERNA)</h3>
+        <p>En <b>Firewall → Rules → INTERNA</b> crea solo estas dos reglas; todo lo demás queda bloqueado por defecto:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Acción</th><th>Proto</th><th>Origen</th><th>Destino</th><th>Puerto destino</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">1</td><td>Pass</td><td class="mono">TCP/UDP</td><td class="mono">INTERNA net</td><td class="mono">INTERNA address</td><td class="mono">53 (DNS)</td><td>DNS hacia OPNsense</td></tr>
+              <tr><td class="mono">2</td><td>Pass</td><td class="mono">TCP</td><td class="mono">INTERNA net</td><td class="mono">any</td><td class="mono">80, 443</td><td>Actualizaciones apk vía NAT (tráfico saliente)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Nadie inicia conexiones <b>hacia</b> la red interna excepto la regla 3306 que ya creaste en la DMZ. Las reglas de esta tabla solo permiten que el servidor de BD salga a actualizarse.</p>
+
+        <h3 class="sub">C.6 — Política de la zona de administración (ADMIN)</h3>
+        <p>La estación <code class="inline">admin-gui</code> es tu puesto de trabajo privilegiado — el equivalente a un <i>bastion host</i> o jump box empresarial. En <b>Firewall → Rules → ADMIN</b> ya existe la regla de gestión web que creaste en B.5; agrega las siguientes debajo de ella:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Acción</th><th>Proto</th><th>Origen</th><th>Destino</th><th>Puerto destino</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">0</td><td>Pass</td><td class="mono">TCP</td><td class="mono">ADMIN net</td><td class="mono">This firewall</td><td class="mono">443 (HTTPS)</td><td>(Ya existe desde B.5) Gestión de la interfaz web</td></tr>
+              <tr><td class="mono">1</td><td>Pass</td><td class="mono">TCP</td><td class="mono">ADMIN net</td><td class="mono">any</td><td class="mono">22 (SSH)</td><td>Administrar las 3 VMs Alpine por SSH</td></tr>
+              <tr><td class="mono">2</td><td>Pass</td><td class="mono">TCP/UDP</td><td class="mono">ADMIN net</td><td class="mono">ADMIN address</td><td class="mono">53 (DNS)</td><td>DNS hacia OPNsense</td></tr>
+              <tr><td class="mono">3</td><td>Pass</td><td class="mono">TCP</td><td class="mono">ADMIN net</td><td class="mono">any</td><td class="mono">80, 443</td><td>Actualizaciones apt / navegación de consulta</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Todo lo demás queda bloqueado por defecto. Nota el contraste deliberado: la zona de administración <b>sí</b> puede hablar con las demás zonas (solo por SSH), porque administrar es su función — pero nadie desde las demás zonas puede iniciar conexiones hacia ella.</p>
+
+        <h3 class="sub">C.7 — Resumen: política resultante por zona</h3>
+        <p>Esta es la matriz completa de políticas que debe quedar configurada. Úsala para autoevaluarte antes de las pruebas:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Zona / Interfaz</th><th>Tráfico entrante permitido</th><th>Tráfico saliente permitido</th><th>Denegado (implícito o explícito)</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>WAN</b></td>
+                <td>En la Parte E: TCP 8080 para el port-forward</td>
+                <td>Traducciones NAT de las 4 zonas</td>
+                <td>Todo lo demás entrante (default deny) — la administración NO se expone aquí</td>
+              </tr>
+              <tr>
+                <td><b>LAN (usuarios)</b></td>
+                <td>SSH 22 solo desde la zona ADMIN</td>
+                <td>DNS al firewall · HTTP/HTTPS a la DMZ · (temporal) HTTP/HTTPS a Internet</td>
+                <td>Red interna completa · cualquier otro destino/puerto</td>
+              </tr>
+              <tr>
+                <td><b>DMZ (srv-web)</b></td>
+                <td>HTTP/HTTPS desde usuarios · (Parte E) HTTP redirigido por PAT desde WAN · SSH 22 solo desde ADMIN</td>
+                <td>MySQL 3306 solo a 10.20.1.10 · DNS al firewall · HTTP/HTTPS a Internet</td>
+                <td>Iniciar hacia usuarios · resto de la red interna · cualquier otro puerto</td>
+              </tr>
+              <tr>
+                <td><b>INTERNA (srv-db)</b></td>
+                <td>MySQL 3306 únicamente desde 10.20.2.10 · SSH 22 solo desde ADMIN</td>
+                <td>DNS al firewall · HTTP/HTTPS a Internet (actualizaciones)</td>
+                <td>Cualquier otro origen y cualquier otro puerto</td>
+              </tr>
+              <tr>
+                <td><b>ADMIN (admin-gui)</b></td>
+                <td>—</td>
+                <td>HTTPS 443 al firewall · SSH 22 a todas las zonas · DNS al firewall · HTTP/HTTPS a Internet</td>
+                <td>Cualquier otro destino/puerto</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">C.8 — Verificación de NAT, segmentación y acceso de administración</h3>
+        <ol class="steps">
+          <li><b>NAT + DNS funcionando</b> — desde <code class="inline">srv-web</code> y desde <code class="inline">srv-db</code> (entra por SSH desde admin-gui: <code class="inline">ssh root@10.20.2.10</code>):
+            <pre>ping -c 3 8.8.8.8
+ping -c 3 google.com
+setup-apkrepos -1
+apk update</pre>
+            El primer ping prueba NAT puro (IP directa, sin DNS), el segundo prueba la resolución DNS a través de OPNsense, <code class="inline">setup-apkrepos -1</code> elige el primer mirror de la lista, y <code class="inline">apk update</code> confirma que puedes descargar índices de paquetes por el NAT. Captura una de estas salidas como evidencia de la salida NAT. (Ejecuta también <code class="inline">setup-apkrepos -1</code> en <code class="inline">cliente-usuarios</code> si necesitas instalarle paquetes.)</li>
+          <li><b>El acceso SSH de administración funciona</b> — desde la terminal de <code class="inline">admin-gui</code>:
+            <pre>ssh root@10.20.2.10 "hostname"</pre>
+            Debe responder <code class="inline">srv-web</code>. Esto confirma que la regla SSH de la zona ADMIN está operativa (y es tu primera evidencia del plano de administración funcionando).</li>
+          <li><b>Bloqueo usuarios → interna</b> — desde <code class="inline">cliente-usuarios</code>:
+            <pre>ping -c 3 10.20.1.10
+nc -zv 10.20.1.10 3306</pre>
+            Ambos deben fallar (timeout).</li>
+          <li><b>Bloqueo DMZ → usuarios</b> — desde <code class="inline">srv-web</code>:
+            <pre>ping -c 3 10.20.0.10</pre>
+            Debe fallar.</li>
+          <li>Abre <b>Firewall → Log Files → Live View</b> en OPNsense mientras repites las pruebas: verás en tiempo real cada paquete marcado como <i>pass</i> (verde) o <i>block</i> (rojo) con la regla que lo procesó. El manual recomienda poner descripciones legibles a las reglas y activar su opción <i>Log</i> precisamente para poder leerlas en esta vista. Captura esta vista como evidencia complementaria.</li>
+        </ol>
+      </section>
+
+      <!-- ============ PARTE D ============ -->
+      <section class="part" id="parteD">
+        <div class="part-head">
+          <span class="part-badge">D</span>
+          <h2>Aplicación Web en la DMZ + Base de Datos en la Red Interna</h2>
+        </div>
+
+        <p>Desplegarás una aplicación web sencilla en PHP (código incluido abajo) que se conecta por red a MariaDB. Cada visita a la página inserta un registro en la base de datos de la red interna — así tu evidencia demuestra el flujo completo: <i>cliente → firewall → DMZ → firewall → BD interna</i>. Gracias a la estación <code class="inline">admin-gui</code>, escribirás el código en un editor gráfico y lo transferirás por <code class="inline">scp</code> — sin teclearlo en consolas seriales.</p>
+
+        <h3 class="sub">D.0 — Anatomía de un paquete en tu laboratorio</h3>
+        <p>Antes de escribir comandos, entiende el recorrido exacto de una petición (son los números ①②③ de la Figura 1):</p>
+        <ol class="steps">
+          <li><code class="inline">cliente-usuarios</code> (10.20.0.10) pide <code class="inline">http://10.20.2.10</code>. El paquete sale por eth0 hacia su gateway <code class="inline">10.20.0.1</code> y <b>entra al firewall por la interfaz LAN</b>. Ahí se evalúan las reglas de LAN de arriba hacia abajo: coincide con la regla 2 (TCP hacia 10.20.2.0/24 puerto 80) → <b>pass</b>. OPNsense crea una <b>entrada de estado</b> para esta conexión.</li>
+          <li>El firewall reenvía el paquete por su interfaz DMZ (<code class="inline">10.20.2.1</code>) hasta <code class="inline">srv-web</code>. nginx recibe la petición y PHP se ejecuta: la aplicación abre una <b>segunda conexión</b>, esta vez TCP al puerto 3306 de <code class="inline">10.20.1.10</code>. Ese paquete entra al firewall por la interfaz DMZ: coincide con la regla 1 de la DMZ (3306 solo a la BD) → <b>pass</b>.</li>
+          <li>El firewall entrega el paquete por su interfaz INTERNA a <code class="inline">srv-db</code>, y MariaDB responde. Aquí está la magia del firewall <b>stateful</b> que describe la documentación oficial: <b>las respuestas de una conexión ya establecida regresan automáticamente sin necesitar reglas inversas</b> — por eso nunca creaste una regla "INTERNA → DMZ" ni "DMZ → usuarios" para el tráfico de respuesta, y sin embargo todo funciona.</li>
+        </ol>
+        <p>Si entiendes estos tres saltos, entiendes el laboratorio completo: cada zona solo puede iniciar lo que su política permite explícitamente, y el estado de la conexión se encarga del retorno.</p>
+
+        <h3 class="sub">D.1 — Servidor MariaDB en srv-db (10.20.1.10)</h3>
+        <p>Trabaja desde la terminal de <code class="inline">admin-gui</code>: entra por SSH con <code class="inline">ssh root@10.20.1.10</code> y ejecuta allí todos los comandos de esta sección (así puedes copiarlos y pegarlos desde esta guía).</p>
+        <ol class="steps">
+          <li>Instala MariaDB:
+            <pre>apk update
+apk add mariadb mariadb-client</pre>
+          </li>
+          <li>Inicializa el directorio de datos y arranca el servicio:
+            <pre>/etc/init.d/mariadb setup
+rc-service mariadb start
+rc-update add mariadb</pre>
+          </li>
+          <li>Asegura la instalación:
+            <pre>mysql_secure_installation</pre>
+            Responde: cuando pida la contraseña actual de root pulsa Enter (está vacía) → <code class="inline">y</code> para definir una nueva contraseña de root de MariaDB (escríbela dos veces) → <code class="inline">y</code> a remover usuarios anónimos → <code class="inline">y</code> a deshabilitar el login remoto de root → <code class="inline">y</code> a eliminar la base de prueba → <code class="inline">y</code> a recargar privilegios.</li>
+          <li>Por defecto MariaDB solo escucha en <code class="inline">localhost</code>; hay que decirle que escuche en la IP de la red interna. Edita el archivo <code class="inline">/etc/my.cnf.d/mariadb-server.cnf</code> (con <code class="inline">vi</code> o instala <code class="inline">nano</code> con <code class="inline">apk add nano</code>) y en la sección <code class="inline">[mysqld]</code> deja estas líneas así (si alguna existe comentada con <code class="inline">#</code>, descoméntala y cámbiala):
+            <pre>[mysqld]
+bind-address = 10.20.1.10
+skip-networking = 0</pre>
+            Reinicia el servicio para aplicar:
+            <pre>rc-service mariadb restart</pre>
+            Verifica que escucha en la red:
+            <pre>netstat -tlnp | grep 3306</pre>
+            <i>Salida esperada (ejemplo ilustrativo):</i> una línea con <code class="inline">10.20.1.10:3306</code> en estado <code class="inline">LISTEN</code>.</li>
+          <li>Crea la base de datos, la tabla y el usuario exclusivo de la aplicación:
+            <pre>mysql -u root -p</pre>
+            (escribe la contraseña de root de MariaDB que definiste). Dentro del prompt <code class="inline">MariaDB [(none)]></code> ejecuta una por una:
+            <pre>CREATE DATABASE appdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'appuser'@'10.20.2.10' IDENTIFIED BY 'Cl4ve-Segura-Lab';
+GRANT SELECT, INSERT ON appdb.* TO 'appuser'@'10.20.2.10';
+USE appdb;
+CREATE TABLE visitas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  ip_cliente VARCHAR(45) NOT NULL,
+  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+FLUSH PRIVILEGES;
+EXIT;</pre>
+            Fíjate en la doble capa de seguridad: el usuario <code class="inline">appuser</code> solo puede conectarse desde la IP exacta del servidor web (<code class="inline">10.20.2.10</code>) y solo tiene privilegios de <code class="inline">SELECT</code> e <code class="inline">INSERT</code> sobre <code class="inline">appdb</code> — ni siquiera puede borrar datos. El firewall limita la red; la base de datos limita al origen y al privilegio mínimo.</li>
+        </ol>
+
+        <h3 class="sub">D.2 — Servidor web nginx + PHP en srv-web (10.20.2.10)</h3>
+        <ol class="steps">
+          <li>Entra por SSH: <code class="inline">ssh root@10.20.2.10</code>. Instala nginx, PHP-FPM y la extensión de MySQL:
+            <pre>apk update
+apk add nginx php83-fpm php83-mysqli php83-session</pre>
+            <b>Nota:</b> si tu versión de Alpine trae PHP 8.4 en lugar de 8.3, cambia el prefijo <code class="inline">php83</code> por <code class="inline">php84</code> en los paquetes (verifica con <code class="inline">apk search php8 | head</code>).</li>
+          <li>Configura PHP-FPM para correr con el mismo usuario que nginx. Edita <code class="inline">/etc/php83/php-fpm.d/www.conf</code> y ajusta estas líneas (búscalas con <code class="inline">/user</code> en vi):
+            <pre>user = nginx
+group = nginx
+listen = 127.0.0.1:9000
+listen.owner = nginx
+listen.group = nginx</pre>
+          </li>
+          <li>Crea el directorio del sitio:
+            <pre>mkdir -p /var/www/app
+chown -R nginx:nginx /var/www/app</pre>
+          </li>
+          <li>Ahora el código de la aplicación. <b>En admin-gui</b> abre un editor de texto gráfico (menú de aplicaciones → <i>Text Editor</i> / <i>FeatherPad</i> / <i>Mousepad</i> según la imagen OSBoxes), pega este contenido completo (cópialo con el botón "Copiar" del bloque) y guárdalo como <code class="inline">/home/osboxes/app/index.php</code> (crea la carpeta <code class="inline">app</code>):
+            <pre>&lt;?php
+// ============================================================
+// App de laboratorio - Seguridad en Redes (CUC)
+// Se conecta a MariaDB en la RED INTERNA y registra visitas.
+// ============================================================
+$host = '10.20.1.10';   // srv-db en la red interna
+$user = 'appuser';
+$pass = 'Cl4ve-Segura-Lab';
+$db   = 'appdb';
+
+$estado = '';
+$ok     = false;
+$filas  = [];
+
+try {
+    $conn = new mysqli($host, $user, $pass, $db);
+    $conn->set_charset('utf8mb4');
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'desconocida';
+    $stmt = $conn->prepare('INSERT INTO visitas (ip_cliente) VALUES (?)');
+    $stmt->bind_param('s', $ip);
+    $stmt->execute();
+
+    $res = $conn->query('SELECT id, ip_cliente, fecha FROM visitas ORDER BY id DESC LIMIT 10');
+    while ($r = $res->fetch_assoc()) { $filas[] = $r; }
+
+    $estado = 'CONECTADO a MariaDB en ' . $host . ':3306';
+    $ok = true;
+} catch (Throwable $e) {
+    http_response_code(500);
+    $estado = 'ERROR de conexion a la base de datos: ' . $e->getMessage();
+}
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;App Lab - DMZ&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #222; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 20px 24px; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+    .ok  { color: #0a7a3d; font-weight: 700; }
+    .err { color: #b00020; font-weight: 700; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 14px; }
+    th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
+    th { background: #f4f4f4; }
+    .meta { color: #666; font-size: 13px; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="card"&gt;
+    &lt;h1&gt;Aplicacion del Laboratorio&lt;/h1&gt;
+    &lt;p class="meta"&gt;Servidor web: &lt;?php echo gethostname(); ?&gt; (zona DMZ, 10.20.2.10)&lt;/p&gt;
+    &lt;p class="&lt;?php echo $ok ? 'ok' : 'err'; ?&gt;"&gt;&lt;?php echo $estado; ?&gt;&lt;/p&gt;
+    &lt;?php if ($ok): ?&gt;
+      &lt;h2&gt;Ultimas 10 visitas registradas en la BD interna&lt;/h2&gt;
+      &lt;table&gt;
+        &lt;tr&gt;&lt;th&gt;#&lt;/th&gt;&lt;th&gt;IP cliente&lt;/th&gt;&lt;th&gt;Fecha&lt;/th&gt;&lt;/tr&gt;
+        &lt;?php foreach ($filas as $f): ?&gt;
+          &lt;tr&gt;
+            &lt;td&gt;&lt;?php echo $f['id']; ?&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;?php echo htmlspecialchars($f['ip_cliente']); ?&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;?php echo $f['fecha']; ?&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;?php endforeach; ?&gt;
+      &lt;/table&gt;
+    &lt;?php endif; ?&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+          </li>
+          <li>Transfiere el archivo al servidor web por SSH (desde la terminal de admin-gui):
+            <pre>scp /home/osboxes/app/index.php root@10.20.2.10:/var/www/app/</pre>
+            Luego, en la sesión SSH de <code class="inline">srv-web</code>, ajusta el propietario:
+            <pre>chown nginx:nginx /var/www/app/index.php</pre>
+          </li>
+          <li>Crea la configuración de nginx. Reemplaza <b>todo</b> el contenido del archivo <code class="inline">/etc/nginx/http.d/default.conf</code> por:
+            <pre>server {
+    listen 80 default_server;
+    server_name _;
+    root /var/www/app;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}</pre>
+          </li>
+          <li>Arranca ambos servicios y déjalos habilitados al arranque:
+            <pre>rc-service php-fpm83 start
+rc-service nginx start
+rc-update add php-fpm83
+rc-update add nginx</pre>
+            (Si instalaste PHP 8.4, el servicio se llama <code class="inline">php-fpm84</code>.)</li>
+          <li>Verifica localmente que nginx y PHP responden:
+            <pre>wget -qO- http://127.0.0.1 | head -8</pre>
+            Deberías ver el HTML de la aplicación. Si aparece el mensaje de error de conexión a la BD, es lo esperado hasta que pruebes la ruta completa en el siguiente paso.</li>
+        </ol>
+
+        <h3 class="sub">D.3 — Verificación de extremo a extremo</h3>
+        <ol class="steps">
+          <li><b>La ruta de datos hacia la BD existe</b> — desde <code class="inline">srv-web</code>:
+            <pre>nc -zv 10.20.1.10 3306</pre>
+            <i>Salida esperada (ejemplo ilustrativo):</i> <code class="inline">10.20.1.10 (10.20.1.10:3306) open</code>. Si dice <code class="inline">open</code>, tu regla 1 de la DMZ y MariaDB están bien. Si falla, revisa el orden de las reglas en C.3 y el <code class="inline">bind-address</code> en D.1.</li>
+          <li><b>El usuario navega la aplicación</b> — desde <code class="inline">cliente-usuarios</code>:
+            <pre>wget -qO- http://10.20.2.10 | grep -E "CONECTADO|ERROR|visitas"</pre>
+            Debes ver la línea <code class="inline">CONECTADO a MariaDB en 10.20.1.10:3306</code> y el encabezado de la tabla de visitas. Cada vez que ejecutes el comando se inserta una visita nueva con la IP del cliente (<code class="inline">10.20.0.10</code>) — ejecútalo 2 o 3 veces y verás crecer la tabla.</li>
+          <li><b>El usuario NO puede tocar la base de datos</b> — desde <code class="inline">cliente-usuarios</code>:
+            <pre>nc -zv 10.20.1.10 3306</pre>
+            Debe fallar (timeout). Captura esta salida junto con la anterior: son la evidencia central del laboratorio.</li>
+          <li><b>Vista gráfica desde la zona de administración:</b> en el navegador de <code class="inline">admin-gui</code> abre <code class="inline">http://10.20.2.10</code> — debería funcionar gracias a la regla SSH/web... ¡espera! Si no carga, es porque la zona ADMIN no tiene una regla HTTP hacia la DMZ. Añádela como ejercicio: <i>Firewall → Rules → ADMIN → Add → Pass · TCP · ADMIN net → 10.20.2.10 · puerto 80 · descripción "Admin prueba la app"</i>. Ahora sí: recarga y verás la app completa con su tabla de visitas. Esta captura (navegador gráfico con la app y la URL visibles) es una de las evidencias más claras de tu entregable.</li>
+          <li><b>Evidencia en el firewall:</b> con las pruebas anteriores corriendo, abre <b>Firewall → Log Files → Live View</b> y captura los registros mostrando el <code class="inline">pass</code> de <code class="inline">10.20.2.10 → 10.20.1.10:3306</code> y los <code class="inline">block</code> de los intentos prohibidos desde usuarios.</li>
+        </ol>
+
+        <div class="callout note">
+          <b>Variante con WordPress (opcional):</b> si prefieres un CMS real en lugar de la app sencilla, el procedimiento es idéntico en arquitectura: instala además los paquetes <code class="inline">php83-mbstring php83-curl php83-zip php83-gd php83-xml php83-dom php83-exif php83-iconv php83-simplexml php83-xmlwriter php83-ctype wget tar</code>, descarga WordPress con <code class="inline">wget https://wordpress.org/latest.tar.gz</code>, descomprímelo en <code class="inline">/var/www/</code>, apunta el <code class="inline">root</code> de nginx a <code class="inline">/var/www/wordpress</code> y en <code class="inline">wp-config.php</code> define <code class="inline">DB_HOST</code> como <code class="inline">10.20.1.10</code> con una base <code class="inline">wordpress</code> y un usuario <code class="inline">wpuser@10.20.2.10</code>. Las reglas de firewall no cambian en absoluto — ese es el punto del ejercicio.
+        </div>
+      </section>
+
+      <!-- ============ PARTE E ============ -->
+      <section class="part" id="parteE">
+        <div class="part-head">
+          <span class="part-badge">E</span>
+          <h2>NAT/PAT Entrante: Publicar la Aplicación hacia la WAN</h2>
+        </div>
+
+        <h3 class="sub">E.1 — Concepto: NAT de salida vs. PAT entrante (port forwarding)</h3>
+        <p class="docref">Referencia oficial: <a href="https://docs.opnsense.org/manual/nat.html">OPNsense — Destination NAT (Port Forward)</a></p>
+        <p>En la Parte C configuraste <b>NAT de salida</b>: muchos hosts internos comparten la IP de la WAN para salir (masquerade). Ahora harás lo inverso: <b>PAT entrante</b>, que la documentación de OPNsense llama <i>Destination NAT (Port Forward)</i>. El problema que resuelve: cuando varios clientes internos comparten una sola IP externa, una conexión entrante dirigida a la IP externa no tiene a dónde ir — el firewall no sabe a qué host interno entregarla. La solución es una regla que traduzca <i>destino = IP-WAN, puerto 8080</i> hacia <i>10.20.2.10, puerto 80</i>. Es exactamente lo que hace una empresa cuando publica su sitio web sin exponer nada más de su red.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Mecanismo</th><th>Dirección</th><th>Qué traduce</th><th>Ejemplo en tu lab</th></tr></thead>
+            <tbody>
+              <tr><td><b>NAT saliente (masquerade)</b></td><td>Interna → Internet</td><td>IP origen interna → IP de la WAN</td><td><code class="inline">10.20.2.10</code> sale a Internet como <code class="inline">&lt;IP-WAN&gt;</code></td></tr>
+              <tr><td><b>PAT entrante (port forward)</b></td><td>Internet → Interna</td><td>Puerto de la WAN → IP:puerto interno</td><td><code class="inline">&lt;IP-WAN&gt;:8080</code> → <code class="inline">10.20.2.10:80</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub">E.2 — Crear la regla de Port Forward</h3>
+        <ol class="steps">
+          <li>En la interfaz web de OPNsense ve a <b>Firewall → NAT → Port Forward</b> y pulsa <b>Add</b> (esquina superior derecha).</li>
+          <li>Llena el formulario exactamente así (los nombres de campo corresponden a la documentación oficial):
+            <ul class="plain">
+              <li><b>Interface:</b> WAN — la interfaz en la que <i>se origina</i> el tráfico entrante.</li>
+              <li><b>TCP/IP Version:</b> IPv4</li>
+              <li><b>Protocol:</b> TCP</li>
+              <li><b>Source / Invert:</b> sin marcar · <b>Source Address:</b> any (cualquier equipo de la red física podrá probar la app) · <b>Source Port:</b> any</li>
+              <li><b>Destination Address:</b> WAN address — el destino original del paquete es la IP externa del firewall.</li>
+              <li><b>Destination Port:</b> de <code class="inline">8080</code> a <code class="inline">8080</code> (usamos 8080 y no 80 para no chocar con servicios de tu red física ni con la interfaz web del firewall)</li>
+              <li><b>Redirect Target IP:</b> <code class="inline">10.20.2.10</code> — la IP interna a la que se reenvía el tráfico.</li>
+              <li><b>Redirect Target Port:</b> <code class="inline">80</code> (HTTP) — el puerto del servidor interno.</li>
+              <li><b>Description:</b> <code class="inline">Publicar app web de la DMZ</code></li>
+              <li><b>Filter rule association:</b> aquí la documentación oficial ofrece tres opciones y vale la pena entenderlas:
+                <ul class="plain">
+                  <li><i>None:</i> no crea ninguna regla — tendrías que crearla a mano en <i>Firewall → Rules → WAN</i> (recomendada solo para escenarios complejos).</li>
+                  <li><i>Pass:</i> deja pasar el tráfico de la regla NAT sin crear una regla visible en la lista (recomendada por simplicidad en la mayoría de casos, pero no se puede auditar en la lista de reglas).</li>
+                  <li><i>Add associated filter rule:</i> crea una regla vinculada <b>visible</b> en <i>Firewall → Rules → WAN</i>, que se actualiza automáticamente si editas la regla NAT. <b>Elige esta</b>: en el laboratorio te conviene ver y documentar la regla. Ten en cuenta el detalle clave de la documentación: el destino de la regla de firewall generada será la IP interna del NAT (<code class="inline">10.20.2.10</code>), no la IP de la WAN.</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>Pulsa <b>Save</b> y luego <b>Apply changes</b>.</li>
+          <li>Verifica la regla asociada: ve a <b>Firewall → Rules → WAN</b> — debes ver una regla nueva que permite TCP hacia <code class="inline">10.20.2.10</code> puerto 80, vinculada a tu port forward. No la edites manualmente (se gestiona desde la regla NAT; si la editas a mano, se desvincula).</li>
+        </ol>
+
+        <h3 class="sub">E.3 — Verificación desde la red WAN</h3>
+        <ol class="steps">
+          <li>Desde el navegador de <b>tu equipo anfitrión</b> (que está en la red WAN del laboratorio), abre:
+            <pre>http://&lt;IP-WAN&gt;:8080</pre>
+            Debe cargar la aplicación del laboratorio con el mensaje <code class="inline">CONECTADO a MariaDB en 10.20.1.10:3306</code> y la tabla de visitas. Captura esta pantalla completa (con la URL visible): es la evidencia de que el PAT entrante funciona.</li>
+          <li>Recarga la página 2 o 3 veces y observa cómo la tabla registra las visitas nuevas. La IP que verás registrada será la de tu equipo en la red física — anótala y coméntala en tu análisis (demuestra que el firewall preserva el origen real al reenviar).</li>
+          <li>Confirma lo que <b>no</b> quedó expuesto: desde tu equipo anfitrión intenta <code class="inline">ping 10.20.1.10</code> o conectarte al puerto 3306 de la WAN — todo debe fallar. Solo el puerto 8080 publicado responde.</li>
+          <li>En <b>Firewall → Log Files → Live View</b>, filtra por la interfaz WAN y captura el registro <code class="inline">pass</code> del tráfico entrante hacia <code class="inline">10.20.2.10:80</code>.</li>
+        </ol>
+
+        <div class="callout warn">
+          <b>Advertencia de seguridad:</b> esta regla expone la aplicación a toda tu red física (compañeros del salón, otros dispositivos de tu casa). Es intencional para el laboratorio, pero cuando termines las evidencias, desactívala: <i>Firewall → NAT → Port Forward</i> → desmarca la regla o usa el ícono de ✓ para deshabilitarla → <i>Apply changes</i>. En producción, un port forward siempre se acompaña de endurecimiento del servicio publicado, porque ese servicio queda al alcance de cualquiera en la red externa.
+        </div>
+
+        <div class="callout note">
+          <b>Guarda tu trabajo:</b> antes de seguir, descarga un respaldo completo de la configuración del firewall: <b>System → Configuration → Backups</b> → botón <b>Download configuration</b>. Obtendrás un archivo <code class="inline">config-*.xml</code> con TODO (interfaces, reglas, NAT). Si algo se daña después, lo restauras desde la misma pantalla o con la opción <code class="inline">13) Restore a configuration</code> del menú de consola — sin rehacer el laboratorio.
+        </div>
+
+        <h3 class="sub">E.4 — Pregunta de análisis</h3>
+        <p>Piensa en este escenario para tu entregable: un atacante en la red WAN encuentra el puerto 8080 abierto y explota una vulnerabilidad en la aplicación PHP, logrando ejecutar comandos como el usuario <code class="inline">nginx</code> en <code class="inline">srv-web</code>. Con las políticas que configuraste: ¿a qué puede llegar desde ahí? (Pista: puede leer las credenciales del <code class="inline">index.php</code> y hablar con la BD por el 3306 con privilegios de solo SELECT/INSERT sobre <code class="inline">appdb</code>… pero ¿puede alcanzar la red de usuarios? ¿otros hosts de la red interna? ¿la interfaz de administración del firewall? ¿puede la BD iniciar conexiones de vuelta hacia él? ¿puede tocar la zona de administración?)</p>
+      </section>
+
+      <!-- ============ PARTE F ============ -->
+      <section class="part" id="parteF">
+        <div class="part-head">
+          <span class="part-badge">F</span>
+          <h2>Entregable del Laboratorio</h2>
+        </div>
+        <p>Un solo documento <b>PDF</b> individual que contenga, en este orden:</p>
+        <ol class="steps">
+          <li><b>Diagrama de la topología</b> implementada (puedes basarte en la Figura 1 de esta guía, dibujarlo en draw.io o fotografiar tu esquema a mano) indicando las 4 zonas internas, las IPs, los flujos permitidos y el port forward.</li>
+          <li><b>Matriz de pruebas ejecutadas</b>: replica esta tabla en tu informe y márcala con tus resultados reales (✓/✗) más la captura asociada a cada prueba:
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Desde</th><th>Hacia</th><th>Comando / acción</th><th>Resultado esperado</th><th>¿Lo lograste?</th></tr></thead>
+                <tbody>
+                  <tr><td class="mono">P1</td><td class="mono">cliente-usuarios</td><td class="mono">10.20.2.10 (ICMP)</td><td class="mono">ping -c 4 10.20.2.10</td><td>Falla — bloqueo por defecto (antes de crear reglas)</td><td></td></tr>
+                  <tr><td class="mono">P2</td><td class="mono">srv-web / srv-db</td><td class="mono">8.8.8.8</td><td class="mono">ping -c 3 8.8.8.8</td><td>Funciona — NAT saliente operativo</td><td></td></tr>
+                  <tr><td class="mono">P3</td><td class="mono">srv-web</td><td class="mono">google.com</td><td class="mono">ping -c 3 google.com</td><td>Funciona — DNS vía OPNsense</td><td></td></tr>
+                  <tr><td class="mono">P4</td><td class="mono">cliente-usuarios</td><td class="mono">10.20.1.10:3306</td><td class="mono">nc -zv 10.20.1.10 3306</td><td>Falla — usuarios nunca tocan la BD</td><td></td></tr>
+                  <tr><td class="mono">P5</td><td class="mono">srv-web</td><td class="mono">10.20.0.10 (ICMP)</td><td class="mono">ping -c 3 10.20.0.10</td><td>Falla — la DMZ no inicia hacia usuarios</td><td></td></tr>
+                  <tr><td class="mono">P6</td><td class="mono">srv-web</td><td class="mono">10.20.1.10:3306</td><td class="mono">nc -zv 10.20.1.10 3306</td><td>Funciona (open) — única vía permitida a la interna</td><td></td></tr>
+                  <tr><td class="mono">P7</td><td class="mono">cliente-usuarios</td><td class="mono">10.20.2.10:80</td><td class="mono">wget -qO- http://10.20.2.10</td><td>HTML de la app + "CONECTADO a MariaDB"</td><td></td></tr>
+                  <tr><td class="mono">P8</td><td class="mono">admin-gui</td><td class="mono">srv-web (SSH)</td><td class="mono">ssh root@10.20.2.10 "hostname"</td><td>Responde "srv-web" — plano de administración operativo</td><td></td></tr>
+                  <tr><td class="mono">P9</td><td class="mono">tu equipo (WAN)</td><td class="mono">&lt;IP-WAN&gt;:8080</td><td>Navegador → http://&lt;IP-WAN&gt;:8080</td><td>La app carga — PAT entrante operativo</td><td></td></tr>
+                  <tr><td class="mono">P10</td><td class="mono">tu equipo (WAN)</td><td class="mono">10.20.1.10</td><td class="mono">ping 10.20.1.10</td><td>Falla — la BD no existe para la WAN</td><td></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </li>
+          <li><b>Capturas de evidencia técnica</b> (con la terminal y la fecha/hora visibles) de cada prueba de la matriz, más el <b>Live View</b> de OPNsense mostrando los pass/block relevantes (C.8 y E.3).</li>
+          <li><b>Tabla de políticas por zona</b>: tu versión de la tabla C.7 con lo que efectivamente configuraste (puedes fotografiar tus pantallas de <i>Firewall → Rules</i> por interfaz como soporte).</li>
+          <li><b>Análisis de seguridad (5–8 líneas):</b> responde la pregunta de E.4 — qué puede y qué no puede hacer un atacante que comprometió la aplicación publicada por PAT, y cómo la combinación de segmentación + privilegio mínimo en la base de datos + plano de administración separado limita el daño.</li>
+        </ol>
+      </section>
+
+      <!-- ============ TROUBLESHOOTING ============ -->
+      <section id="troubleshooting">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Solución de Problemas Frecuentes</h2>
+        <p>Si algo no funciona, ubica el síntoma en esta tabla antes de preguntar — el 90% de los bloqueos del laboratorio están aquí:</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Síntoma</th><th>Causa más probable</th><th>Solución</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>El instalador de OPNsense falla con <i>"File copy failed during installation"</i></td>
+                <td>Memoria insuficiente asignada a la VM (problema documentado oficialmente)</td>
+                <td>Apaga la VM, súbela a <b>2048 MB</b> de RAM y reintenta la instalación</td>
+              </tr>
+              <tr>
+                <td>La WAN de OPNsense no obtiene IP</td>
+                <td>El Adaptador 1 no está en modo puente o apunta a la tarjeta física equivocada (ej. Ethernet sin cable)</td>
+                <td>Configuración → Red → Adaptador 1 → Adaptador puente → elige la tarjeta que sí tiene Internet (normalmente tu Wi-Fi). Luego en consola: opción 8 → <code class="inline">dhclient em0</code></td>
+              </tr>
+              <tr>
+                <td>No carga <code class="inline">https://10.20.3.1</code> desde admin-gui</td>
+                <td>Reactivaste el firewall (<code class="inline">pfctl -e</code>) antes de crear la regla de administración, o la regla tiene mal el origen/destino</td>
+                <td>Consola de OPNsense → opción 8 → <code class="inline">pfctl -d</code> → entra por el navegador → revisa la regla en <i>Firewall → Rules → ADMIN</i> (Source: ADMIN net · Destination: This firewall · puerto 443) → <code class="inline">pfctl -e</code></td>
+              </tr>
+              <tr>
+                <td>No puedes copiar/pegar texto dentro de las VMs Alpine</td>
+                <td>La consola de VirtualBox es una terminal serial cruda — no tiene portapapeles</td>
+                <td>No es un error: trabaja por SSH desde la terminal de admin-gui (<code class="inline">ssh root@10.20.x.x</code>). El portapapeles bidireccional solo aplica entre tu equipo y admin-gui</td>
+              </tr>
+              <tr>
+                <td><code class="inline">apk update</code> falla en una VM Alpine</td>
+                <td>Sin NAT de salida, sin regla 80/443 en esa zona, o sin DNS</td>
+                <td>Verifica en orden: <code class="inline">ping 10.20.2.1</code> (gateway) → <code class="inline">ping 8.8.8.8</code> (NAT) → <code class="inline">ping google.com</code> (DNS). El primero que falle te dice qué capa revisar (red local / NAT / regla DNS)</td>
+              </tr>
+              <tr>
+                <td><code class="inline">nc -zv 10.20.1.10 3306</code> falla desde srv-web</td>
+                <td>Regla 3306 debajo del bloqueo a la red interna, o MariaDB escuchando solo en localhost</td>
+                <td>En <i>Firewall → Rules → DMZ</i> sube la regla 3306 por encima del bloqueo (flecha de mover). En srv-db verifica <code class="inline">netstat -tlnp | grep 3306</code> → debe mostrar <code class="inline">10.20.1.10:3306</code>, no <code class="inline">127.0.0.1:3306</code></td>
+              </tr>
+              <tr>
+                <td>La app muestra <i>"ERROR de conexión a la base de datos"</i></td>
+                <td>Usuario/clave incorrectos en <code class="inline">index.php</code>, o el usuario MariaDB no permite el origen</td>
+                <td>Verifica que el usuario sea <code class="inline">'appuser'@'10.20.2.10'</code> (con esa IP exacta) y que la clave coincida. Prueba desde srv-web: <code class="inline">apk add mariadb-client</code> → <code class="inline">mysql -h 10.20.1.10 -u appuser -p</code></td>
+              </tr>
+              <tr>
+                <td>nginx responde <i>502 Bad Gateway</i></td>
+                <td>PHP-FPM no está corriendo o escucha en otro socket/puerto</td>
+                <td><code class="inline">rc-service php-fpm83 status</code> → si está parado, <code class="inline">rc-service php-fpm83 start</code>. Verifica que <code class="inline">listen = 127.0.0.1:9000</code> en www.conf coincida con el <code class="inline">fastcgi_pass</code> de nginx</td>
+              </tr>
+              <tr>
+                <td>El port forward no responde desde tu navegador (<code class="inline">http://&lt;IP-WAN&gt;:8080</code>)</td>
+                <td>Falta la regla de firewall asociada en WAN, o la app no está escuchando</td>
+                <td>Verifica que en <i>Firewall → Rules → WAN</i> exista la regla vinculada al port forward hacia <code class="inline">10.20.2.10:80</code>. Luego desde srv-web: <code class="inline">wget -qO- http://127.0.0.1 | head -3</code> debe responder</td>
+              </tr>
+              <tr>
+                <td>Después de cambiar reglas, una conexión vieja sigue comportándose igual</td>
+                <td>La tabla de estados conserva la conexión anterior (comportamiento stateful documentado)</td>
+                <td><i>Firewall → Diagnostics → States → Reset States</i> para forzar que las conexiones se reevalúen con las reglas nuevas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ RÚBRICA ============ -->
+      <section id="rubrica">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Rúbrica de Evaluación (10% de la nota final)</h2>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Criterio</th>
+                <th>Qué se evalúa</th>
+                <th>Peso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Topología montada y funcional</b></td>
+                <td>VirtualBox + OPNsense + 3 VMs Alpine + estación admin-gui en sus zonas correctas, con IPs coherentes con la Parte A.</td>
+                <td class="rubric-weight">25%</td>
+              </tr>
+              <tr>
+                <td><b>Políticas de firewall entre zonas</b></td>
+                <td>Política Zero Trust por interfaz, en el orden correcto, verificada con evidencia real (permitido vs. bloqueado).</td>
+                <td class="rubric-weight">30%</td>
+              </tr>
+              <tr>
+                <td><b>Aplicación web + base de datos</b></td>
+                <td>App en la DMZ respondiendo y conectada a MariaDB de la red interna únicamente por el puerto 3306.</td>
+                <td class="rubric-weight">20%</td>
+              </tr>
+              <tr>
+                <td><b>NAT saliente y PAT entrante</b></td>
+                <td>Salida a Internet por masquerade y publicación del servicio por port forward, ambos verificados.</td>
+                <td class="rubric-weight">15%</td>
+              </tr>
+              <tr>
+                <td><b>Razonamiento de seguridad</b></td>
+                <td>Análisis del escenario de compromiso y de cómo la segmentación limita el movimiento lateral.</td>
+                <td class="rubric-weight">10%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ REFERENCIAS ============ -->
+      <section id="referencias">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Referencias Oficiales y Glosario</h2>
+        <p>Esta guía está alineada con la documentación oficial de las herramientas. Consúltala si un paso difiere de lo que ves en tu versión del software:</p>
+        <ul class="plain">
+          <li><a href="https://docs.opnsense.org/manual/install.html">OPNsense — Initial Installation &amp; Configuration</a> (instalador, entorno en vivo, menú de consola, configuración inicial)</li>
+          <li><a href="https://docs.opnsense.org/manual/virtuals.html">OPNsense — Virtual &amp; Cloud-Based Installation</a> (requisitos de RAM/disco en VMs, off-loading, problemas conocidos)</li>
+          <li><a href="https://docs.opnsense.org/manual/firewall.html">OPNsense — Firewall Rules</a> (stateful, orden de procesamiento, quick, block vs. reject, default deny)</li>
+          <li><a href="https://docs.opnsense.org/manual/nat.html">OPNsense — Network Address Translation</a> (Outbound NAT, Destination NAT / Port Forward, filter rule association)</li>
+          <li><a href="https://www.virtualbox.org/manual/ch01.html">Oracle VM VirtualBox User Manual — Chapter 1: First Steps</a> (VirtualBox Manager, asistente de creación de VMs, memoria y disco)</li>
+          <li><a href="https://docs.alpinelinux.org/user-handbook/0.1a/Installing/setup_alpine.html">Alpine Linux Handbook — setup-alpine</a> y <a href="https://wiki.alpinelinux.org/wiki/Installation">Wiki oficial — Installation</a></li>
+          <li><a href="https://www.osboxes.org/">OSBoxes</a> (imágenes VDI pre-construidas para VirtualBox — fuente de la estación admin-gui)</li>
+        </ul>
+
+        <h3 class="sub">Glosario mínimo</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Término</th><th>Definición práctica (como se usa en este lab)</th></tr></thead>
+            <tbody>
+              <tr><td><b>Zero Trust</b></td><td>Nada se confía por defecto: todo tráfico se deniega salvo que una regla explícita lo permita.</td></tr>
+              <tr><td><b>Default deny</b></td><td>La política implícita del firewall: si ningún paquete coincide con una regla, se descarta en silencio.</td></tr>
+              <tr><td><b>DMZ</b></td><td>Zona desmilitarizada: red intermedia donde viven los servicios expuestos, aislada de la red interna.</td></tr>
+              <tr><td><b>Stateful</b></td><td>El firewall recuerda las conexiones activas: las respuestas de una conexión permitida regresan sin regla inversa.</td></tr>
+              <tr><td><b>NAT saliente (masquerade)</b></td><td>Muchos hosts internos comparten la IP de la WAN para salir a Internet; el firewall reescribe el origen.</td></tr>
+              <tr><td><b>PAT entrante (port forward)</b></td><td>Publicar un servicio interno: un puerto de la IP de la WAN se traduce a la IP:puerto del servidor interno.</td></tr>
+              <tr><td><b>Red interna (VirtualBox)</b></td><td>Switch virtual aislado dentro del hipervisor: solo se comunican las VMs conectadas a ese mismo nombre de red.</td></tr>
+              <tr><td><b>Plano de administración</b></td><td>Zona separada (red-admin) desde donde se gestiona el firewall y los servidores; nunca se expone por la WAN.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ CHECKLIST ============ -->
+      <section id="checklist">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Checklist de Verificación Previa</h2>
+        <ul class="checklist">
+          <li><span class="box"></span><span class="text">Virtualización habilitada en BIOS/UEFI antes de instalar cualquier software.</span></li>
+          <li><span class="box"></span><span class="text">Mínimo 8 GB de RAM en el equipo y 35 GB de disco libres.</span></li>
+          <li><span class="box"></span><span class="text">En Windows: verificado que Hyper-V/WSL2 no generan conflicto con VirtualBox.</span></li>
+          <li><span class="box"></span><span class="text">Estación admin-gui arrancando con escritorio gráfico y portapapeles bidireccional probado.</span></li>
+          <li><span class="box"></span><span class="text">Instantáneas tomadas de las 5 VMs recién instaladas (B.8) antes de tocar reglas.</span></li>
+          <li><span class="box"></span><span class="text">Regla de administración creada ANTES de reactivar el firewall (pfctl -e) — no me bloqueé a mí mismo.</span></li>
+          <li><span class="box"></span><span class="text">Orden de reglas de la DMZ revisado: primero el permitir 3306 a la BD, después los bloqueos.</span></li>
+          <li><span class="box"></span><span class="text">Respaldo config-*.xml descargado y port forward desactivado al terminar las evidencias.</span></li>
+        </ul>
+      </section>
+
+      <footer class="page">
+        <strong>Ing. Rodolfo Cañas Cervantes</strong> · Seguridad en Redes · Unidad 1 · Actividad 1 · Universidad de la Costa (CUC) · Barranquilla, Colombia · 2026-2
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toggleBackToTop();
+
+  const tocToggle = document.getElementById('toc-toggle');
+  const tocNav = document.getElementById('toc');
+  if (tocToggle && tocNav) {
+    tocToggle.addEventListener('click', () => {
+      tocNav.classList.toggle('mobile-open');
+      tocToggle.textContent = tocNav.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+    tocNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      tocNav.classList.remove('mobile-open');
+      tocToggle.textContent = '☰';
+    }));
+  }
+
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.type = 'button';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => {
+      const text = pre.innerText.replace(/Copiar$|Copiado ✓$/, '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copiado ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+    pre.appendChild(btn);
+  });
+
+  const checklistItems = document.querySelectorAll('.checklist li');
+  const storageKey = 'cuc-lab-segmentacion-natpat-chk';
+  let savedState = {};
+  try { savedState = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch (e) { savedState = {}; }
+  checklistItems.forEach((li, idx) => {
+    if (savedState[idx]) li.classList.add('done');
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+      savedState[idx] = li.classList.contains('done');
+      localStorage.setItem(storageKey, JSON.stringify(savedState));
+    });
+  });
+</script>
+
+</body>
+</html>
