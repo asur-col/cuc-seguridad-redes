@@ -2,7 +2,7 @@
 **Seguridad en Redes · Unidad 1 · Actividad 2 del 10% · Trabajo asíncrono en TryHackMe**
 Ing. Rodolfo Cañas Cervantes — Universidad de la Costa (CUC) · Periodo 2026-2 · Semana 4
 
-**Datos rápidos:** 1 h 45 min – 2 h · 10% Unidad 1 · Actividad 2 · 100% asíncrono · sala gratuita · Snort 2.9
+**Datos rápidos:** 1 h 45 min – 2 h · 10% Unidad 1 · Actividad 2 · 100% asíncrono · sala gratuita · Snort 2.9.7.0
 *(Versión Markdown del instructivo; los diagramas FIG A y FIG 1 están en la versión HTML.)*
 
 ## OBJETIVO
@@ -18,26 +18,27 @@ Acción + tráfico (protocolo, origen, dirección, destino) + opciones entre par
 
 ## PREVIO
 - Cuenta gratuita en tryhackme.com · navegador actualizado · ~1.5 h continuas (puedes pausar).
-- La VM usa **Snort 2.9 (build 149)**: sintaxis Snort 2. Suricata NO acepta `<>`.
+- La VM usa **Snort 2.9.7.0**: sintaxis Snort 2. Suricata NO acepta `<>`. El número de build exacto lo confirmas tú con `snort -V` (es una pregunta de la sala).
 - La VM gratuita expira ~1 hora por arranque: planifica en bloques; el progreso de respuestas se conserva.
 
 ## FASE 0 · Arranque (5 min) — Tasks 1–2
 1. Entra a https://tryhackme.com/room/snort · Start Machine → Show Split View.
 2. ```
    cd ~/Desktop/Task-Exercises
-   ./easy.sh
+   ./.easy.sh
    ```
-   Salida esperada: **Too Easy!**
+   Es un archivo **oculto** (empieza con punto) — `./easy.sh` sin el punto no lo encuentra. Salida esperada: **Too Easy!**
 
 ## FASE 1 · Conceptos (10 min) — Task 3
-Quiz: NIDS/HIDS/NIPS/HIPS/NBA y baselining.
+Quiz: NIDS/HIDS (detección, red/host) · NIPS/HIPS/NBA/WIPS (prevención, red/host/comportamiento/inalámbrica) y baselining (periodo de entrenamiento de NBA).
 
 ## FASE 2 · Instalación y validación (10 min) — Task 4
 ```
 snort -V
 sudo snort -c /etc/snort/snort.conf -T
+sudo snort -c /etc/snort/snortv2.conf -T
 ```
-Build 149 · snort.conf = 4151 reglas · snortv2.conf = 1 regla.
+`-V` te da la versión y el build (anótalo, es respuesta de la sala). `-c archivo -T` valida y reporta cuántas reglas cargó — compara snort.conf (completo) contra snortv2.conf (mínimo, muchas menos reglas).
 
 ## FASE 3 · Modo sniffer (15 min) — Task 5
 ```
@@ -55,13 +56,13 @@ sudo snort -r snort.log.* -n 10
 sudo snort -r snort.log.* -X
 sudo snort -r snort.log.* 'tcp port 80'
 ```
-Los logs ASCII no se releen con Snort; solo el binario. Carpeta 145.254.160.237, archivos tipo TCP:3009-53.
+Los logs ASCII no se releen con Snort; solo el binario. Se crea una carpeta con nombre de IP (ej. 145.254.160.237 — la que pregunta la sala) y dentro, archivos por protocolo/puerto (ej. UDP:36648-53).
 
 ## FASE 5 · Modo NIDS (20 min) — Task 7
 ```
 sudo snort -c /etc/snort/snort.conf -A full -l .
 ```
-Genera tráfico (traffic-generator.sh → TASK 6) y detén con Ctrl+C: **el resumen estadístico solo aparece al detener**. Variantes: -A console / fast / cmg.
+Genera tráfico (traffic-generator.sh → TASK 7) y detén con Ctrl+C: **el resumen estadístico solo aparece al detener**. Variantes: -A console / fast / cmg.
 
 ## FASE 6 · Reglas propias + pcaps (25 min) — Tasks 8–9
 ```
@@ -70,7 +71,7 @@ sudo snort -c /etc/snort/snortv2.conf -A console -l . -r mx-1.pcap
 sudo snort -c /etc/snort/snortv2.conf -A console --pcap-list="mx-2.pcap mx-3.pcap" --pcap-show
 sudo gedit local.rules      # o nano
 ```
-Elementos: id: 35369 · flags:S · flags:PA · sameip · sid ≥ 1000001 · rev incremental.
+Elementos: opción no-payload `id:35369` (filtra el campo IP ID — no es `content`, ese keyword busca dentro del payload) · flags:S · flags:PA · `sameip` (alerta cuando origen y destino son la misma IP) · `sid` ≥ 1.000.000 (Snort reserva <100 para el motor y 100-999.999 para reglas del build; el rango de usuario empieza en 1.000.000) · rev incremental.
 
 ## FASE 7 · Lectura final (5 min) — Tasks 10–11
 Lógica interna y buenas prácticas → sala al 100%.
@@ -97,7 +98,7 @@ Lógica interna y buenas prácticas → sala al 100%.
 | Generador no corre | sudo ./traffic-generator.sh y elige la TASK exacta |
 | ASCII no se relee | Solo binario: snort -r |
 | Mi regla no alerta | Comenta reglas viejas (#), borra logs, prueba -A console |
-| sameip no cuadra | Excluye broadcast/multicast/sin asignar: son 7, no 13 |
+| sameip no cuadra | `sameip` = origen y destino son la MISMA IP (no filtra broadcast/multicast); revisa que apuntes al protocolo correcto y que borraste el archivo de alertas anterior |
 | No sé editar local.rules | sudo gedit local.rules o nano |
 | VM expira ~1 hora | Dos arranques; respuestas conservadas |
 

@@ -123,7 +123,7 @@
   <div class="badges">
     <span class="badge"><svg class="ic"><use href="#i-clock"/></svg> <b>1 h 45 min – 2 h</b></span>
     <span class="badge"><b>10%</b> Unidad 1 · Actividad 2</span>
-    <span class="badge">100% asíncrono · sala gratuita · Snort 2.9</span>
+    <span class="badge">100% asíncrono · sala gratuita · Snort 2.9.7.0</span>
   </div>
   <button class="printbtn" onclick="window.print()">Imprimir / Guardar PDF</button>
   <p class="meta"><b>Ing. Rodolfo Cañas Cervantes</b> — Universidad de la Costa (CUC)<br>Seguridad en Redes · Periodo 2026-2 · Semana 4<br><a href="lab-02-ids-ips-tryhackme.md" download>📄 Descargar versión Markdown</a></p>
@@ -168,7 +168,7 @@
       <li>Navegador actualizado — la sala corre una máquina virtual dentro del navegador, no instalas nada en tu equipo.</li>
       <li>~1.5 horas continuas (puedes pausar y retomar, TryHackMe guarda tu progreso en la cuenta).</li>
     </ul>
-    <div class="warn">La VM usa <b>Snort 2.9 (build 149)</b>: sintaxis Snort 2. Suricata NO acepta el operador bidireccional <span class="mono">&lt;&gt;</span>.</div>
+    <div class="warn">La VM usa <b>Snort 2.9.7.0</b>: sintaxis Snort 2. Suricata NO acepta el operador bidireccional <span class="mono">&lt;&gt;</span>. El número de <i>build</i> exacto no está fijo — lo confirmas tú mismo con <span class="mono">snort -V</span> (es una de las preguntas de la sala).</div>
     <div class="nota">La VM gratuita <b>expira ~1 hora por arranque</b>. Planifica en bloques: si te detiene el tiempo, vuelve a iniciar — el progreso de respuestas se conserva en tu cuenta.</div>
     <div class="warn">Esta actividad es <b>asíncrona</b>: no se hace en la sesión de clase de esta semana, tienes hasta la fecha límite que se anuncie en clase para completarla y subir el entregable.</div>
   </section>
@@ -181,8 +181,8 @@
       <li>Haz clic en <b>"Start Room"</b> / <b>"Join Room"</b>. TryHackMe desplegará una máquina virtual Linux accesible desde el navegador (puede tardar 1-2 minutos en iniciar).</li>
       <li>Confirma que tu usuario queda visible en tu perfil.</li>
       <li><b>Start Machine</b> → <b>Show Split View</b>.</li>
-      <li>Terminal (<span class="mono">sudo su -</span>):<div class="codeblock"><pre><code>cd ~/Desktop/Task-Exercises
-./easy.sh</code></pre><button class="copy-btn">Copiar</button></div>Salida esperada: <b>Too Easy!</b> — respuesta de la tarea 2.</li>
+      <li>Terminal:<div class="codeblock"><pre><code>cd ~/Desktop/Task-Exercises
+./.easy.sh</code></pre><button class="copy-btn">Copiar</button></div>Es un archivo <b>oculto</b> (empieza con punto) — si escribes <span class="mono">./easy.sh</span> sin el punto, no lo va a encontrar. Salida esperada: <b>Too Easy!</b> — respuesta de la tarea 2.</li>
     </ol>
   </section>
     <figure class="diagram">
@@ -201,7 +201,7 @@
       <tr><td>El generador no corre</td><td>Falta sudo o TASK equivocada</td><td><span class='mono'>sudo ./traffic-generator.sh</span> y elige la TASK exacta</td></tr>
       <tr><td>Snort no relee mis logs ASCII</td><td>ASCII es solo humano</td><td>Solo binario se relee: <span class='mono'>snort -r snort.log.*</span></td></tr>
       <tr><td>Mi regla no dispara alertas</td><td>Reglas viejas o logs sucios</td><td>Comenta con <span class='mono'>#</span>, borra logs (<span class='mono'>rm snort.log.*</span>), prueba <span class='mono'>-A console</span></td></tr>
-      <tr><td>Pregunta sameip no cuadra</td><td>Contaste broadcast/multicast/sin asignar</td><td>La respuesta <b>excluye</b> esas: son <b>7</b>, no 13</td></tr>
+      <tr><td>Pregunta de <span class="mono">sameip</span> no cuadra</td><td><span class="mono">sameip</span> filtra paquetes donde la IP de <b>origen y destino son iguales</b> (no es un filtro de broadcast/multicast) — típico indicador de spoofing</td><td>Verifica que tu regla apunte al protocolo correcto (UDP en este ejercicio) y que borraste el archivo de alertas anterior antes de contar de nuevo</td></tr>
       <tr><td>No sé editar local.rules</td><td>Sin editor abierto</td><td><span class='mono'>sudo gedit local.rules</span> o nano</td></tr>
       <tr><td>La VM expira ~1 hora</td><td>Límite gratuito</td><td>Dos arranques planificados; respuestas conservadas</td></tr>
       <tr><td>La VM no carga / queda en blanco</td><td>Despliegue lento del contenedor</td><td>Espera 2 min y recarga sin cerrar sesión</td></tr>
@@ -213,11 +213,11 @@
       <li><div class="codeblock"><pre><code>cd ~/Desktop/Task-Exercises &amp;&amp; ./.easy.sh</code></pre><button class="copy-btn">Copiar</button></div>Respuesta esperada: <b>Too Easy!</b> — confirma que el entorno funciona.</li>
     </ol>
     <h3 class="fase-h" style="font-size:16px;">Fase 1 · Conceptos <span class="t">⏱ 10 min</span> <span class="task">Task 3</span></h3>
-    <p>Quiz de conceptos: <b>NIDS / HIDS / NIPS / HIPS / NBA</b> y qué significa <b>baselining</b> (línea base del tráfico "normal") — exactamente los términos de la clase.</p>
+    <p>Quiz de conceptos: <b>NIDS / HIDS</b> (detección, red/host) y <b>NIPS / HIPS / NBA / WIPS</b> (prevención, red/host/comportamiento/inalámbrica) y qué significa <b>baselining</b> (línea base del tráfico "normal", el periodo de entrenamiento de NBA) — exactamente los términos de la clase.</p>
     <h3 class="fase-h" style="font-size:16px;">Fase 2 · Instalación y validación <span class="t">⏱ 10 min</span> <span class="task">Task 4</span></h3>
     <div class="codeblock"><pre><code>snort -V
 sudo snort -c /etc/snort/snort.conf -T</code></pre><button class="copy-btn">Copiar</button></div>
-    <p><span class="mono">-V</span>: versión (<b>build 149</b>, Snort 2.9). La validación con <span class="mono">-T</span> carga <b>4151 reglas</b> del snort.conf completo; <span class="mono">snortv2.conf</span> trae <b>1 sola regla</b> — la usarás en la Fase 6.</p>
+    <p><span class="mono">-V</span>: muestra versión y número de build (anótalo, es una respuesta de la sala). La validación con <span class="mono">-c archivo -T</span> también reporta cuántas reglas cargó ese archivo de configuración — compara el resultado de <span class="mono">/etc/snort/snort.conf</span> (el conjunto completo) contra <span class="mono">/etc/snort/snortv2.conf</span> (una versión mínima, muchas menos reglas) — la usarás en la Fase 6.</p>
     <h3 class="fase-h" style="font-size:16px;">Fase 3 · Modo sniffer <span class="t">⏱ 15 min</span> <span class="task">Task 5</span></h3>
     <div class="codeblock"><pre><code>sudo snort -v
 sudo snort -v -i eth0
@@ -230,10 +230,10 @@ ls
 sudo snort -r snort.log.* -n 10
 sudo snort -r snort.log.* -X
 sudo snort -r snort.log.* 'tcp port 80'</code></pre><button class="copy-btn">Copiar</button></div>
-    <div class="nota">Los logs <b>ASCII (-K ASCII)</b> son para tus ojos: Snort no puede releerlos. Solo el formato <b>binario</b> se relee con <span class="mono">-r</span>. Verás la carpeta <span class="mono">145.254.160.237</span> con archivos tipo <span class="mono">TCP:3009-53</span>.</div>
+    <div class="nota">Los logs <b>ASCII (-K ASCII)</b> son para tus ojos: Snort no puede releerlos. Solo el formato <b>binario</b> se relee con <span class="mono">-r</span>. Verás carpetas con nombre de IP (ej. <span class="mono">145.254.160.237</span>) y dentro, archivos nombrados por protocolo y puerto (ej. <span class="mono">UDP:36648-53</span>, <span class="mono">TCP:xxxx-80</span>) — la sala pregunta específicamente por la carpeta <span class="mono">145.254.160.237</span>.</div>
     <h3 class="fase-h" style="font-size:16px;">Fase 5 · Modo NIDS <span class="t">⏱ 20 min</span> <span class="task">Task 7</span></h3>
     <div class="codeblock"><pre><code>sudo snort -c /etc/snort/snort.conf -A full -l .
-# genera tráfico con traffic-generator.sh → TASK 6
+# genera tráfico con traffic-generator.sh → TASK 7
 # detén con Ctrl+C: el resumen estadístico SOLO aparece al detener</code></pre><button class="copy-btn">Copiar</button></div>
     <div class="warn">El conteo de HTTP GET que pide la tarea aparece <b>solo al detener Snort con Ctrl+C</b> — no cierres la pestaña sin parar el proceso.</div>
     <p>Variantes de alerta: <span class="mono">-A console</span> (pantalla, ideal para probar), <span class="mono">-A fast</span> (una línea), <span class="mono">-A cmg</span> (verbosa con payload).</p>
@@ -243,7 +243,7 @@ sudo snort -c /etc/snort/snortv2.conf -A console -l . -r mx-1.pcap
 sudo snort -c /etc/snort/snortv2.conf -A console --pcap-list="mx-2.pcap mx-3.pcap" --pcap-show</code></pre><button class="copy-btn">Copiar</button></div>
     <p>Edita tus reglas en <span class="mono">local.rules</span>:</p>
     <div class="codeblock"><pre><code>sudo gedit local.rules        # o: sudo nano local.rules</code></pre><button class="copy-btn">Copiar</button></div>
-    <p>Elementos a practicar: <span class="mono">content:"id: 35369"</span>, banderas TCP <span class="mono">flags:S</span> y <span class="mono">flags:PA</span>, opción <span class="mono">sameip</span>; tus reglas usan <span class="mono">sid ≥ 1000001</span> (rango local) con <span class="mono">rev</span> incremental.</p>
+    <p>Elementos a practicar: opción no-payload <span class="mono">id:35369</span> (filtra por el campo IP ID del paquete — NO es <span class="mono">content</span>, ese keyword es solo para buscar dentro del payload), banderas TCP <span class="mono">flags:S</span> y <span class="mono">flags:PA</span>, opción <span class="mono">sameip</span> (alerta cuando origen y destino coinciden); tus reglas van con <span class="mono">sid</span> ≥ 1.000.000 (Snort reserva &lt;100 para el propio motor y 100-999.999 para las reglas que vienen con el build — el rango de usuario empieza en 1.000.000) y <span class="mono">rev</span> incremental.</p>
     <h3 class="fase-h" style="font-size:16px;">Fase 7 · Lectura final <span class="t">⏱ 5 min</span> <span class="task">Tasks 10–11</span></h3>
     <p>Lecturas de cierre sobre la lógica interna de Snort y buenas prácticas — al terminar, la sala marca <b>100 %</b>.</p>
 
