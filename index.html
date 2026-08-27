@@ -84,6 +84,14 @@
   .week-card.pending .num { background: var(--surface-2); color: var(--ink-soft); }
   .week-card.pending .go { font-style: italic; }
 
+  .week-card.multi .go-group { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .week-card.multi .go-group .go {
+    margin-left: 0; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface-2); font-family: 'IBM Plex Mono'; font-size: 12px; text-decoration: none;
+    transition: border-color .15s, color .15s;
+  }
+  .week-card.multi .go-group .go:hover { border-color: var(--vino); color: var(--vino); }
+
   .tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
   table.calendar { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
   table.calendar th { background: var(--vino); color: #fff; text-align: left; padding: 10px 12px; font-weight: 600; white-space: nowrap; }
