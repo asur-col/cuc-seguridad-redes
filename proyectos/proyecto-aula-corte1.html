@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proyecto de Aula Corte 1 — Diseño de Segmentación y Control de Acceso · Seguridad en Redes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  :root{
+    --bg:#FBF8F3; --surface:#FFFFFF; --surface-2:#F4EEE3;
+    --ink:#2A2A2A; --ink-soft:#6B6259;
+    --vino:#A6192E; --vino-strong:#7E1223; --vino-tint:#FBEBEC;
+    --dorado:#A9791C; --dorado-tint:#FBF3DE;
+    --line:#E5DCCB;
+    --ok:#0E7A4B; --ok-tint:#E8F5EE;
+    --warn:#B23A3A; --warn-tint:#FBE9E7;
+    --shadow:0 1px 2px rgba(42,26,20,.05),0 8px 24px rgba(42,26,20,.07);
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --serif:'Fraunces',Georgia,serif;
+  }
+  @media(prefers-color-scheme:dark){
+    :root:not([data-theme=light]){
+      --bg:#1B1613; --surface:#24201B; --surface-2:#2C2620;
+      --ink:#EFE7D9; --ink-soft:#B3A896;
+      --vino:#E2536B; --vino-strong:#F0748A; --vino-tint:#3A1E22;
+      --dorado:#E4BC5C; --dorado-tint:#3B321C; --line:#3D362B;
+      --ok:#5BD69E; --ok-tint:#1D3328;
+      --warn:#F0748A; --warn-tint:#3A1E22;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.65}
+  .layout{display:flex;align-items:flex-start;max-width:1400px;margin:0 auto;gap:0}
+  .wrap{flex:1 1 auto;min-width:0;max-width:1140px;margin:0 auto;padding:0 20px 80px}
+  .sidenav{position:sticky;top:0;flex:0 0 220px;padding:32px 12px 32px 20px;display:flex;flex-direction:column;gap:4px;align-self:flex-start;max-height:100vh;overflow-y:auto}
+  .sidenav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:8px 12px;border-radius:8px;border-left:2px solid transparent;line-height:1.4}
+  .sidenav a:hover{color:var(--vino);background:var(--surface-2)}
+  .sidenav a.active{color:var(--vino-strong);border-left-color:var(--vino);background:var(--vino-tint);font-weight:600}
+  @media(max-width:960px){
+    .layout{display:block}
+    .sidenav{position:static;flex-direction:row;flex-wrap:wrap;max-height:none;overflow-y:visible;padding:14px 20px 6px;gap:8px}
+    .sidenav a{border:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface-2);border-radius:20px;padding:6px 13px}
+    .sidenav a.active{border-color:var(--vino)}
+    .wrap{max-width:100%}
+  }
+  header.top{padding:44px 20px 30px;text-align:center;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  header.top img.logo{height:52px;margin-bottom:14px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--vino);margin:0 0 6px;font-weight:500}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,38px);margin:0 0 10px;line-height:1.15}
+  .sub{color:var(--ink-soft);margin:0;font-size:16px;max-width:680px;margin-left:auto;margin-right:auto}
+  .accent-bar{width:72px;height:4px;background:linear-gradient(90deg,var(--vino),var(--dorado));margin:18px auto;border-radius:2px}
+  .meta{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);line-height:1.8;margin:0}
+  .meta b{color:var(--ink)}
+  section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 30px;margin-top:26px;box-shadow:var(--shadow)}
+  h2{font-family:var(--serif);font-size:23px;margin:0 0 4px;display:flex;align-items:center;gap:12px}
+  h2 .paso{font-family:var(--mono);font-size:13px;background:var(--vino);color:#fff;border-radius:8px;padding:3px 11px;font-weight:500;flex:none}
+  h3{font-size:17px;margin:26px 0 8px;color:var(--vino-strong);font-family:var(--serif)}
+  h4{font-size:15px;margin:18px 0 6px;color:var(--ink)}
+  .lead{color:var(--ink-soft);margin-top:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.8px;margin:14px 0}
+  th{text-align:left;background:var(--surface-2);padding:9px 12px;border:1px solid var(--line);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+  td{padding:8px 12px;border:1px solid var(--line);vertical-align:top}
+  .tbl-wrap{overflow-x:auto}
+  code{font-family:var(--mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  blockquote{margin:14px 0;padding:14px 18px;border-left:4px solid var(--dorado);background:var(--dorado-tint);border-radius:0 8px 8px 0;font-style:italic;color:var(--ink)}
+  .tip,.warn,.danger{border-left:4px solid;border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14.5px}
+  .tip{border-color:var(--ok);background:var(--ok-tint)} .tip::before{content:"💡 TIP — ";font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ok)}
+  .warn{border-color:var(--dorado);background:var(--dorado-tint)} .warn::before{content:"⚠ ATENCIÓN — ";font-family:var(--mono);font-size:11px;font-weight:600;color:var(--dorado)}
+  .danger{border-color:var(--vino);background:var(--vino-tint)} .danger::before{content:"☠ MANDATO DEL CLIENTE — ";font-family:var(--mono);font-size:11px;font-weight:600;color:var(--vino)}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  figure.diagram{margin:22px 0;padding:18px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+  figure.diagram svg{min-width:820px;width:100%;height:auto;display:block}
+  figcaption{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px;letter-spacing:.03em}
+  pre.ascii{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:18px;overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.45;color:var(--ink);margin:16px 0}
+  .rubrica td:first-child, .rubrica th:first-child{font-family:var(--mono);text-align:center;width:28px}
+  .rubrica td.crit{font-weight:600;color:var(--vino-strong)}
+  footer{margin-top:34px;padding:26px 20px;text-align:center;color:var(--ink-soft);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line)}
+  a.ext{color:var(--vino);text-decoration:none;border-bottom:1px dotted var(--vino)}
+  a.ext:hover{color:var(--vino-strong);border-bottom-style:solid}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="logo" src="https://es.wikipedia.org/wiki/Special:FilePath/Logo_cuc.png" alt="Universidad de la Costa">
+  <p class="eyebrow">Proyecto de Aula · Primer Corte · Unidad 1</p>
+  <h1>Diseño de Segmentación y Control de Acceso</h1>
+  <p class="sub">SaludVital Barranquilla necesita dejar de ser un candidato al siguiente caso de ransomware tipo Keralty — no le sirve "más firewall en el borde", necesita fronteras nuevas por dentro</p>
+  <div class="accent-bar"></div>
+  <p class="meta">
+    <b>Curso:</b> Seguridad en Redes — Ingeniería de Sistemas<br>
+    <b>Docente:</b> Ing. Rodolfo Cañas Cervantes · Universidad de la Costa (CUC) · 2026-2<br>
+    <b>Modalidad:</b> equipo de máximo 2 estudiantes &nbsp;·&nbsp; <b>Ponderación:</b> 20% del corte &nbsp;·&nbsp; <b>Unidad evaluada:</b> Unidad 1 completa
+  </p>
+</header>
+
+<div class="layout">
+<nav class="sidenav">
+  <a href="#s1">1. Info general</a>
+  <a href="#s2">2. Caso de estudio</a>
+  <a href="#s3">3. Objetivo</a>
+  <a href="#s4">4. Contenido mínimo</a>
+  <a href="#s5">5. Rúbrica</a>
+  <a href="#s6">6. Entregables</a>
+  <a href="#s7">7. Condiciones</a>
+  <a href="#s8">8. Recomendaciones</a>
+</nav>
+<div class="wrap">
+
+<section>
+  <blockquote><b>Alcance:</b> este proyecto evalúa la <b>Unidad 1</b> completa (panorama de amenazas y Zero Trust, red básica y controles, segmentación de redes, firewalls de host e IDS/IPS, hardening perimetral y políticas de control de acceso).</blockquote>
+  <p><b>Rol de las partes:</b> el docente actúa como el <b>cliente</b> — SaludVital Barranquilla, una IPS que digitaliza su operación clínica — y entrega el <b>diagnóstico técnico de partida</b> (inventario de red, segmentación actual, incidente que motiva el encargo, sección 2). El equipo de estudiantes actúa como la <b>firma de seguridad contratada</b> para producir el <b>documento de diseño de red segura</b>: no es una auditoría forense del incidente (eso excede lo visto en Unidad 1), es la propuesta técnica que responde a "¿cómo debería estar segmentada y controlada esta red para que lo que le pasó a este tipo de empresa no le pase a esta?" — con las herramientas y conceptos vistos hasta la semana 5.</p>
+  <p><b>Caso inspirado en un hecho real</b> (no un ejercicio inventado sin fundamento): en 2022 el ataque de ransomware RansomHouse contra Keralty (matriz de EPS Sanitas/Colsanitas en Colombia) cifró sistemas clínicos y administrativos y forzó procesos manuales durante semanas — un antecedente documentado, no hipotético, del riesgo de una red plana en el sector salud.</p>
+</section>
+
+<!-- ============ 1. INFO GENERAL ============ -->
+<section id="s1">
+  <h2><span class="paso">1</span> Información general</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Campo</th><th>Detalle</th></tr>
+    <tr><td>Asignatura</td><td>Seguridad en Redes</td></tr>
+    <tr><td>Corte evaluado</td><td>Primer corte</td></tr>
+    <tr><td>Unidad evaluada</td><td>Unidad 1 completa (Redes)</td></tr>
+    <tr><td>Modalidad</td><td><b>Máximo 2 estudiantes</b> (se permite individual)</td></tr>
+    <tr><td>Ponderación</td><td>20% del corte (rúbrica) — además del 10% de los labs de unidad ya calificados por separado</td></tr>
+    <tr><td><b>Fecha límite de entrega</b></td><td><b>Sábado 12 de septiembre de 2026</b> (deja el domingo 13 para calificar antes del plazo oficial de ingreso de notas del corte 1)</td></tr>
+    <tr><td>Medio de entrega</td><td>Microsoft Teams</td></tr>
+    <tr><td>Nomenclatura del archivo</td><td><code>ProyectoC1_Equipo#_Apellidos.pdf</code> + carpeta de evidencia de laboratorio</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 2. CASO DE ESTUDIO ============ -->
+<section id="s2">
+  <h2><span class="paso">2</span> Caso de estudio: Segmentación de red de "SaludVital Barranquilla"</h2>
+
+  <h3>Perfil de la empresa</h3>
+  <p>SaludVital Barranquilla es una IPS mediana con una sede principal (consulta externa, laboratorio clínico, farmacia) y dos sedes satélite en la ciudad. Digitalizó su operación hace tres años: historias clínicas electrónicas, agenda de citas en línea, y un portal para que los pacientes descarguen resultados. Toda la red —clínica, administrativa, de invitados (WiFi de sala de espera) y los servidores que exponen el portal de pacientes— corre hoy sobre la <b>misma red plana</b>, sin segmentación real.</p>
+
+  <h3>El mandato explícito del cliente</h3>
+  <div class="danger">"Nos enteramos de lo que le pasó a Keralty y no queremos ser el siguiente caso en el periódico. Hoy, si alguien compromete el computador de la sala de espera o el portal de pacientes, puede llegar caminando por la red hasta el servidor de historias clínicas — nadie nos lo había explicado así hasta que preguntamos. No necesitamos todavía IA, ni un SOC de 24 horas: necesitamos que la red esté dividida de forma que comprometer una parte no signifique comprometer todo, que el firewall y el IDS realmente detecten y frenen algo, y que quede documentado y probado quién puede administrar cada parte — no una lista de excepciones que solo entiende la persona que las escribió."</div>
+  <p>Este mandato no es decorativo: es un requisito de evaluación. Una propuesta que solo agrega un firewall perimetral más grande sin tocar la segmentación interna <b>no cumple el encargo del cliente</b>, sin importar qué tan robusta esté esa única regla.</p>
+
+  <h3>Inventario técnico de partida</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>Recurso</th><th>Función</th><th>Ubicación actual</th><th>Patrón de uso real</th><th>Criticidad</th></tr>
+    <tr><td>Servidor de Historias Clínicas Electrónicas (HCE)</td><td>Base de datos + aplicación web interna</td><td>Misma red que todo lo demás</td><td>24/7, acceso constante del personal clínico en horario de atención</td><td>Crítica — datos de salud, sujetos a Ley 1581</td></tr>
+    <tr><td>Servidor de Agenda/Citas</td><td>Aplicación web, expuesta al portal de pacientes</td><td>Misma red, con puerto abierto a Internet</td><td>Picos en horario de atención y fin de mes (agendamiento de controles)</td><td>Alta — es la puerta de entrada desde Internet</td></tr>
+    <tr><td>Portal de resultados para pacientes</td><td>Aplicación web pública</td><td>Misma red que HCE</td><td>Tráfico bajo y disperso todo el día</td><td>Alta — único sistema con exposición directa a Internet</td></tr>
+    <tr><td>Servidor de Farmacia/Inventario</td><td>Aplicación de gestión de stock</td><td>Misma red</td><td>Horario laboral, uso moderado</td><td>Media</td></tr>
+    <tr><td>PACS/imágenes diagnósticas (laboratorio)</td><td>Almacenamiento de estudios</td><td>Misma red que HCE</td><td>Uso concentrado en horario de laboratorio</td><td>Alta — volumen de datos sensibles</td></tr>
+    <tr><td>Estaciones clínicas (consultorios, ×15)</td><td>Acceso del personal médico a HCE</td><td>LAN clínica sin distinguir de administrativa</td><td>Horario de atención</td><td>Alta (punto de entrada humano)</td></tr>
+    <tr><td>Estaciones administrativas (facturación, RRHH, ×10)</td><td>Acceso a sistemas administrativos y HCE parcial</td><td>Misma LAN que las clínicas</td><td>Horario laboral</td><td>Media</td></tr>
+    <tr><td>WiFi de sala de espera (invitados)</td><td>Acceso a Internet para pacientes</td><td><b>Mismo switch/VLAN que todo lo demás</b></td><td>Uso disperso, dispositivos no gestionados por la IPS</td><td>Baja en sí misma, <b>alta como vector de entrada</b></td></tr>
+    <tr><td>Firewall perimetral</td><td>Único punto de filtrado, reglas heredadas de hace 3 años sin revisión</td><td>Borde de la red</td><td>24/7</td><td>—</td></tr>
+    <tr><td>Router de las 2 sedes satélite</td><td>Conexión hacia la sede principal</td><td>VPN sin segmentación adicional al llegar</td><td>Horario de atención de cada sede</td><td>Media</td></tr>
+  </table></div>
+
+  <h3>Diagrama de la red actual (analícenlo antes de proponer nada)</h3>
+  <p>El cliente entrega este diagrama tal como lo tiene documentado internamente — <b>no está simplificado a propósito para el ejercicio</b>. Antes de escribir una sola línea del documento, el equipo debe leerlo con cuidado y extraer al menos 3 observaciones propias (van en el Capítulo 0): por ejemplo, qué recurso queda alcanzable desde un segmento que no debería tener ninguna razón para llegar hasta ahí, o qué zona concentra el mayor riesgo sin que el diagrama lo distinga visualmente de las demás.</p>
+  <pre class="ascii">                    ┌─────────────────────────────────────────────────────────┐
+                    │                     INTERNET                             │
+                    └───────────────────────┬───────────────────────────────────┘
+                                             │
+                                    ┌────────▼────────┐
+                                    │   Firewall único  │  (reglas heredadas,
+                                    │   perimetral      │   sin revisión en 3 años)
+                                    └────────┬────────┘
+                                             │
+                        ┌────────────────────┴────────────────────┐
+                        │         RED PLANA 10.10.0.0/22            │
+                        │            (una sola VLAN, un solo switch │
+                        │             core para todo lo siguiente)  │
+                        │                                            │
+                        │  Servidor HCE ──── Servidor Agenda/Citas   │
+                        │       │                    │               │
+                        │  PACS/Imágenes      Portal de Resultados   │
+                        │       │              (expuesto a Internet) │
+                        │  Servidor Farmacia                          │
+                        │                                            │
+                        │  15 estaciones clínicas ── 10 estaciones   │
+                        │  (consultorios)             administrativas│
+                        │                                            │
+                        │  WiFi sala de espera (pacientes/invitados) │
+                        │        ↑ mismo switch que TODO lo anterior │
+                        └────────────────────┬────────────────────┘
+                                             │
+                                   VPN sin segmentación adicional
+                                             │
+                        ┌────────────────────┴────────────────────┐
+                        │  Sede satélite 1        Sede satélite 2   │
+                        │  (mismas reglas de acceso que la principal)│
+                        └────────────────────────────────────────────┘</pre>
+
+  <p><b>Detalles que el diagrama muestra y la tabla del inventario no dice explícitamente</b> (parte del ejercicio es notarlos):</p>
+  <ul>
+    <li>El <b>WiFi de sala de espera comparte switch con el servidor de Historias Clínicas</b> — un dispositivo de un paciente, sin ningún control, está en la misma capa 2 que el activo más crítico de la empresa.</li>
+    <li>El <b>portal de resultados, el único sistema expuesto directamente a Internet, vive en la misma red que la base de datos de HCE</b> — no hay una DMZ que aísle lo público de lo interno.</li>
+    <li>El <b>firewall perimetral es el único punto de filtrado</b>: una vez algo cruza esa frontera, no hay ningún control adicional entre segmentos internos — no hay firewalls de host, no hay Security Groups equivalentes, no hay nada que detecte movimiento lateral.</li>
+    <li>Las <b>dos sedes satélite heredan exactamente las mismas reglas de acceso que la sede principal</b>, sin razón funcional — no necesitan alcanzar el PACS ni la farmacia, pero hoy pueden.</li>
+    <li>No existe ningún control de quién administra qué: el diagrama no distingue roles, coherente con la queja del cliente sobre "una lista de excepciones que solo entiende quien las escribió".</li>
+  </ul>
+
+  <h3>Desafíos que motivan el rediseño</h3>
+  <ol>
+    <li>Una sola VLAN significa que comprometer cualquier punto de entrada (WiFi de invitados, una estación clínica con phishing, el portal expuesto) da acceso directo a los sistemas más críticos — exactamente el patrón que permitió el movimiento lateral en el caso Keralty.</li>
+    <li>El firewall perimetral filtra la frontera pero no distingue entre lo que debería y no debería moverse una vez adentro.</li>
+    <li>No hay IDS/IPS: si algo entra, nadie se entera hasta que el daño ya es visible (ej. archivos cifrados).</li>
+    <li>No hay política de control de acceso documentada — administración por costumbre, no por diseño ("todos con la misma cuenta, porque siempre ha sido así").</li>
+    <li>Las sedes satélite amplían la superficie de ataque sin aportar ningún control adicional.</li>
+  </ol>
+
+  <h3>La decisión estratégica</h3>
+  <p>La dirección de SaludVital Barranquilla aprobó un <b>rediseño de segmentación y control de acceso</b> para la sede principal y su conexión con las sedes satélite, usando exactamente lo que este curso cubre en la Unidad 1: VLANs/DMZ, firewalls de host y perimetral, IDS/IPS, hardening sistemático y políticas de control de acceso. Todo lo anterior en esta sección 2 es el <b>diagnóstico entregado por el cliente</b> — el equipo no lo inventa ni lo modifica, es el punto de partida sobre el que debe responder con su documento de diseño.</p>
+</section>
+
+<!-- ============ 3. OBJETIVO GENERAL ============ -->
+<section id="s3">
+  <h2><span class="paso">3</span> Objetivo general</h2>
+  <p>A partir del diagnóstico entregado por el cliente (sección 2), producir el <b>documento de diseño de segmentación, filtrado, detección y control de acceso</b> para la red de SaludVital Barranquilla, con el nivel de detalle suficiente para construir y probar la topología propuesta en el entorno de laboratorio del curso (Containerlab/Killercoda), demostrando explícitamente <b>por qué el diseño elegido contiene el tipo de incidente que le ocurrió a Keralty</b>, no solo "agrega más firewall".</p>
+</section>
+
+<!-- ============ 4. CONTENIDO MÍNIMO ============ -->
+<section id="s4">
+  <h2><span class="paso">4</span> Contenido mínimo del documento</h2>
+  <p class="lead">El documento debe tener esta estructura. El <b>capítulo 0 es obligatorio y es el que diferencia este trabajo de una copia de la primera respuesta que dé cualquier asistente de IA</b> — sin él, los capítulos 1-4 no pueden calificarse por encima de un desempeño insuficiente en el criterio de análisis comparativo (ver rúbrica, sección 5).</p>
+
+  <h3>Capítulo 0 — Análisis de la red actual y comparación de rutas de rediseño (el corazón del documento)</h3>
+  <p>La pregunta que este capítulo obliga a responder es: <b>¿la red plana actual necesita "más firewall en el borde", o necesita fronteras nuevas por dentro?</b></p>
+  <p>Presentar y comparar 3 vías:</p>
+  <ul>
+    <li><b>Vía A — solo perimetral</b>: reforzar únicamente el firewall de borde (reglas más estrictas, tal vez un segundo firewall) sin tocar la segmentación interna. Es la respuesta más obvia y la que casi cualquier asistente de IA da si se le pregunta "¿cómo mejoro la seguridad de esta red?" sin más contexto — y es exactamente lo que <b>no</b> habría contenido un incidente tipo Keralty, porque el problema no fue cruzar el borde, fue lo que pasó después de cruzarlo.</li>
+    <li><b>Vía B — segmentación uniforme</b>: dividir todo en VLANs "por convención" (una VLAN por piso o por tipo de dispositivo) sin priorizar por criticidad del dato ni por el patrón de acceso real descrito en la sección 2.</li>
+    <li><b>Vía C — segmentación por criticidad y patrón de acceso real</b>: zonas diseñadas según qué necesita hablar con qué (HCE y PACS aislados en una zona clínica que solo el personal médico alcanza; el portal de resultados y agenda en una DMZ real, separada de la base de datos; WiFi de invitados completamente aislado de todo lo demás; sedes satélite con acceso restringido solo a lo que necesitan, no a toda la red), combinada con controles de host y detección dentro de cada zona, no solo en el borde. Esta vía es la única que responde de verdad al mandato del cliente.</li>
+  </ul>
+  <ul>
+    <li><b>Al menos 3 observaciones propias</b> del diagrama de red legacy (sección 2): qué notaron que la tabla de inventario no decía explícitamente.</li>
+    <li><b>Decisión final justificada</b>: por qué la Vía C (u otra combinación argumentada) es la que se lleva al resto del documento, conectando la justificación con el incidente Keralty y con el mandato del cliente — no con "es más moderno" o "es lo que se ve en internet".</li>
+  </ul>
+  <div class="tip">La primera respuesta de un asistente de IA a "¿cómo aseguro esta red?" casi siempre es una versión de la Vía A. Este capítulo existe explícitamente para que esa primera respuesta se cuestione, no se entregue tal cual.</div>
+
+  <h3>Capítulo 1 — Diseño de segmentación (VLANs, subnetting, DMZ)</h3>
+  <ul>
+    <li><b>Esquema de zonas propuesto</b>, como mínimo: zona clínica (HCE, PACS, estaciones clínicas), zona administrativa (farmacia, estaciones administrativas), DMZ (portal de resultados, agenda de citas), zona de invitados (WiFi sala de espera), y la interconexión con las sedes satélite.</li>
+    <li><b>Direccionamiento CIDR completo</b> para cada VLAN, sin solapamientos.</li>
+    <li><b>Diagrama de red propuesto</b>, mostrando cada zona, su CIDR, y qué recursos viven en ella — el más detallado de todo el documento.</li>
+    <li><b>Justificación explícita</b> de por qué cada recurso quedó en la zona donde quedó, conectada con la criticidad del inventario (sección 2).</li>
+  </ul>
+
+  <h3>Capítulo 2 — Firewalls y control de tráfico entre zonas</h3>
+  <ul>
+    <li><b>Reglas de firewall perimetral</b> (equivalentes a lo trabajado con <code>ufw</code>/<code>iptables</code> en el curso): qué puede entrar desde Internet y a qué zona exactamente (solo a la DMZ, nunca directo a la zona clínica).</li>
+    <li><b>Reglas de firewall de host</b> para al menos 3 servidores críticos (HCE, PACS, portal de resultados), en política por defecto <b>deny</b> con excepciones explícitas y documentadas — ninguna regla sin justificación de una línea.</li>
+    <li><b>Matriz de tráfico permitido entre zonas</b> (tabla: zona origen → zona destino → puerto/protocolo → justificación), dejando explícito que el WiFi de invitados no tiene ruta hacia ninguna zona clínica ni administrativa.</li>
+  </ul>
+
+  <h3>Capítulo 3 — Detección: IDS/IPS</h3>
+  <ul>
+    <li><b>Ubicación del sensor</b> (Snort u homólogo) en la topología: al menos en el borde de la DMZ y en la zona clínica, justificando modo pasivo (NIDS) vs. en línea (NIPS) para cada punto.</li>
+    <li><b>Al menos 3 reglas de detección propuestas</b> (formato de regla Snort, con cabecera y opciones), relevantes al caso: por ejemplo, tráfico anómalo desde el WiFi de invitados hacia cualquier IP de la zona clínica, o un volumen de conexiones saliente inusual desde el servidor HCE (posible señal de exfiltración).</li>
+    <li><b>Qué se hace con una alerta</b>: a quién llega, y qué acción mínima se toma (esto no requiere SIEM, eso es Unidad 2 — solo el flujo básico de "se detecta, se avisa, se actúa").</li>
+  </ul>
+
+  <h3>Capítulo 4 — Hardening y políticas de control de acceso</h3>
+  <ul>
+    <li><b>Checklist de hardening aplicado</b> (los 5 pasos vistos en la semana 5) para al menos los 3 servidores críticos: qué servicios/puertos se cierran, qué credenciales por defecto se eliminan, política de parcheo, logging de cambios de regla.</li>
+    <li><b>Diseño de control de acceso</b> (RBAC o ABAC, justificando cuál se usa y por qué) con al menos 4 roles distintos (ej. médico, administrativo, TI/administrador de red, auditor de solo lectura), cada uno con lo que puede y no puede hacer.</li>
+    <li><b>Cómo este diseño resuelve el problema actual</b> de "una sola cuenta administradora que todos comparten" descrito en el mandato del cliente.</li>
+    <li>Mención explícita de mínimo privilegio y de por qué la contraseña compartida sin MFA es, por sí sola, un hallazgo crítico independientemente de cualquier otro control.</li>
+  </ul>
+</section>
+
+<!-- ============ 5. RÚBRICA ============ -->
+<section id="s5">
+  <h2><span class="paso">5</span> Rúbrica de evaluación — 5 criterios, nota final de 0.0 a 5.0</h2>
+  <p class="lead">Cada criterio vale <b>hasta 1.0 punto</b>. La suma de los 5 da la nota final del proyecto (máximo 5.0).</p>
+  <div class="tbl-wrap"><table class="rubrica">
+    <tr><th>#</th><th>Criterio</th><th>Qué mide</th><th>1.0 (pleno)</th><th>0.6 (parcial)</th><th>0.2 (mínimo)</th><th>0.0</th></tr>
+    <tr><td class="crit">1</td><td><b>Comprensión de la red actual y su superficie de ataque</b></td><td>Que el equipo entendió de verdad por qué la red plana es el problema, no solo que "hay que segmentar"</td><td>Identifica con precisión los puntos de entrada, los caminos de movimiento lateral y por qué el WiFi de invitados es el riesgo más urgente, conectándolo explícitamente con el patrón del caso Keralty</td><td>Identifica la mayoría de los riesgos pero pasa por alto 1-2 relevantes (ej. no menciona las sedes satélite)</td><td>Identificación superficial, tipo checklist, sin conectar con el diagrama entregado</td><td>No presenta análisis o es genérico/inventado</td></tr>
+    <tr><td class="crit">2</td><td><b>Exploración de rutas alternativas (Capítulo 0)</b></td><td>Que el equipo no se quedó con "más firewall en el borde"</td><td>Presenta las 3 vías con comparación real de qué contiene y qué no contiene cada una frente a un incidente tipo Keralty</td><td>Presenta las 3 vías pero la comparación es superficial o incompleta</td><td>Presenta solo 2 vías, o la "Vía C" no es realmente distinta de la "Vía B"</td><td>No hay Capítulo 0 o es un párrafo genérico sin comparación real</td></tr>
+    <tr><td class="crit">3</td><td><b>Diseño de segmentación y filtrado (Capítulos 1-2)</b></td><td>Calidad técnica del esquema de zonas, direccionamiento y reglas de firewall</td><td>Zonas coherentes con la criticidad del inventario, CIDR sin solapamientos, matriz de tráfico completa y consistente con el mandato (invitados sin ruta a zona clínica)</td><td>El diseño es correcto pero incompleto (ej. falta la matriz de tráfico, o una zona sin justificar)</td><td>Errores técnicos de fondo (solapamiento de CIDR, zona clínica alcanzable desde invitados)</td><td>No hay diseño técnico o es copiado sin adaptar al caso</td></tr>
+    <tr><td class="crit">4</td><td><b>Detección, hardening y control de acceso (Capítulos 3-4)</b></td><td>Que el diseño no se queda solo en segmentar, también detecta y controla quién administra qué</td><td>IDS ubicado y justificado, reglas de detección relevantes al caso, checklist de hardening aplicado a los servidores críticos, RBAC/ABAC con mínimo 4 roles resolviendo el problema de la cuenta compartida</td><td>Cubre 3 de los 4 elementos (IDS, hardening, RBAC/ABAC, resolución del problema de la cuenta compartida) con suficiencia</td><td>Cubre solo 1-2 elementos, o de forma genérica sin adaptar al caso</td><td>No hay diseño de detección ni de control de acceso</td></tr>
+    <tr><td class="crit">5</td><td><b>Coherencia y trazabilidad con el caso</b></td><td>Que todo el documento cuente una sola historia, y que lo diseñado se haya probado en el laboratorio</td><td>El diseño del Capítulo 0 es exactamente el que se implementa en los capítulos 1-4; hay evidencia de laboratorio (capturas de Containerlab/Killercoda) que respalda el diseño, no solo el diagrama en papel</td><td>1 inconsistencia menor entre capítulos, o evidencia de laboratorio parcial</td><td>Varias inconsistencias, o el documento no tiene ninguna evidencia de laboratorio</td><td>El documento se contradice entre capítulos o no hay ningún intento de construirlo</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 6. ENTREGABLES ============ -->
+<section id="s6">
+  <h2><span class="paso">6</span> Entregables</h2>
+  <ol>
+    <li><b>Documento</b> en PDF con los cinco capítulos (0 a 4), máximo 15 páginas.</li>
+    <li><b>Diagramas de red</b> (esquema de zonas del capítulo 1) <b>incluidos dentro del documento</b> — no basta con mencionarlos, deben verse.</li>
+    <li><b>Evidencia de laboratorio</b>: capturas o export de la topología construida en Containerlab o Killercoda (la misma plataforma usada en los labs de unidad), reglas de firewall aplicadas, y al menos una alerta de Snort generada por una de las reglas propuestas en el Capítulo 3. Esta evidencia se entrega en una carpeta comprimida junto con el PDF.</li>
+  </ol>
+</section>
+
+<!-- ============ 7. CONDICIONES ============ -->
+<section id="s7">
+  <h2><span class="paso">7</span> Condiciones de entrega</h2>
+  <ul>
+    <li>Los equipos (<b>máximo 2 integrantes</b>, se permite trabajo individual) deben quedar registrados con el docente antes de la fecha de entrega.</li>
+    <li>El documento se entrega en PDF con la nomenclatura <code>ProyectoC1_Equipo#_Apellidos.pdf</code>, junto con la carpeta de evidencia de laboratorio.</li>
+    <li>Todo el tráfico de prueba se genera <b>dentro del entorno aislado</b> (Containerlab/Killercoda) — no se realizan escaneos ni pruebas de red reales contra la infraestructura de la CUC ni de terceros, por la misma razón de siempre: el firewall institucional interfiere con ese tráfico y no está autorizado.</li>
+    <li>El equipo responde por la exactitud técnica de todo el contenido entregado, sin excepción.</li>
+  </ul>
+</section>
+
+<!-- ============ 8. RECOMENDACIONES ============ -->
+<section id="s8">
+  <h2><span class="paso">8</span> Recomendaciones</h2>
+  <ul>
+    <li>Empiecen por el Capítulo 0, no por el diagrama de VLANs: si no tienen claro por qué "más firewall perimetral" no habría evitado un incidente tipo Keralty, todo lo que construyan después hereda el mismo error de fondo.</li>
+    <li>Usen lo que ya construyeron en los labs de las semanas 3 y 4 (segmentación con OPNsense, reglas <code>ufw</code>, Snort) como base real de su topología en Containerlab/Killercoda — no hace falta empezar de cero.</li>
+    <li>Relean el mandato del cliente antes de entregar: si su propuesta final sigue dejando el WiFi de invitados en la misma red que el servidor de Historias Clínicas, no cumplieron el encargo, sin importar qué tan detallado esté el resto del documento.</li>
+    <li>Revisen la coherencia entre capítulos antes de entregar: es un error frecuente diseñar las zonas en el Capítulo 1 y luego, en el Capítulo 2, escribir reglas de firewall que no corresponden a esas mismas zonas.</li>
+  </ul>
+
+  <div class="warn">Este primer corte cubre solo la Unidad 1 (Redes). El proyecto de aula de las Unidades 2 y 3 sobre el mismo caso SaludVital Barranquilla —cifrado e identidad a fondo, monitoreo/SIEM y gestión de CVEs en la Unidad 2; simulación de la cadena de ataque tipo ransomware, respuesta a incidentes, NDR y ethical hacking asistido por IA con marco legal de la Ley 1273 de 2009 en la Unidad 3— se define y se comunica <b>solo en la semana del parcial correspondiente</b> (semana 10 y semana 15-16), siguiendo la misma regla ya establecida para las tres unidades del curso: la rúbrica del 20% queda "por definir" hasta esa semana, nunca se anuncia antes como un hecho.</div>
+</section>
+
+</div>
+</div>
+
+<footer>
+  Seguridad en Redes · Universidad de la Costa (CUC) · Periodo 2026-2 · Proyecto de Aula — Primer Corte
+</footer>
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.sidenav a'));
+  var sections = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var current = 0;
+    sections.forEach(function(s, i){ if (s && s.offsetTop <= pos) current = i; });
+    links.forEach(function(a, i){ a.classList.toggle('active', i === current); });
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
