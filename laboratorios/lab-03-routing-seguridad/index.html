@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada · Seguridad en Redes (CUC)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #ffffff;
+      color: #1a1a1a;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    .page { max-width: 860px; margin: 0 auto; padding: 48px 32px 90px; }
+
+    header.doc { text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 22px; margin-bottom: 30px; }
+    header.doc img.logo { height: 74px; width: auto; display: block; margin: 0 auto; }
+    header.doc h1 { font-size: 25px; line-height: 1.35; margin: 20px 0 8px; }
+    header.doc p.docente { font-size: 16px; font-style: italic; margin: 0 0 14px; color: #A6192E; }
+    header.doc p.meta { font-size: 13.5px; color: #444; margin: 0; }
+
+    h2 { font-size: 20px; color: #A6192E; border-bottom: 2px solid #D4AF37; padding-bottom: 6px; margin: 42px 0 16px; }
+    h3 { font-size: 17px; margin: 30px 0 12px; }
+    p { margin: 0 0 14px; }
+    strong { font-weight: bold; }
+
+    ol, ul { margin: 0 0 16px; padding-left: 28px; }
+    li { margin-bottom: 11px; }
+    li > ul, li > ol { margin-top: 8px; }
+
+    table { border-collapse: collapse; width: 100%; margin: 18px 0 24px; font-size: 14.5px; }
+    th, td { border: 1px solid #000; padding: 7px 10px; text-align: left; vertical-align: top; }
+    th { background: #FBF3DE; color: #A6192E; font-weight: bold; }
+
+    code {
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 0.90em;
+      background: #f2f2f2;
+      border: 1px solid #ddd;
+      padding: 1px 4px;
+    }
+    pre {
+      background: #f6f6f6;
+      border: 1px solid #bbb;
+      border-left: 4px solid #A6192E;
+      padding: 14px 18px;
+      overflow-x: auto;
+      margin: 16px 0 22px;
+    }
+    pre code { background: none; border: none; padding: 0; font-size: 13.5px; line-height: 1.55; }
+
+    blockquote {
+      margin: 0 0 20px;
+      padding: 12px 18px;
+      border-left: 4px solid #D4AF37;
+      background: #FBF3DE;
+      color: #444;
+      font-size: 14.5px;
+    }
+    blockquote p { margin: 0 0 8px; }
+    blockquote p:last-child { margin: 0; }
+
+    figure { margin: 28px 0; text-align: center; }
+    figure img { max-width: 100%; height: auto; border: 1px solid #ccc; }
+    figcaption { font-size: 13.5px; color: #444; margin-top: 10px; font-style: italic; }
+
+    a { color: #0645ad; }
+
+    .verificacion { border: 1px solid #000; background: #fbfbfb; padding: 10px 16px; margin: 0 0 20px; }
+    .verificacion p:last-child { margin-bottom: 0; }
+
+    @media print {
+      .page { padding: 0; max-width: none; }
+      body { font-size: 12.5px; }
+      figure img { max-width: 100%; }
+      h2 { page-break-after: avoid; }
+      pre, table, figure { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="doc">
+    <img src="logo-cuc.png" alt="Logo Universidad de la Costa CUC" class="logo">
+    <h1>Laboratorio 3: Routing Multi-Sitio con Seguridad<br>de Red Aplicada</h1>
+    <p class="docente">Docente: Rodolfo Jose Cañas Cervantes</p>
+    <p class="meta">Seguridad en Redes · Universidad de la Costa (CUC) · 2026-2</p>
+  </header>
+
+  <blockquote>
+    <p><strong>Seguridad en Redes (CUC) · Ponderación y semana: por definir con Rodolfo — construido a partir del &laquo;Taller de Routing&raquo; original.</strong></p>
+    <p>Adaptado del taller de enrutamiento estático/VLANs de Packet Tracer (base: Ing. Rodolfo Cañas), agregando la capa de seguridad que el taller original no tenía: gestión remota cifrada (SSH/AAA), control de acceso entre zonas (ACLs) y monitoreo centralizado (Syslog) — para que el mismo escenario de red sirva también como ejercicio de Seguridad en Redes, no solo de Routing.</p>
+  </blockquote>
+
+  <h2>Antes de empezar — 3 correcciones al taller original</h2>
+
+  <p>Al revisar el taller base se encontraron 3 errores técnicos que se corrigen aquí (no están en la versión que circulaba antes):</p>
+
+  <ol>
+    <li><strong>Máscara incorrecta en R4 (interfaz de LAN3):</strong> la configuración original tenía <code>ip address 172.30.3.1 255.255.248.0</code> (<code>/21</code>), pero el diseño (tabla de LANs 2-5) definía <code>172.30.3.0/24</code>. Se corrige a <code>255.255.255.0</code>.</li>
+    <li><strong>IP de ping mal escrita en la prueba de conectividad a LAN2/LAN3:</strong> el taller original probaba <code>170.20.2.3</code> (con &laquo;170&raquo;, typo) en vez de <code>172.20.2.2</code> — eso explica el &laquo;Destination host unreachable&raquo; que aparecía ahí, no era un problema real de la red. Se corrige el destino del ping.</li>
+    <li><strong>Ruta rechazada en R6 sin explicar por qué:</strong> el taller original mostraba el error real de IOS <code>%Invalid next hop address (it's this router)</code> al intentar <code>ip route 10.0.5.0 255.255.255.252 10.0.4.1</code> (esa IP es la del propio R6, no puede ser el &laquo;next hop&raquo;). Se corrige a <code>10.0.4.2</code> (la IP de R5 al otro lado del enlace) y se deja la nota explicando el error, como ejemplo real de troubleshooting — vale la pena mostrarlo a los estudiantes, pero explicado, no como si fuera parte normal del procedimiento.</li>
+  </ol>
+
+  <h2>Topología (igual que el taller original, sin cambios)</h2>
+
+  <p>6 routers (R1-R6) interconectados por 6 enlaces WAN punto a punto en anillo/malla parcial, LAN #1 con 2 VLANs (GrupoA/GrupoB) tras un switch central + 2 switches de acceso, LAN #2 a LAN #5 sin VLANs (una red plana cada una), un servidor Web (LAN5) y un servidor DNS (LAN4).</p>
+
+  <figure>
+    <img src="topologia-lab03.drawio.png" alt="Topología de referencia del Laboratorio 3: 6 routers interconectados por 6 enlaces WAN punto a punto, LAN #1 con switch central y 2 switches de acceso con VLAN 10/20, LAN #2 a LAN #5, servidor Web en LAN5, DNS y Syslog en LAN4">
+    <figcaption>Figura 1. Topología de referencia del laboratorio. El archivo <code>.pkt</code> de Packet Tracer lo construye el estudiante como parte de la actividad.</figcaption>
+  </figure>
+
+  <p><strong>Planificación de LAN #1 (VLSM sobre 192.168.10.0/24):</strong></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>VLAN</th>
+        <th>Nombre</th>
+        <th>Hosts</th>
+        <th>Red</th>
+        <th>Rango asignable</th>
+        <th>Gateway</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>10</td>
+        <td>GrupoA</td>
+        <td>70</td>
+        <td>192.168.10.0/25</td>
+        <td>.1 - .126</td>
+        <td>192.168.10.1</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>GrupoB</td>
+        <td>50</td>
+        <td>192.168.10.128/26</td>
+        <td>.129 - .190</td>
+        <td>192.168.10.129</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>LAN #2 a LAN #5</strong> (sin VLAN, /24 cada una): LAN2 <code>172.20.2.0/24</code>, LAN3 <code>172.30.3.0/24</code> (<strong>corregida</strong>, ver error 1), LAN4-DNS <code>172.40.4.0/24</code>, LAN5-Web <code>172.50.5.0/24</code>.</p>
+
+  <p><strong>WANs (6 enlaces /30 punto a punto):</strong> WAN1 R1-R2, WAN2 R2-R4, WAN3 R4-R6, WAN4 R6-R5, WAN5 R5-R3, WAN6 R3-R1 (<code>10.0.1.0/30</code> a <code>10.0.6.0/30</code> en ese orden) — ver el taller original para el detalle interfaz por interfaz, no se repite aquí porque no cambia.</p>
+
+  <p><strong>Ruteo:</strong> estático en los 6 routers (cada uno con las rutas hacia las redes que no están directamente conectadas). Ver taller original para las 7-8 rutas por router — tampoco cambian, solo se corrige la de R6 (error 3).</p>
+
+  <h2>Parte NUEVA — Capa de seguridad (esto es lo que agrega este laboratorio)</h2>
+
+  <h3>S.1 — Gestión remota cifrada: SSH en vez de Telnet (todos los routers y switches)</h3>
+
+  <p><strong>Por qué:</strong> Telnet manda usuario y clave en texto plano; cualquiera que capture el tráfico de gestión los ve. SSH los cifra. Es la primera regla de hardening de cualquier dispositivo de red real.</p>
+
+  <p>En <strong>cada router y switch</strong> (ejemplo con R1, repetir con R2-R6, Central, SW-1, SW-2):</p>
+
+  <pre><code>enable
+configure terminal
+hostname R1
+ip domain-name cuc-lab.local
+username admin privilege 15 secret Cisco123!
+crypto key generate rsa
+   ! elegir 1024 bits cuando lo pida
+line vty 0 4
+ transport input ssh
+ login local
+ exec-timeout 5 0
+line console 0
+ exec-timeout 5 0
+ logging synchronous
+enable secret Cisco123!
+service password-encryption
+end
+wr</code></pre>
+
+  <div class="verificacion">
+    <p><strong>Verificación:</strong> desde otro router, <code>ssh -l admin <ip-destino></code> debe pedir la clave y entrar; <code>telnet <ip-destino></code> debe ser rechazado (no hay <code>transport input telnet</code>).</p>
+  </div>
+
+  <h3>S.2 — Control de acceso entre zonas: ACLs extendidas (en R1, punto de entrada de LAN #1)</h3>
+
+  <p><strong>Objetivo:</strong> aplicar el principio de mínimo privilegio del taller de Identidad y Acceso (semana 7) a esta topología: GrupoB (usuarios) no necesita administrar nada — solo debe poder navegar a la Web (LAN5) y resolver DNS (LAN4). GrupoA (TI/administración) sí puede llegar a todo.</p>
+
+  <p>En R1:</p>
+
+  <pre><code>enable
+configure terminal
+ip access-list extended ACL-GRUPOB
+ permit udp 192.168.10.128 0.0.0.63 host 172.40.4.2 eq 53
+ permit tcp 192.168.10.128 0.0.0.63 host 172.50.5.2 eq 80
+ permit tcp 192.168.10.128 0.0.0.63 host 172.50.5.2 eq 443
+ permit icmp 192.168.10.128 0.0.0.63 host 172.50.5.2
+ deny ip 192.168.10.128 0.0.0.63 172.20.2.0 0.0.0.255
+ deny ip 192.168.10.128 0.0.0.63 172.30.3.0 0.0.0.255
+ permit ip any any
+exit
+interface g0/0/1.2
+ ip access-group ACL-GRUPOB in
+end
+wr</code></pre>
+
+  <p><strong>Qué demuestra:</strong> <code>permit ip any any</code> al final es intencional — el punto no es bloquear todo, es bloquear específicamente lo que GrupoB no necesita (acceso a LAN2/LAN3, redes de administración/servidores internos) sin romper su navegación normal.</p>
+
+  <div class="verificacion">
+    <p><strong>Verificación:</strong> desde una PC de GrupoB, <code>ping 172.50.5.2</code> (Web) debe responder; <code>ping 172.20.2.2</code> (LAN2) debe fallar por la ACL, no por falta de ruta (se puede comparar con el resultado de una PC de GrupoA, que sí llega).</p>
+  </div>
+
+  <h3>S.3 — Port Security en los switches de acceso (SW-1, SW-2)</h3>
+
+  <p><strong>Objetivo:</strong> que un puerto de acceso solo acepte la MAC del equipo que ya está conectado — si alguien desconecta la PC y conecta otro equipo (o un switch no autorizado), el puerto se bloquea.</p>
+
+  <p>En SW-1 y SW-2, en los puertos de acceso (<code>f0/2</code> a <code>f0/20</code>):</p>
+
+  <pre><code>enable
+configure terminal
+interface range f0/2-20
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky
+ switchport port-security violation shutdown
+end
+wr</code></pre>
+
+  <div class="verificacion">
+    <p><strong>Verificación:</strong> <code>show port-security interface f0/2</code> debe mostrar la MAC aprendida y el estado <code>secure-up</code>. Si se cambia el cable de esa PC a otro puerto y se intenta usarlo con una MAC distinta en el puerto original (simulado agregando otra PC), el puerto debe pasar a <code>err-disabled</code>.</p>
+  </div>
+
+  <h3>S.4 — Monitoreo centralizado: Syslog (nuevo dispositivo en LAN4)</h3>
+
+  <p><strong>Objetivo:</strong> conectar el tema de la semana (&laquo;Monitoreo y logging de red&raquo;) con la topología existente — todos los routers mandan sus logs a un solo punto, en vez de tener que revisar cada uno por separado.</p>
+
+  <ol>
+    <li>Agregar un servidor genérico (&laquo;Server-PT&raquo;) en LAN4, junto al DNS existente, con IP <code>172.40.4.3/24</code>. Activar el servicio <strong>Syslog</strong> en su pestaña &laquo;Services&raquo;.</li>
+    <li>En cada router:</li>
+  </ol>
+
+  <pre><code>enable
+configure terminal
+logging host 172.40.4.3
+logging trap informational
+logging on
+end
+wr</code></pre>
+
+  <div class="verificacion">
+    <p><strong>Verificación:</strong> provocar un evento (por ejemplo, un intento de SSH fallido, o el port-security del paso S.3 disparándose) y revisar en el servidor Syslog que el mensaje llegó con severidad correcta.</p>
+  </div>
+
+  <h2>Entregable</h2>
+
+  <p><strong>Un solo archivo: el <code>.pkt</code> completo</strong>, con las correcciones (sección &laquo;Antes de empezar&raquo;) y las 4 partes de seguridad (S.1-S.4) implementadas en los 6 routers y los 3 switches. No se piden capturas ni documento aparte — la evaluación se hace abriendo el <code>.pkt</code> directamente y revisando la configuración real de cada dispositivo (<code>show running-config</code>, <code>show ip route</code>, <code>show port-security</code>, <code>show logging</code>, etc.), no capturas de pantalla que el estudiante eligió mostrar.</p>
+
+  <h2>Criterios de evaluación (ponderación por definir)</h2>
+
+  <p>Se verifica revisando la configuración de cada dispositivo dentro del propio <code>.pkt</code> entregado (no capturas):</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Criterio</th>
+        <th>Cómo se verifica en el .pkt</th>
+        <th>Peso sugerido</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Topología base (routing+VLANs) funcionando sin las 3 fallas originales</td>
+        <td><code>show ip route</code> en los 6 routers, <code>show vlan</code> en los switches</td>
+        <td>25%</td>
+      </tr>
+      <tr>
+        <td>S.1 SSH/AAA en los 9 dispositivos</td>
+        <td><code>show running-config</code> — <code>transport input ssh</code>, sin <code>telnet</code>; conexión SSH real entre dos dispositivos</td>
+        <td>20%</td>
+      </tr>
+      <tr>
+        <td>S.2 ACL de mínimo privilegio, verificada en ambos sentidos</td>
+        <td><code>show access-lists</code>, <code>show ip interface g0/0/1.2</code> (ACL aplicada); ping real GrupoB&rarr;Web (pasa) y GrupoB&rarr;LAN2 (bloqueado)</td>
+        <td>25%</td>
+      </tr>
+      <tr>
+        <td>S.3 Port security verificado</td>
+        <td><code>show port-security interface</code> en SW-1/SW-2 — estado <code>secure-up</code>, MAC aprendida</td>
+        <td>15%</td>
+      </tr>
+      <tr>
+        <td>S.4 Syslog centralizado con evento real capturado</td>
+        <td><code>show logging</code> en los routers + mensajes reales recibidos en el servidor Syslog de LAN4</td>
+        <td>15%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Referencias</h2>
+
+  <ul>
+    <li>Taller de Routing original — Ing. Rodolfo Cañas Cervantes (base de la topología, VLSM y routing estático).</li>
+    <li>Cisco: <a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/security/command/sec-cr-book.html">IOS Security Command Reference</a> — ACLs, AAA, port security.</li>
+    <li>Cisco: <a href="https://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/13608-21.html">Configuring Syslog</a>.</li>
+  </ul>
+
+</div>
+</body>
+</html>
