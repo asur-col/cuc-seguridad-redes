@@ -1,45 +1,178 @@
 # Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada
 
-> **Seguridad en Redes (CUC) · Ponderación y semana: por definir con Rodolfo — construido a partir del "Taller de Routing" original.**
-> Adaptado del taller de enrutamiento estático/VLANs de Packet Tracer (base: Ing. Rodolfo Cañas), agregando la capa de seguridad que el taller original no tenía: gestión remota cifrada (SSH/AAA), control de acceso entre zonas (ACLs) y monitoreo centralizado (Syslog) — para que el mismo escenario de red sirva también como ejercicio de Seguridad en Redes, no solo de Routing.
+**Curso:** Seguridad en Redes — Ingeniería de Sistemas
+**Docente:** Ing. Rodolfo Cañas Cervantes — Universidad de la Costa (CUC) · 2026-2
+**Unidad · Actividad · Ponderación:** por definir
+**Modalidad:** Packet Tracer (el estudiante construye la topología completa desde cero)
 
-## Antes de empezar — 3 correcciones al taller original
+## Introducción
 
-Al revisar el taller base se encontraron 3 errores técnicos que se corrigen aquí (no están en la versión que circulaba antes):
+Vas a construir, desde cero en Packet Tracer, una red de 6 sitios interconectados por enlaces WAN punto a punto, con segmentación por VLANs en el sitio principal, ruteo estático completo entre todas las redes, y una capa de seguridad aplicada sobre esa infraestructura: gestión remota cifrada, control de acceso entre zonas por mínimo privilegio, protección de puertos de acceso y monitoreo centralizado por Syslog.
 
-1. **Máscara incorrecta en R4 (interfaz de LAN3):** la configuración original tenía `ip address 172.30.3.1 255.255.248.0` (`/21`), pero el diseño (tabla de LANs 2-5) definía `172.30.3.0/24`. Se corrige a `255.255.255.0`.
-2. **IP de ping mal escrita en la prueba de conectividad a LAN2/LAN3:** el taller original probaba `170.20.2.3` (con "170", typo) en vez de `172.20.2.2` — eso explica el "Destination host unreachable" que aparecía ahí, no era un problema real de la red. Se corrige el destino del ping.
-3. **Ruta rechazada en R6 sin explicar por qué:** el taller original mostraba el error real de IOS `%Invalid next hop address (it's this router)` al intentar `ip route 10.0.5.0 255.255.255.252 10.0.4.1` (esa IP es la del propio R6, no puede ser el "next hop"). Se corrige a `10.0.4.2` (la IP de R5 al otro lado del enlace) y se deja la nota explicando el error, como ejemplo real de troubleshooting — vale la pena mostrarlo a los estudiantes, pero explicado, no como si fuera parte normal del procedimiento.
+No es un ejercicio de routing solamente ni de seguridad solamente — es el mismo escenario que vas a encontrar en una red empresarial real: primero se hace que la red funcione (routing, direccionamiento), y después se asegura (quién puede administrar qué, quién puede llegar a dónde, y cómo te enteras si algo raro pasa).
 
-## Topología (igual que el taller original, sin cambios)
+## Diseño del escenario
 
-6 routers (R1-R6) interconectados por 6 enlaces WAN punto a punto en anillo/malla parcial, LAN #1 con 2 VLANs (GrupoA/GrupoB) tras un switch central + 2 switches de acceso, LAN #2 a LAN #5 sin VLANs (una red plana cada una), un servidor Web (LAN5) y un servidor DNS (LAN4).
+6 routers (R1-R6) interconectados en anillo por 6 enlaces WAN punto a punto. El Sitio 1 (LAN #1) tiene dos grupos de usuarios segmentados por VLAN; los sitios 2 a 5 son redes planas (sin VLAN) con un propósito cada una: dos sitios de usuarios (LAN2, LAN3), un sitio de servicios de red (LAN4: DNS + Syslog) y un sitio de aplicación (LAN5: servidor Web).
 
-**Planificación de LAN #1 (VLSM sobre 192.168.10.0/24):**
+### Planificación de LAN #1 (VLSM sobre 192.168.10.0/24)
 
-| VLAN | Nombre | Hosts | Red | Rango asignable | Gateway |
+| VLAN | Nombre | Hosts necesarios | Red | Rango asignable | Gateway |
 |---|---|---|---|---|---|
-| 10 | GrupoA | 70 | 192.168.10.0/25 | .1 - .126 | 192.168.10.1 |
-| 20 | GrupoB | 50 | 192.168.10.128/26 | .129 - .190 | 192.168.10.129 |
+| 10 | GrupoA | 70 | 192.168.10.0/25 | .1 – .126 | 192.168.10.1 |
+| 20 | GrupoB | 50 | 192.168.10.128/26 | .129 – .190 | 192.168.10.129 |
 
-**LAN #2 a LAN #5** (sin VLAN, /24 cada una): LAN2 `172.20.2.0/24`, LAN3 `172.30.3.0/24` (**corregida**, ver error 1), LAN4-DNS `172.40.4.0/24`, LAN5-Web `172.50.5.0/24`.
+### Planificación de LAN #2 a LAN #5 (sin VLAN, /24 cada una)
 
-**WANs (6 enlaces /30 punto a punto):** WAN1 R1-R2, WAN2 R2-R4, WAN3 R4-R6, WAN4 R6-R5, WAN5 R5-R3, WAN6 R3-R1 (`10.0.1.0/30` a `10.0.6.0/30` en ese orden) — ver el taller original para el detalle interfaz por interfaz, no se repite aquí porque no cambia.
+| Sitio | Red | Gateway | Propósito |
+|---|---|---|---|
+| LAN2 | 172.20.2.0/24 | 172.20.2.1 | Usuarios |
+| LAN3 | 172.30.3.0/24 | 172.30.3.1 | Usuarios |
+| LAN4 | 172.40.4.0/24 | 172.40.4.1 | DNS (.2) + Syslog (.3) |
+| LAN5 | 172.50.5.0/24 | 172.50.5.1 | Servidor Web (.2) |
 
-**Ruteo:** estático en los 6 routers (cada uno con las rutas hacia las redes que no están directamente conectadas). Ver taller original para las 7-8 rutas por router — tampoco cambian, solo se corrige la de R6 (error 3).
+### Planificación de las 6 WAN (enlaces /30 punto a punto)
 
-## Parte NUEVA — Capa de seguridad (esto es lo que agrega este laboratorio)
+| WAN | Red | Router | IP | Puerto |
+|---|---|---|---|---|
+| WAN1 | 10.0.1.0/30 | R1 | 10.0.1.1 | S0/1/1 |
+| | | R2 | 10.0.1.2 | S0/1/1 |
+| WAN2 | 10.0.2.0/30 | R2 | 10.0.2.1 | S0/1/0 |
+| | | R4 | 10.0.2.2 | S0/1/0 |
+| WAN3 | 10.0.3.0/30 | R4 | 10.0.3.1 | S0/1/1 |
+| | | R6 | 10.0.3.2 | S0/1/1 |
+| WAN4 | 10.0.4.0/30 | R6 | 10.0.4.1 | S0/1/0 |
+| | | R5 | 10.0.4.2 | S0/1/0 |
+| WAN5 | 10.0.5.0/30 | R5 | 10.0.5.1 | S0/1/1 |
+| | | R3 | 10.0.5.2 | S0/1/1 |
+| WAN6 | 10.0.6.0/30 | R1 | 10.0.6.1 | S0/1/0 |
+| | | R3 | 10.0.6.2 | S0/1/0 |
 
-### S.1 — Gestión remota cifrada: SSH en vez de Telnet (todos los routers y switches)
+Cada router de borde (R2, R3, R4, R5, R6) conecta además su LAN correspondiente por `g0/0/1`; R1 conecta LAN #1 por `g0/0/1` con dos subinterfaces (una por VLAN).
 
-**Por qué:** Telnet manda usuario y clave en texto plano; cualquiera que capture el tráfico de gestión los ve. SSH los cifra. Es la primera regla de hardening de cualquier dispositivo de red real.
+## Parte 1 — Direccionamiento IP de los equipos finales
 
-En **cada router y switch** (ejemplo con R1, repetir con R2-R6, Central, SW-1, SW-2):
+Configura IP estática en cada PC y servidor según su sitio (ver tabla de LANs arriba). Todos apuntan como DNS al servidor `172.40.4.2`.
+
+## Parte 2 — LAN #1: troncal y VLANs
+
+En el switch central (modo troncal hacia SW-1 y SW-2, VLAN nativa 99):
+
+```
+enable
+configure terminal
+interface range f0/1-3
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan all
+end
+wr
+```
+
+En SW-1 y SW-2 (troncal hacia el central, VLANs de acceso hacia las PCs):
+
+```
+enable
+configure terminal
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan all
+exit
+vlan 10
+ name GrupoA
+vlan 20
+ name GrupoB
+interface range f0/2-10
+ switchport mode access
+ switchport access vlan 10
+exit
+interface range f0/11-20
+ switchport mode access
+ switchport access vlan 20
+end
+wr
+```
+
+**Verificación:** `show interfaces trunk` en el switch central y `show vlan` en SW-1/SW-2.
+
+## Parte 3 — Ruteo Inter-VLAN en R1
 
 ```
 enable
 configure terminal
 hostname R1
+interface g0/0/1
+ no shutdown
+exit
+interface g0/0/1.1
+ encapsulation dot1q 10
+ ip address 192.168.10.1 255.255.255.128
+exit
+interface g0/0/1.2
+ encapsulation dot1q 20
+ ip address 192.168.10.129 255.255.255.192
+end
+wr
+```
+
+**Verificación:** desde una PC de GrupoA, `ping 192.168.10.129` (gateway de GrupoB) debe responder — confirma el ruteo entre VLANs.
+
+## Parte 4 — Interfaces WAN y LAN en cada router de borde
+
+Configura en cada router las interfaces seriales de sus enlaces WAN (según la tabla de la sección de diseño) y su interfaz LAN. Ejemplo con R4 (LAN3 + WAN2 + WAN3):
+
+```
+enable
+configure terminal
+hostname R4
+interface g0/0/1
+ ip address 172.30.3.1 255.255.255.0
+ no shutdown
+exit
+interface s0/1/0
+ ip address 10.0.2.2 255.255.255.252
+ no shutdown
+exit
+interface s0/1/1
+ ip address 10.0.3.1 255.255.255.252
+ no shutdown
+end
+wr
+```
+
+Repite el mismo patrón en R2, R3, R5 y R6 con las IPs que le correspondan según la tabla de WANs y de LANs.
+
+**Verificación:** `show ip interface brief` en cada router — todas las interfaces usadas deben estar `up/up`.
+
+## Parte 5 — Ruteo estático
+
+Con routing estático se configuran manualmente, en cada router, las rutas hacia todas las redes que no están directamente conectadas.
+
+**Tabla de rutas por router:**
+
+| Router | Comandos |
+|---|---|
+| R1 | `ip route 172.20.2.0 255.255.255.0 10.0.1.2` · `ip route 10.0.2.0 255.255.255.252 10.0.1.2` · `ip route 172.30.3.0 255.255.255.0 10.0.1.2` · `ip route 10.0.3.0 255.255.255.252 10.0.1.2` · `ip route 172.50.5.0 255.255.255.0 10.0.1.2` · `ip route 172.40.4.0 255.255.255.0 10.0.6.2` · `ip route 10.0.5.0 255.255.255.252 10.0.6.2` · `ip route 10.0.4.0 255.255.255.252 10.0.6.2` |
+| R2 | `ip route 192.168.10.0 255.255.255.0 10.0.1.1` · `ip route 10.0.6.0 255.255.255.252 10.0.1.1` · `ip route 172.40.4.0 255.255.255.0 10.0.1.1` · `ip route 10.0.5.0 255.255.255.252 10.0.1.1` · `ip route 10.0.4.0 255.255.255.252 10.0.1.1` · `ip route 172.30.3.0 255.255.255.0 10.0.2.2` · `ip route 10.0.3.0 255.255.255.252 10.0.2.2` · `ip route 172.50.5.0 255.255.255.0 10.0.2.2` |
+| R3 | `ip route 192.168.10.0 255.255.255.0 10.0.6.1` · `ip route 10.0.1.0 255.255.255.252 10.0.6.1` · `ip route 172.20.2.0 255.255.255.0 10.0.6.1` · `ip route 10.0.2.0 255.255.255.252 10.0.6.1` · `ip route 172.30.3.0 255.255.255.0 10.0.6.1` · `ip route 10.0.4.0 255.255.255.252 10.0.5.2` · `ip route 172.50.5.0 255.255.255.0 10.0.5.2` · `ip route 10.0.3.0 255.255.255.252 10.0.5.2` |
+| R4 | `ip route 172.20.2.0 255.255.255.0 10.0.2.1` · `ip route 10.0.1.0 255.255.255.252 10.0.2.1` · `ip route 192.168.10.0 255.255.255.0 10.0.2.1` · `ip route 10.0.6.0 255.255.255.252 10.0.2.1` · `ip route 172.40.4.0 255.255.255.0 10.0.3.2` · `ip route 10.0.4.0 255.255.255.252 10.0.3.2` · `ip route 10.0.5.0 255.255.255.252 10.0.3.2` |
+| R5 | `ip route 172.40.4.0 255.255.255.0 10.0.5.1` · `ip route 10.0.6.0 255.255.255.252 10.0.5.1` · `ip route 192.168.10.0 255.255.255.0 10.0.5.1` · `ip route 10.0.1.0 255.255.255.252 10.0.5.1` · `ip route 172.20.2.0 255.255.255.0 10.0.5.1` · `ip route 172.50.5.0 255.255.255.0 10.0.4.1` · `ip route 10.0.3.0 255.255.255.252 10.0.4.1` · `ip route 172.30.3.0 255.255.255.0 10.0.4.1` |
+| R6 | `ip route 172.30.3.0 255.255.255.0 10.0.3.1` · `ip route 10.0.2.0 255.255.255.252 10.0.3.1` · `ip route 172.20.2.0 255.255.255.0 10.0.3.1` · `ip route 10.0.1.0 255.255.255.252 10.0.3.1` · `ip route 192.168.10.0 255.255.255.0 10.0.3.1` · `ip route 10.0.5.0 255.255.255.252 10.0.4.2` · `ip route 172.40.4.0 255.255.255.0 10.0.4.2` · `ip route 10.0.6.0 255.255.255.252 10.0.4.2` |
+
+Al terminar cada router, `wr` y `show ip route` para confirmar que aparecen todas las rutas `S`.
+
+**Verificación de conectividad de punta a punta:** desde cada sitio, `ping` al servidor Web (172.50.5.2) y al DNS (172.40.4.2) debe responder con 0% de pérdida (el primer paquete puede perderse por ARP, es normal — repite el ping).
+
+## Parte 6 — Gestión remota cifrada: SSH en vez de Telnet
+
+**Por qué:** Telnet manda usuario y clave en texto plano; cualquiera que capture el tráfico de gestión los ve. SSH los cifra. Es la primera regla de hardening de cualquier dispositivo de red real.
+
+En **cada router y switch** (ejemplo con R1, repetir en R2-R6, Central, SW-1, SW-2):
+
+```
+enable
+configure terminal
 ip domain-name cuc-lab.local
 username admin privilege 15 secret Cisco123!
 crypto key generate rsa
@@ -59,9 +192,9 @@ wr
 
 **Verificación:** desde otro router, `ssh -l admin <ip-destino>` debe pedir la clave y entrar; `telnet <ip-destino>` debe ser rechazado (no hay `transport input telnet`).
 
-### S.2 — Control de acceso entre zonas: ACLs extendidas (en R1, punto de entrada de LAN #1)
+## Parte 7 — Control de acceso entre zonas: ACLs de mínimo privilegio
 
-**Objetivo:** aplicar el principio de mínimo privilegio del taller de Identidad y Acceso (semana 7) a esta topología: GrupoB (usuarios) no necesita administrar nada — solo debe poder navegar a la Web (LAN5) y resolver DNS (LAN4). GrupoA (TI/administración) sí puede llegar a todo.
+**Objetivo:** GrupoB (usuarios) no necesita administrar nada — solo debe poder navegar a la Web (LAN5) y resolver DNS (LAN4). GrupoA (TI/administración) sí puede llegar a todo.
 
 En R1:
 
@@ -83,11 +216,11 @@ end
 wr
 ```
 
-**Qué demuestra:** `permit ip any any` al final es intencional — el punto no es bloquear todo, es bloquear específicamente lo que GrupoB no necesita (acceso a LAN2/LAN3, redes de administración/servidores internos) sin romper su navegación normal.
+**Qué demuestra:** `permit ip any any` al final es intencional — el punto no es bloquear todo, es bloquear específicamente lo que GrupoB no necesita (acceso a LAN2/LAN3) sin romper su navegación normal.
 
-**Verificación:** desde una PC de GrupoB, `ping 172.50.5.2` (Web) debe responder; `ping 172.20.2.2` (LAN2) debe fallar por la ACL, no por falta de ruta (se puede comparar con el resultado de una PC de GrupoA, que sí llega).
+**Verificación:** desde una PC de GrupoB, `ping 172.50.5.2` (Web) debe responder; `ping 172.20.2.2` (LAN2) debe fallar por la ACL, no por falta de ruta (compara con el resultado de una PC de GrupoA, que sí llega).
 
-### S.3 — Port Security en los switches de acceso (SW-1, SW-2)
+## Parte 8 — Port Security en los switches de acceso
 
 **Objetivo:** que un puerto de acceso solo acepte la MAC del equipo que ya está conectado — si alguien desconecta la PC y conecta otro equipo (o un switch no autorizado), el puerto se bloquea.
 
@@ -105,13 +238,13 @@ end
 wr
 ```
 
-**Verificación:** `show port-security interface f0/2` debe mostrar la MAC aprendida y el estado `secure-up`. Si se cambia el cable de esa PC a otro puerto y se intenta usarlo con una MAC distinta en el puerto original (simulado agregando otra PC), el puerto debe pasar a `err-disabled`.
+**Verificación:** `show port-security interface f0/2` debe mostrar la MAC aprendida y el estado `secure-up`. Si se conecta otro equipo (MAC distinta) en ese mismo puerto, debe pasar a `err-disabled`.
 
-### S.4 — Monitoreo centralizado: Syslog (nuevo dispositivo en LAN4)
+## Parte 9 — Monitoreo centralizado: Syslog
 
-**Objetivo:** conectar el tema de la semana ("Monitoreo y logging de red") con la topología existente — todos los routers mandan sus logs a un solo punto, en vez de tener que revisar cada uno por separado.
+**Objetivo:** todos los routers mandan sus logs a un solo punto, en vez de tener que revisar cada uno por separado.
 
-1. Agregar un servidor genérico ("Server-PT") en LAN4, junto al DNS existente, con IP `172.40.4.3/24`. Activar el servicio **Syslog** en su pestaña "Services".
+1. Agrega un servidor genérico ("Server-PT") en LAN4, junto al DNS existente, con IP `172.40.4.3/24`. Activa el servicio **Syslog** en su pestaña "Services".
 2. En cada router:
 
 ```
@@ -124,26 +257,13 @@ end
 wr
 ```
 
-**Verificación:** provocar un evento (por ejemplo, un intento de SSH fallido, o el port-security del paso S.3 disparándose) y revisar en el servidor Syslog que el mensaje llegó con severidad correcta.
+**Verificación:** provoca un evento (un intento de SSH fallido, o el port-security de la Parte 8 disparándose) y revisa en el servidor Syslog que el mensaje llegó con la severidad correcta.
 
 ## Entregable
 
-**Un solo archivo: el `.pkt` completo**, con las correcciones (sección "Antes de empezar") y las 4 partes de seguridad (S.1-S.4) implementadas en los 6 routers y los 3 switches. No se piden capturas ni documento aparte — la evaluación se hace abriendo el `.pkt` directamente y revisando la configuración real de cada dispositivo (`show running-config`, `show ip route`, `show port-security`, `show logging`, etc.), no capturas de pantalla que el estudiante eligió mostrar.
-
-## Criterios de evaluación (ponderación por definir)
-
-Se verifica revisando la configuración de cada dispositivo dentro del propio `.pkt` entregado (no capturas):
-
-| Criterio | Cómo se verifica en el .pkt | Peso sugerido |
-|---|---|---|
-| Topología base (routing+VLANs) funcionando sin las 3 fallas originales | `show ip route` en los 6 routers, `show vlan` en los switches | 25% |
-| S.1 SSH/AAA en los 9 dispositivos | `show running-config` — `transport input ssh`, sin `telnet`; conexión SSH real entre dos dispositivos | 20% |
-| S.2 ACL de mínimo privilegio, verificada en ambos sentidos | `show access-lists`, `show ip interface g0/0/1.2` (ACL aplicada); ping real GrupoB→Web (pasa) y GrupoB→LAN2 (bloqueado) | 25% |
-| S.3 Port security verificado | `show port-security interface` en SW-1/SW-2 — estado `secure-up`, MAC aprendida | 15% |
-| S.4 Syslog centralizado con evento real capturado | `show logging` en los routers + mensajes reales recibidos en el servidor Syslog de LAN4 | 15% |
+**Un solo archivo: el `.pkt` completo** de Packet Tracer, con las 9 partes implementadas en los 6 routers y los 3 switches.
 
 ## Referencias
 
-- Taller de Routing original — Ing. Rodolfo Cañas Cervantes (base de la topología, VLSM y routing estático).
 - Cisco: [IOS Security Command Reference](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/security/command/sec-cr-book.html) — ACLs, AAA, port security.
 - Cisco: [Configuring Syslog](https://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/13608-21.html).

@@ -3,168 +3,713 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada · Seguridad en Redes (CUC)</title>
+  <title>Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada · CUC</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      background: #ffffff;
-      color: #1a1a1a;
-      font-family: Georgia, 'Times New Roman', serif;
-      font-size: 16px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px;
       line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
-    .page { max-width: 860px; margin: 0 auto; padding: 48px 32px 90px; }
 
-    header.doc { text-align: center; border-bottom: 3px solid #D4AF37; padding-bottom: 22px; margin-bottom: 30px; }
-    header.doc img.logo { height: 74px; width: auto; display: block; margin: 0 auto; }
-    header.doc h1 { font-size: 25px; line-height: 1.35; margin: 20px 0 8px; }
-    header.doc p.docente { font-size: 16px; font-style: italic; margin: 0 0 14px; color: #A6192E; }
-    header.doc p.meta { font-size: 13.5px; color: #444; margin: 0; }
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
 
-    h2 { font-size: 20px; color: #A6192E; border-bottom: 2px solid #D4AF37; padding-bottom: 6px; margin: 42px 0 16px; }
-    h3 { font-size: 17px; margin: 30px 0 12px; }
-    p { margin: 0 0 14px; }
-    strong { font-weight: bold; }
-
-    ol, ul { margin: 0 0 16px; padding-left: 28px; }
-    li { margin-bottom: 11px; }
-    li > ul, li > ol { margin-top: 8px; }
-
-    table { border-collapse: collapse; width: 100%; margin: 18px 0 24px; font-size: 14.5px; }
-    th, td { border: 1px solid #000; padding: 7px 10px; text-align: left; vertical-align: top; }
-    th { background: #FBF3DE; color: #A6192E; font-weight: bold; }
-
-    code {
-      font-family: 'Courier New', Consolas, monospace;
-      font-size: 0.90em;
-      background: #f2f2f2;
-      border: 1px solid #ddd;
-      padding: 1px 4px;
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
     }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
     pre {
-      background: #f6f6f6;
-      border: 1px solid #bbb;
-      border-left: 4px solid #A6192E;
+      position: relative;
+      background: #211D18; color: #EFE7D9;
+      border-radius: 10px;
       padding: 14px 18px;
       overflow-x: auto;
-      margin: 16px 0 22px;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid #3D362B;
     }
-    pre code { background: none; border: none; padding: 0; font-size: 13.5px; line-height: 1.55; }
 
-    blockquote {
-      margin: 0 0 20px;
-      padding: 12px 18px;
-      border-left: 4px solid #D4AF37;
-      background: #FBF3DE;
-      color: #444;
-      font-size: 14.5px;
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
     }
-    blockquote p { margin: 0 0 8px; }
-    blockquote p:last-child { margin: 0; }
 
-    figure { margin: 28px 0; text-align: center; }
-    figure img { max-width: 100%; height: auto; border: 1px solid #ccc; }
-    figcaption { font-size: 13.5px; color: #444; margin-top: 10px; font-style: italic; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
 
-    a { color: #0645ad; }
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
 
-    .verificacion { border: 1px solid #000; background: #fbfbfb; padding: 10px 16px; margin: 0 0 20px; }
-    .verificacion p:last-child { margin-bottom: 0; }
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .rubric-weight { font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--vino); }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin: 14px 0 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagram-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .diagram-card svg { width: 100%; height: auto; display: block; }
+
+    .diagram-caption {
+      font-size: 12.5px; color: var(--ink-soft);
+      text-align: center; margin-top: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    figure.ref {
+      margin: 14px 0 24px;
+      max-width: 640px;
+    }
+
+    figure.ref img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: block;
+      background: #fff;
+    }
+
+    figure.ref img.logo-img {
+      max-width: 180px;
+      margin: 0 auto;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    figure.ref figcaption {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.5;
+    }
+
+    figure.ref figcaption a { color: var(--ink-soft); text-decoration: underline; }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
 
     @media print {
-      .page { padding: 0; max-width: none; }
-      body { font-size: 12.5px; }
-      figure img { max-width: 100%; }
-      h2 { page-break-after: avoid; }
-      pre, table, figure { page-break-inside: avoid; }
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
     }
   </style>
-</head>
 <body>
-<div class="page">
 
-  <header class="doc">
-    <img src="logo-cuc.png" alt="Logo Universidad de la Costa CUC" class="logo">
-    <h1>Laboratorio 3: Routing Multi-Sitio con Seguridad<br>de Red Aplicada</h1>
-    <p class="docente">Docente: Rodolfo Jose Cañas Cervantes</p>
-    <p class="meta">Seguridad en Redes · Universidad de la Costa (CUC) · 2026-2</p>
-  </header>
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
 
-  <blockquote>
-    <p><strong>Seguridad en Redes (CUC) · Ponderación y semana: por definir con Rodolfo — construido a partir del &laquo;Taller de Routing&raquo; original.</strong></p>
-    <p>Adaptado del taller de enrutamiento estático/VLANs de Packet Tracer (base: Ing. Rodolfo Cañas), agregando la capa de seguridad que el taller original no tenía: gestión remota cifrada (SSH/AAA), control de acceso entre zonas (ACLs) y monitoreo centralizado (Syslog) — para que el mismo escenario de red sirva también como ejercicio de Seguridad en Redes, no solo de Routing.</p>
-  </blockquote>
+<div class="shell">
+  <nav class="toc" id="toc">
+    <p class="toc-label">Contenido</p>
+    <a href="#intro"><span class="badge">·</span> Introducción</a>
+    <a href="#parteA"><span class="badge">A</span> Diseño del escenario</a>
+    <a href="#parteB"><span class="badge">B</span> Construcción de la red</a>
+    <a href="#parteC"><span class="badge">C</span> Seguridad aplicada</a>
+    <a href="#parteD"><span class="badge">D</span> Entregable</a>
+    <a href="#referencias"><span class="badge">·</span> Referencias</a>
+  </nav>
 
-  <h2>Antes de empezar — 3 correcciones al taller original</h2>
+  <div>
+    <header class="top portada">
+      <img class="portada-logo"
+           src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
+           onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
+           alt="Logo Universidad de la Costa (CUC)">
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes</div>
+      <h1>Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada</h1>
+      <p class="sub">6 routers, VLANs y ruteo estático construidos desde cero en Packet Tracer, más una capa de seguridad completa: gestión remota cifrada, control de acceso entre zonas, port security y monitoreo centralizado</p>
+      <div class="accent-bar"></div>
+      <div class="author-block">
+        <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
+        <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
+        <span>📅 <strong>Ponderación y semana: por definir · 2026-2</strong></span>
+        <span>📄 <a href="lab-03-routing-seguridad.md" download>Descargar versión Markdown</a></span>
+      </div>
+    </header>
 
-  <p>Al revisar el taller base se encontraron 3 errores técnicos que se corrigen aquí (no están en la versión que circulaba antes):</p>
+    <main>
+      <section id="intro">
+        <p class="lede">Vas a construir, desde cero en Packet Tracer, una red de 6 sitios interconectados por enlaces WAN punto a punto, con segmentación por VLANs en el sitio principal, ruteo estático completo entre todas las redes, y una capa de seguridad aplicada sobre esa infraestructura: gestión remota cifrada, control de acceso entre zonas por mínimo privilegio, protección de puertos de acceso y monitoreo centralizado por Syslog.</p>
 
-  <ol>
-    <li><strong>Máscara incorrecta en R4 (interfaz de LAN3):</strong> la configuración original tenía <code>ip address 172.30.3.1 255.255.248.0</code> (<code>/21</code>), pero el diseño (tabla de LANs 2-5) definía <code>172.30.3.0/24</code>. Se corrige a <code>255.255.255.0</code>.</li>
-    <li><strong>IP de ping mal escrita en la prueba de conectividad a LAN2/LAN3:</strong> el taller original probaba <code>170.20.2.3</code> (con &laquo;170&raquo;, typo) en vez de <code>172.20.2.2</code> — eso explica el &laquo;Destination host unreachable&raquo; que aparecía ahí, no era un problema real de la red. Se corrige el destino del ping.</li>
-    <li><strong>Ruta rechazada en R6 sin explicar por qué:</strong> el taller original mostraba el error real de IOS <code>%Invalid next hop address (it's this router)</code> al intentar <code>ip route 10.0.5.0 255.255.255.252 10.0.4.1</code> (esa IP es la del propio R6, no puede ser el &laquo;next hop&raquo;). Se corrige a <code>10.0.4.2</code> (la IP de R5 al otro lado del enlace) y se deja la nota explicando el error, como ejemplo real de troubleshooting — vale la pena mostrarlo a los estudiantes, pero explicado, no como si fuera parte normal del procedimiento.</li>
-  </ol>
+        <p>No es un ejercicio de routing solamente ni de seguridad solamente — es el mismo escenario que vas a encontrar en una red empresarial real: primero se hace que la red funcione (routing, direccionamiento), y después se asegura (quién puede administrar qué, quién puede llegar a dónde, y cómo te enteras si algo raro pasa).</p>
+      </section>
 
-  <h2>Topología (igual que el taller original, sin cambios)</h2>
+      <!-- ============ PARTE A ============ -->
+      <section class="part" id="parteA">
+        <div class="part-head">
+          <span class="part-badge">A</span>
+          <h2>Diseño del escenario</h2>
+        </div>
 
-  <p>6 routers (R1-R6) interconectados por 6 enlaces WAN punto a punto en anillo/malla parcial, LAN #1 con 2 VLANs (GrupoA/GrupoB) tras un switch central + 2 switches de acceso, LAN #2 a LAN #5 sin VLANs (una red plana cada una), un servidor Web (LAN5) y un servidor DNS (LAN4).</p>
+        <p>6 routers (R1-R6) interconectados en anillo por 6 enlaces WAN punto a punto. El Sitio 1 (LAN #1) tiene dos grupos de usuarios segmentados por VLAN; los sitios 2 a 5 son redes planas (sin VLAN) con un propósito cada una: dos sitios de usuarios (LAN2, LAN3), un sitio de servicios de red (LAN4: DNS + Syslog) y un sitio de aplicación (LAN5: servidor Web).</p>
 
-  <figure>
-    <img src="topologia-lab03.drawio.png" alt="Topología de referencia del Laboratorio 3: 6 routers interconectados por 6 enlaces WAN punto a punto, LAN #1 con switch central y 2 switches de acceso con VLAN 10/20, LAN #2 a LAN #5, servidor Web en LAN5, DNS y Syslog en LAN4">
-    <figcaption>Figura 1. Topología de referencia del laboratorio. El archivo <code>.pkt</code> de Packet Tracer lo construye el estudiante como parte de la actividad.</figcaption>
-  </figure>
+        <div class="diagram-card">
+          <img src="topologia-lab03.drawio.png" alt="Topología del Laboratorio 3: 6 routers interconectados por 6 enlaces WAN punto a punto, LAN #1 con switch central y 2 switches de acceso con VLAN 10/20, LAN #2 a LAN #5, servidor Web en LAN5, DNS y Syslog en LAN4" style="width:100%;height:auto;border-radius:8px;">
+        </div>
+        <p class="diagram-caption">Figura 1. Topología del laboratorio. El archivo <code class="inline">.pkt</code> de Packet Tracer lo construye el estudiante como parte de la actividad.</p>
 
-  <p><strong>Planificación de LAN #1 (VLSM sobre 192.168.10.0/24):</strong></p>
+        <h3 style="margin-top:34px;">Planificación de LAN #1 (VLSM sobre 192.168.10.0/24)</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>VLAN</th><th>Nombre</th><th>Hosts necesarios</th><th>Red</th><th>Rango asignable</th><th>Gateway</th></tr></thead>
+            <tbody>
+              <tr><td>10</td><td>GrupoA</td><td>70</td><td class="mono">192.168.10.0/25</td><td class="mono">.1 – .126</td><td class="mono">192.168.10.1</td></tr>
+              <tr><td>20</td><td>GrupoB</td><td>50</td><td class="mono">192.168.10.128/26</td><td class="mono">.129 – .190</td><td class="mono">192.168.10.129</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>VLAN</th>
-        <th>Nombre</th>
-        <th>Hosts</th>
-        <th>Red</th>
-        <th>Rango asignable</th>
-        <th>Gateway</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>10</td>
-        <td>GrupoA</td>
-        <td>70</td>
-        <td>192.168.10.0/25</td>
-        <td>.1 - .126</td>
-        <td>192.168.10.1</td>
-      </tr>
-      <tr>
-        <td>20</td>
-        <td>GrupoB</td>
-        <td>50</td>
-        <td>192.168.10.128/26</td>
-        <td>.129 - .190</td>
-        <td>192.168.10.129</td>
-      </tr>
-    </tbody>
-  </table>
+        <h3>Planificación de LAN #2 a LAN #5 (sin VLAN, /24 cada una)</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Sitio</th><th>Red</th><th>Gateway</th><th>Propósito</th></tr></thead>
+            <tbody>
+              <tr><td>LAN2</td><td class="mono">172.20.2.0/24</td><td class="mono">172.20.2.1</td><td>Usuarios</td></tr>
+              <tr><td>LAN3</td><td class="mono">172.30.3.0/24</td><td class="mono">172.30.3.1</td><td>Usuarios</td></tr>
+              <tr><td>LAN4</td><td class="mono">172.40.4.0/24</td><td class="mono">172.40.4.1</td><td>DNS (.2) + Syslog (.3)</td></tr>
+              <tr><td>LAN5</td><td class="mono">172.50.5.0/24</td><td class="mono">172.50.5.1</td><td>Servidor Web (.2)</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-  <p><strong>LAN #2 a LAN #5</strong> (sin VLAN, /24 cada una): LAN2 <code>172.20.2.0/24</code>, LAN3 <code>172.30.3.0/24</code> (<strong>corregida</strong>, ver error 1), LAN4-DNS <code>172.40.4.0/24</code>, LAN5-Web <code>172.50.5.0/24</code>.</p>
+        <h3>Planificación de las 6 WAN (enlaces /30 punto a punto)</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>WAN</th><th>Red</th><th>Router</th><th>IP</th><th>Puerto</th></tr></thead>
+            <tbody>
+              <tr><td>WAN1</td><td class="mono">10.0.1.0/30</td><td>R1</td><td class="mono">10.0.1.1</td><td class="mono">S0/1/1</td></tr>
+              <tr><td></td><td></td><td>R2</td><td class="mono">10.0.1.2</td><td class="mono">S0/1/1</td></tr>
+              <tr><td>WAN2</td><td class="mono">10.0.2.0/30</td><td>R2</td><td class="mono">10.0.2.1</td><td class="mono">S0/1/0</td></tr>
+              <tr><td></td><td></td><td>R4</td><td class="mono">10.0.2.2</td><td class="mono">S0/1/0</td></tr>
+              <tr><td>WAN3</td><td class="mono">10.0.3.0/30</td><td>R4</td><td class="mono">10.0.3.1</td><td class="mono">S0/1/1</td></tr>
+              <tr><td></td><td></td><td>R6</td><td class="mono">10.0.3.2</td><td class="mono">S0/1/1</td></tr>
+              <tr><td>WAN4</td><td class="mono">10.0.4.0/30</td><td>R6</td><td class="mono">10.0.4.1</td><td class="mono">S0/1/0</td></tr>
+              <tr><td></td><td></td><td>R5</td><td class="mono">10.0.4.2</td><td class="mono">S0/1/0</td></tr>
+              <tr><td>WAN5</td><td class="mono">10.0.5.0/30</td><td>R5</td><td class="mono">10.0.5.1</td><td class="mono">S0/1/1</td></tr>
+              <tr><td></td><td></td><td>R3</td><td class="mono">10.0.5.2</td><td class="mono">S0/1/1</td></tr>
+              <tr><td>WAN6</td><td class="mono">10.0.6.0/30</td><td>R1</td><td class="mono">10.0.6.1</td><td class="mono">S0/1/0</td></tr>
+              <tr><td></td><td></td><td>R3</td><td class="mono">10.0.6.2</td><td class="mono">S0/1/0</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-  <p><strong>WANs (6 enlaces /30 punto a punto):</strong> WAN1 R1-R2, WAN2 R2-R4, WAN3 R4-R6, WAN4 R6-R5, WAN5 R5-R3, WAN6 R3-R1 (<code>10.0.1.0/30</code> a <code>10.0.6.0/30</code> en ese orden) — ver el taller original para el detalle interfaz por interfaz, no se repite aquí porque no cambia.</p>
+        <div class="callout note">
+          Cada router de borde (R2, R3, R4, R5, R6) conecta además su LAN correspondiente por <code class="inline">g0/0/1</code>; R1 conecta LAN #1 por <code class="inline">g0/0/1</code> con dos subinterfaces (una por VLAN).
+        </div>
+      </section>
 
-  <p><strong>Ruteo:</strong> estático en los 6 routers (cada uno con las rutas hacia las redes que no están directamente conectadas). Ver taller original para las 7-8 rutas por router — tampoco cambian, solo se corrige la de R6 (error 3).</p>
+      <!-- ============ PARTE B ============ -->
+      <section class="part" id="parteB">
+        <div class="part-head">
+          <span class="part-badge">B</span>
+          <h2>Construcción de la red</h2>
+        </div>
 
-  <h2>Parte NUEVA — Capa de seguridad (esto es lo que agrega este laboratorio)</h2>
+        <h3>1 — Direccionamiento IP de los equipos finales</h3>
+        <p>Configura IP estática en cada PC y servidor según su sitio (ver tablas de la Parte A). Todos apuntan como DNS al servidor <code class="inline">172.40.4.2</code>.</p>
 
-  <h3>S.1 — Gestión remota cifrada: SSH en vez de Telnet (todos los routers y switches)</h3>
+        <h3>2 — LAN #1: troncal y VLANs</h3>
+        <p>En el switch central (modo troncal hacia SW-1 y SW-2, VLAN nativa 99):</p>
+        <pre><code>enable
+configure terminal
+interface range f0/1-3
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan all
+end
+wr</code></pre>
 
-  <p><strong>Por qué:</strong> Telnet manda usuario y clave en texto plano; cualquiera que capture el tráfico de gestión los ve. SSH los cifra. Es la primera regla de hardening de cualquier dispositivo de red real.</p>
+        <p>En SW-1 y SW-2 (troncal hacia el central, VLANs de acceso hacia las PCs):</p>
+        <pre><code>enable
+configure terminal
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan all
+exit
+vlan 10
+ name GrupoA
+vlan 20
+ name GrupoB
+interface range f0/2-10
+ switchport mode access
+ switchport access vlan 10
+exit
+interface range f0/11-20
+ switchport mode access
+ switchport access vlan 20
+end
+wr</code></pre>
 
-  <p>En <strong>cada router y switch</strong> (ejemplo con R1, repetir con R2-R6, Central, SW-1, SW-2):</p>
+        <div class="callout note"><b>Verificación:</b> <code class="inline">show interfaces trunk</code> en el switch central y <code class="inline">show vlan</code> en SW-1/SW-2.</div>
 
-  <pre><code>enable
+        <h3>3 — Ruteo Inter-VLAN en R1</h3>
+        <pre><code>enable
 configure terminal
 hostname R1
+interface g0/0/1
+ no shutdown
+exit
+interface g0/0/1.1
+ encapsulation dot1q 10
+ ip address 192.168.10.1 255.255.255.128
+exit
+interface g0/0/1.2
+ encapsulation dot1q 20
+ ip address 192.168.10.129 255.255.255.192
+end
+wr</code></pre>
+
+        <div class="callout note"><b>Verificación:</b> desde una PC de GrupoA, <code class="inline">ping 192.168.10.129</code> (gateway de GrupoB) debe responder — confirma el ruteo entre VLANs.</div>
+
+        <h3>4 — Interfaces WAN y LAN en cada router de borde</h3>
+        <p>Configura en cada router las interfaces seriales de sus enlaces WAN (según la Parte A) y su interfaz LAN. Ejemplo con R4 (LAN3 + WAN2 + WAN3):</p>
+        <pre><code>enable
+configure terminal
+hostname R4
+interface g0/0/1
+ ip address 172.30.3.1 255.255.255.0
+ no shutdown
+exit
+interface s0/1/0
+ ip address 10.0.2.2 255.255.255.252
+ no shutdown
+exit
+interface s0/1/1
+ ip address 10.0.3.1 255.255.255.252
+ no shutdown
+end
+wr</code></pre>
+        <p>Repite el mismo patrón en R2, R3, R5 y R6 con las IPs que le correspondan según las tablas de la Parte A.</p>
+
+        <div class="callout note"><b>Verificación:</b> <code class="inline">show ip interface brief</code> en cada router — todas las interfaces usadas deben estar <code class="inline">up/up</code>.</div>
+
+        <h3>5 — Ruteo estático</h3>
+        <p>Con routing estático se configuran manualmente, en cada router, las rutas hacia todas las redes que no están directamente conectadas.</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Router</th><th>Comandos</th></tr></thead>
+            <tbody>
+              <tr><td>R1</td><td class="mono">ip route 172.20.2.0 255.255.255.0 10.0.1.2 · ip route 10.0.2.0 255.255.255.252 10.0.1.2 · ip route 172.30.3.0 255.255.255.0 10.0.1.2 · ip route 10.0.3.0 255.255.255.252 10.0.1.2 · ip route 172.50.5.0 255.255.255.0 10.0.1.2 · ip route 172.40.4.0 255.255.255.0 10.0.6.2 · ip route 10.0.5.0 255.255.255.252 10.0.6.2 · ip route 10.0.4.0 255.255.255.252 10.0.6.2</td></tr>
+              <tr><td>R2</td><td class="mono">ip route 192.168.10.0 255.255.255.0 10.0.1.1 · ip route 10.0.6.0 255.255.255.252 10.0.1.1 · ip route 172.40.4.0 255.255.255.0 10.0.1.1 · ip route 10.0.5.0 255.255.255.252 10.0.1.1 · ip route 10.0.4.0 255.255.255.252 10.0.1.1 · ip route 172.30.3.0 255.255.255.0 10.0.2.2 · ip route 10.0.3.0 255.255.255.252 10.0.2.2 · ip route 172.50.5.0 255.255.255.0 10.0.2.2</td></tr>
+              <tr><td>R3</td><td class="mono">ip route 192.168.10.0 255.255.255.0 10.0.6.1 · ip route 10.0.1.0 255.255.255.252 10.0.6.1 · ip route 172.20.2.0 255.255.255.0 10.0.6.1 · ip route 10.0.2.0 255.255.255.252 10.0.6.1 · ip route 172.30.3.0 255.255.255.0 10.0.6.1 · ip route 10.0.4.0 255.255.255.252 10.0.5.2 · ip route 172.50.5.0 255.255.255.0 10.0.5.2 · ip route 10.0.3.0 255.255.255.252 10.0.5.2</td></tr>
+              <tr><td>R4</td><td class="mono">ip route 172.20.2.0 255.255.255.0 10.0.2.1 · ip route 10.0.1.0 255.255.255.252 10.0.2.1 · ip route 192.168.10.0 255.255.255.0 10.0.2.1 · ip route 10.0.6.0 255.255.255.252 10.0.2.1 · ip route 172.40.4.0 255.255.255.0 10.0.3.2 · ip route 10.0.4.0 255.255.255.252 10.0.3.2 · ip route 10.0.5.0 255.255.255.252 10.0.3.2</td></tr>
+              <tr><td>R5</td><td class="mono">ip route 172.40.4.0 255.255.255.0 10.0.5.1 · ip route 10.0.6.0 255.255.255.252 10.0.5.1 · ip route 192.168.10.0 255.255.255.0 10.0.5.1 · ip route 10.0.1.0 255.255.255.252 10.0.5.1 · ip route 172.20.2.0 255.255.255.0 10.0.5.1 · ip route 172.50.5.0 255.255.255.0 10.0.4.1 · ip route 10.0.3.0 255.255.255.252 10.0.4.1 · ip route 172.30.3.0 255.255.255.0 10.0.4.1</td></tr>
+              <tr><td>R6</td><td class="mono">ip route 172.30.3.0 255.255.255.0 10.0.3.1 · ip route 10.0.2.0 255.255.255.252 10.0.3.1 · ip route 172.20.2.0 255.255.255.0 10.0.3.1 · ip route 10.0.1.0 255.255.255.252 10.0.3.1 · ip route 192.168.10.0 255.255.255.0 10.0.3.1 · ip route 10.0.5.0 255.255.255.252 10.0.4.2 · ip route 172.40.4.0 255.255.255.0 10.0.4.2 · ip route 10.0.6.0 255.255.255.252 10.0.4.2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Al terminar cada router, <code class="inline">wr</code> y <code class="inline">show ip route</code> para confirmar que aparecen todas las rutas <code class="inline">S</code>.</p>
+
+        <div class="callout note"><b>Verificación de conectividad de punta a punta:</b> desde cada sitio, <code class="inline">ping</code> al servidor Web (172.50.5.2) y al DNS (172.40.4.2) debe responder con 0% de pérdida (el primer paquete puede perderse por ARP, es normal — repite el ping).</div>
+      </section>
+
+      <!-- ============ PARTE C ============ -->
+      <section class="part" id="parteC">
+        <div class="part-head">
+          <span class="part-badge">C</span>
+          <h2>Seguridad aplicada</h2>
+        </div>
+
+        <h3>6 — Gestión remota cifrada: SSH en vez de Telnet</h3>
+        <p><b>Por qué:</b> Telnet manda usuario y clave en texto plano; cualquiera que capture el tráfico de gestión los ve. SSH los cifra. Es la primera regla de hardening de cualquier dispositivo de red real.</p>
+        <p>En <b>cada router y switch</b> (ejemplo con R1, repetir en R2-R6, Central, SW-1, SW-2):</p>
+        <pre><code>enable
+configure terminal
 ip domain-name cuc-lab.local
 username admin privilege 15 secret Cisco123!
 crypto key generate rsa
@@ -180,18 +725,12 @@ enable secret Cisco123!
 service password-encryption
 end
 wr</code></pre>
+        <div class="callout note"><b>Verificación:</b> desde otro router, <code class="inline">ssh -l admin &lt;ip-destino&gt;</code> debe pedir la clave y entrar; <code class="inline">telnet &lt;ip-destino&gt;</code> debe ser rechazado (no hay <code class="inline">transport input telnet</code>).</div>
 
-  <div class="verificacion">
-    <p><strong>Verificación:</strong> desde otro router, <code>ssh -l admin <ip-destino></code> debe pedir la clave y entrar; <code>telnet <ip-destino></code> debe ser rechazado (no hay <code>transport input telnet</code>).</p>
-  </div>
-
-  <h3>S.2 — Control de acceso entre zonas: ACLs extendidas (en R1, punto de entrada de LAN #1)</h3>
-
-  <p><strong>Objetivo:</strong> aplicar el principio de mínimo privilegio del taller de Identidad y Acceso (semana 7) a esta topología: GrupoB (usuarios) no necesita administrar nada — solo debe poder navegar a la Web (LAN5) y resolver DNS (LAN4). GrupoA (TI/administración) sí puede llegar a todo.</p>
-
-  <p>En R1:</p>
-
-  <pre><code>enable
+        <h3>7 — Control de acceso entre zonas: ACLs de mínimo privilegio</h3>
+        <p><b>Objetivo:</b> GrupoB (usuarios) no necesita administrar nada — solo debe poder navegar a la Web (LAN5) y resolver DNS (LAN4). GrupoA (TI/administración) sí puede llegar a todo.</p>
+        <p>En R1:</p>
+        <pre><code>enable
 configure terminal
 ip access-list extended ACL-GRUPOB
  permit udp 192.168.10.128 0.0.0.63 host 172.40.4.2 eq 53
@@ -206,20 +745,13 @@ interface g0/0/1.2
  ip access-group ACL-GRUPOB in
 end
 wr</code></pre>
+        <p><b>Qué demuestra:</b> <code class="inline">permit ip any any</code> al final es intencional — el punto no es bloquear todo, es bloquear específicamente lo que GrupoB no necesita (acceso a LAN2/LAN3) sin romper su navegación normal.</p>
+        <div class="callout note"><b>Verificación:</b> desde una PC de GrupoB, <code class="inline">ping 172.50.5.2</code> (Web) debe responder; <code class="inline">ping 172.20.2.2</code> (LAN2) debe fallar por la ACL, no por falta de ruta (compara con el resultado de una PC de GrupoA, que sí llega).</div>
 
-  <p><strong>Qué demuestra:</strong> <code>permit ip any any</code> al final es intencional — el punto no es bloquear todo, es bloquear específicamente lo que GrupoB no necesita (acceso a LAN2/LAN3, redes de administración/servidores internos) sin romper su navegación normal.</p>
-
-  <div class="verificacion">
-    <p><strong>Verificación:</strong> desde una PC de GrupoB, <code>ping 172.50.5.2</code> (Web) debe responder; <code>ping 172.20.2.2</code> (LAN2) debe fallar por la ACL, no por falta de ruta (se puede comparar con el resultado de una PC de GrupoA, que sí llega).</p>
-  </div>
-
-  <h3>S.3 — Port Security en los switches de acceso (SW-1, SW-2)</h3>
-
-  <p><strong>Objetivo:</strong> que un puerto de acceso solo acepte la MAC del equipo que ya está conectado — si alguien desconecta la PC y conecta otro equipo (o un switch no autorizado), el puerto se bloquea.</p>
-
-  <p>En SW-1 y SW-2, en los puertos de acceso (<code>f0/2</code> a <code>f0/20</code>):</p>
-
-  <pre><code>enable
+        <h3>8 — Port Security en los switches de acceso</h3>
+        <p><b>Objetivo:</b> que un puerto de acceso solo acepte la MAC del equipo que ya está conectado — si alguien desconecta la PC y conecta otro equipo (o un switch no autorizado), el puerto se bloquea.</p>
+        <p>En SW-1 y SW-2, en los puertos de acceso (<code class="inline">f0/2</code> a <code class="inline">f0/20</code>):</p>
+        <pre><code>enable
 configure terminal
 interface range f0/2-20
  switchport port-security
@@ -228,85 +760,126 @@ interface range f0/2-20
  switchport port-security violation shutdown
 end
 wr</code></pre>
+        <div class="callout note"><b>Verificación:</b> <code class="inline">show port-security interface f0/2</code> debe mostrar la MAC aprendida y el estado <code class="inline">secure-up</code>. Si se conecta otro equipo (MAC distinta) en ese mismo puerto, debe pasar a <code class="inline">err-disabled</code>.</div>
 
-  <div class="verificacion">
-    <p><strong>Verificación:</strong> <code>show port-security interface f0/2</code> debe mostrar la MAC aprendida y el estado <code>secure-up</code>. Si se cambia el cable de esa PC a otro puerto y se intenta usarlo con una MAC distinta en el puerto original (simulado agregando otra PC), el puerto debe pasar a <code>err-disabled</code>.</p>
-  </div>
-
-  <h3>S.4 — Monitoreo centralizado: Syslog (nuevo dispositivo en LAN4)</h3>
-
-  <p><strong>Objetivo:</strong> conectar el tema de la semana (&laquo;Monitoreo y logging de red&raquo;) con la topología existente — todos los routers mandan sus logs a un solo punto, en vez de tener que revisar cada uno por separado.</p>
-
-  <ol>
-    <li>Agregar un servidor genérico (&laquo;Server-PT&raquo;) en LAN4, junto al DNS existente, con IP <code>172.40.4.3/24</code>. Activar el servicio <strong>Syslog</strong> en su pestaña &laquo;Services&raquo;.</li>
-    <li>En cada router:</li>
-  </ol>
-
-  <pre><code>enable
+        <h3>9 — Monitoreo centralizado: Syslog</h3>
+        <p><b>Objetivo:</b> todos los routers mandan sus logs a un solo punto, en vez de tener que revisar cada uno por separado.</p>
+        <ol class="steps">
+          <li>Agrega un servidor genérico ("Server-PT") en LAN4, junto al DNS existente, con IP <code class="inline">172.40.4.3/24</code>. Activa el servicio <b>Syslog</b> en su pestaña "Services".</li>
+          <li>En cada router:
+            <pre><code>enable
 configure terminal
 logging host 172.40.4.3
 logging trap informational
 logging on
 end
 wr</code></pre>
+          </li>
+        </ol>
+        <div class="callout note"><b>Verificación:</b> provoca un evento (un intento de SSH fallido, o el port-security de la Parte C.8 disparándose) y revisa en el servidor Syslog que el mensaje llegó con la severidad correcta.</div>
+      </section>
 
-  <div class="verificacion">
-    <p><strong>Verificación:</strong> provocar un evento (por ejemplo, un intento de SSH fallido, o el port-security del paso S.3 disparándose) y revisar en el servidor Syslog que el mensaje llegó con severidad correcta.</p>
+      <!-- ============ PARTE D ============ -->
+      <section class="part" id="parteD">
+        <div class="part-head">
+          <span class="part-badge">D</span>
+          <h2>Entregable</h2>
+        </div>
+        <p><b>Un solo archivo: el <code class="inline">.pkt</code> completo</b> de Packet Tracer, con las 9 partes implementadas en los 6 routers y los 3 switches.</p>
+      </section>
+
+      <section id="referencias">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Referencias</h2>
+        <ul class="plain">
+          <li><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/security/command/sec-cr-book.html">Cisco IOS Security Command Reference</a> — ACLs, AAA, port security.</li>
+          <li><a href="https://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/13608-21.html">Cisco — Configuring Syslog</a>.</li>
+        </ul>
+      </section>
+
+      <footer class="page">
+        <strong>Ing. Rodolfo Cañas Cervantes</strong> · Seguridad en Redes · Universidad de la Costa (CUC) · Barranquilla, Colombia · 2026-2
+      </footer>
+    </main>
   </div>
-
-  <h2>Entregable</h2>
-
-  <p><strong>Un solo archivo: el <code>.pkt</code> completo</strong>, con las correcciones (sección &laquo;Antes de empezar&raquo;) y las 4 partes de seguridad (S.1-S.4) implementadas en los 6 routers y los 3 switches. No se piden capturas ni documento aparte — la evaluación se hace abriendo el <code>.pkt</code> directamente y revisando la configuración real de cada dispositivo (<code>show running-config</code>, <code>show ip route</code>, <code>show port-security</code>, <code>show logging</code>, etc.), no capturas de pantalla que el estudiante eligió mostrar.</p>
-
-  <h2>Criterios de evaluación (ponderación por definir)</h2>
-
-  <p>Se verifica revisando la configuración de cada dispositivo dentro del propio <code>.pkt</code> entregado (no capturas):</p>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Criterio</th>
-        <th>Cómo se verifica en el .pkt</th>
-        <th>Peso sugerido</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Topología base (routing+VLANs) funcionando sin las 3 fallas originales</td>
-        <td><code>show ip route</code> en los 6 routers, <code>show vlan</code> en los switches</td>
-        <td>25%</td>
-      </tr>
-      <tr>
-        <td>S.1 SSH/AAA en los 9 dispositivos</td>
-        <td><code>show running-config</code> — <code>transport input ssh</code>, sin <code>telnet</code>; conexión SSH real entre dos dispositivos</td>
-        <td>20%</td>
-      </tr>
-      <tr>
-        <td>S.2 ACL de mínimo privilegio, verificada en ambos sentidos</td>
-        <td><code>show access-lists</code>, <code>show ip interface g0/0/1.2</code> (ACL aplicada); ping real GrupoB&rarr;Web (pasa) y GrupoB&rarr;LAN2 (bloqueado)</td>
-        <td>25%</td>
-      </tr>
-      <tr>
-        <td>S.3 Port security verificado</td>
-        <td><code>show port-security interface</code> en SW-1/SW-2 — estado <code>secure-up</code>, MAC aprendida</td>
-        <td>15%</td>
-      </tr>
-      <tr>
-        <td>S.4 Syslog centralizado con evento real capturado</td>
-        <td><code>show logging</code> en los routers + mensajes reales recibidos en el servidor Syslog de LAN4</td>
-        <td>15%</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h2>Referencias</h2>
-
-  <ul>
-    <li>Taller de Routing original — Ing. Rodolfo Cañas Cervantes (base de la topología, VLSM y routing estático).</li>
-    <li>Cisco: <a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/security/command/sec-cr-book.html">IOS Security Command Reference</a> — ACLs, AAA, port security.</li>
-    <li>Cisco: <a href="https://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/13608-21.html">Configuring Syslog</a>.</li>
-  </ul>
-
 </div>
+
+
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toggleBackToTop();
+
+  const tocToggle = document.getElementById('toc-toggle');
+  const tocNav = document.getElementById('toc');
+  if (tocToggle && tocNav) {
+    tocToggle.addEventListener('click', () => {
+      tocNav.classList.toggle('mobile-open');
+      tocToggle.textContent = tocNav.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+    tocNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      tocNav.classList.remove('mobile-open');
+      tocToggle.textContent = '☰';
+    }));
+  }
+
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.type = 'button';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => {
+      const text = pre.innerText.replace(/Copiar$|Copiado ✓$/, '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copiado ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+    pre.appendChild(btn);
+  });
+
+  const checklistItems = document.querySelectorAll('.checklist li');
+  const storageKey = 'cuc-lab-segmentacion-natpat-chk';
+  let savedState = {};
+  try { savedState = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch (e) { savedState = {}; }
+  checklistItems.forEach((li, idx) => {
+    if (savedState[idx]) li.classList.add('done');
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+      savedState[idx] = li.classList.contains('done');
+      localStorage.setItem(storageKey, JSON.stringify(savedState));
+    });
+  });
+</script>
+
 </body>
 </html>

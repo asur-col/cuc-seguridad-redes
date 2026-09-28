@@ -4,7 +4,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" value="Topología de referencia — Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#1A1A1A;" vertex="1" parent="1">
+        <mxCell id="title" value="Topología del Laboratorio 3: Routing Multi-Sitio con Seguridad de Red Aplicada" style="text;html=1;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#1A1A1A;" vertex="1" parent="1">
           <mxGeometry x="40" y="8" width="1100" height="26" as="geometry" />
         </mxCell>
         <mxCell id="zoneLAN1" value="LAN #1 — 192.168.10.0/24" style="rounded=1;dashed=1;fillColor=none;strokeColor=#666666;verticalAlign=top;align=left;html=1;fontStyle=1;fontSize=11;fontColor=#333333;spacing=8;" vertex="1" parent="1">
@@ -178,7 +178,7 @@
         <mxCell id="SRVDNS" value="DNS · 172.40.4.2" style="strokeColor=#ffffff;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.cisco.servers.software_based_server;fontSize=10;" vertex="1" parent="1">
           <mxGeometry x="106" y="585" width="67" height="77" as="geometry" />
         </mxCell>
-        <mxCell id="SRVSYS" value="Syslog · 172.40.4.3&#xa;(nuevo — parte S.4)" style="strokeColor=#ffffff;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.cisco.servers.software_based_server;fontSize=10;" vertex="1" parent="1">
+        <mxCell id="SRVSYS" value="Syslog · 172.40.4.3&#xa;(parte 9)" style="strokeColor=#ffffff;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.cisco.servers.software_based_server;fontSize=10;" vertex="1" parent="1">
           <mxGeometry x="216" y="585" width="67" height="77" as="geometry" />
         </mxCell>
         <mxCell id="SRVWEB" value="Web · 172.50.5.2" style="strokeColor=#ffffff;sketch=0;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.cisco.servers.software_based_server;fontSize=10;" vertex="1" parent="1">
