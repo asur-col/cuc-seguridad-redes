@@ -55,7 +55,7 @@ Auditoría esperada: 0 desbordes · gráfico ≥ 90 % · diagrama ≥ 60 % · gu
 ## Estado por semana (4-oct-2026)
 | Semana | Fechas | `publicada` | Fuentes (`fuentes/SNN`) | Pendiente |
 |---|---|---|---|---|
-| 1–6 | 5 ago–13 sep | sí (viejo S01–S05 aún en la raíz) | **Oleada 1 en curso** (subagentes escribiendo partes 1–4) | Auditar cada entrega, `construir.py`, PDF, commit; quitar del repo los HTML/PDF viejos que se reemplacen |
+| 1–6 | 5 ago–13 sep | sí (viejo S01–S05 aún en la raíz, intactos) | **SUSPENDIDA** — Oleada 1 detenida a petición del docente; no hay partes escritas (solo `semana.json`) | Producir S01–S06 con el encargo de `docs/estandar-semana.md`; auditar, `construir.py`, PDF, commit; quitar HTML/PDF viejos al reemplazar |
 | 7, 8 | 14–27 sep | sí (versión vieja de 56 diap.) | solo `semana.json` | Reescribir a íconos propios y diagramas reales; S07 sin dependencia de AWS KMS; añadir post-cuántica/SSH/WireGuard (S07) y Wi-Fi WPA3/EAP (S08); T2/V6 |
 | **9** | 28 sep–4 oct | sí (en curso, **sin material aún**) | solo `semana.json` | **Prioridad 1**: Monitoreo/SIEM; Suricata + syslog en OPNsense |
 | 10 | 12–18 oct | no | solo `semana.json` | Se dicta el 12-oct |
@@ -66,7 +66,7 @@ Auditoría esperada: 0 desbordes · gráfico ≥ 90 % · diagrama ≥ 60 % · gu
 (Actualizar esta tabla al cerrar cada oleada.)
 
 ## Plan para continuar (en local, con Claude Code)
-1. `git pull` en la rama y `python3 herramientas/auditar.py` de S01–S06 para ver qué dejó la Oleada 1.
+1. `git pull` en la rama. **La producción está suspendida**: Oleada 0 (infraestructura) terminada; Oleada 1 (S01–S06) sin empezar a producir contenido. Reanudar por la Oleada 1 (o por S09 si urge), un subagente Sonnet por semana.
 2. **Oleada 2 — S07–S11** (S09 primero): un subagente por semana (modelo Sonnet) con el mismo encargo que en `docs/estandar-semana.md`; el coordinador audita cada entrega (conteos, capturas, precisión técnica, duración) antes de aceptar.
 3. **Oleada 3 — S12–S16/17**, igual. Se crean pero `publicada:false`.
 4. Cuando el docente decida publicar una semana: `"publicada": true` en su `semana.json` → `python3 herramientas/indice.py`.
