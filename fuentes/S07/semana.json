@@ -1,0 +1,54 @@
+{
+  "semana": 7,
+  "etiqueta": "Semana 7",
+  "unidad": "Unidad 2",
+  "titulo": "Cifrado en tránsito: TLS/SSL, VPN/IPsec — la nube híbrida como extensión cifrada de la red",
+  "titulo_corto": "Cifrado en tránsito",
+  "fechas": "14–20 sep",
+  "archivo": "2026-2-S07-seguridad-redes-cifrado-transito",
+  "descripcion": "Criptografía aplicada, TLS 1.3, PKI y certificados, VPN/IPsec, WireGuard y SSH, cifrado en reposo y gestión de llaves",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Por qué cifrar el tránsito: TLS",
+      "temas": [
+        "Amenazas al canal",
+        "Simétrico y asimétrico",
+        "Handshake TLS 1.3",
+        "Post-cuántica"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "PKI y certificados",
+      "temas": [
+        "Autoridades",
+        "Cadena de confianza",
+        "X.509",
+        "Revocación y ACME"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "VPN, IPsec y alternativas",
+      "temas": [
+        "Sitio a sitio",
+        "Acceso remoto",
+        "IPsec",
+        "WireGuard y SSH"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Reposo, llaves y práctica",
+      "temas": [
+        "Cifrado en reposo",
+        "Gestión de llaves",
+        "Cumplimiento",
+        "CA propia y túnel"
+      ],
+      "guion": ""
+    }
+  ]
+}

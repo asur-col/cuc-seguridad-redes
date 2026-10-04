@@ -130,7 +130,7 @@
 </style>
 
 <header class="top">
-  <img class="logo" src="https://es.wikipedia.org/wiki/Special:FilePath/Logo_cuc.png" alt="Universidad de la Costa" />
+  <img class="logo" src="assets/logo-cuc.png" alt="Universidad de la Costa" />
   <p class="eyebrow">Curso</p>
   <h1>Seguridad en Redes</h1>
   <p class="sub">Material del curso — Ingeniería de Sistemas</p>
@@ -140,13 +140,14 @@
 
 <div class="wrap">
   <section>
-    <div class="section-head"><h2>Semanas</h2><span class="count">5 de 13 publicadas</span></div>
+    <div class="section-head"><h2>Semanas</h2><span class="count">9 de 16 publicadas</span></div>
     <div class="card-grid">
+      <!-- SEMANAS:INICIO -->
       <div class="week-card multi">
         <div class="num">1</div>
         <div>
           <div class="title">Semana 1 · Panorama de amenazas y Zero Trust</div>
-          <div class="desc">Encuadre, calendario del curso, superficie de ataque, amenazas comunes e incidentes reales 2024–2026</div>
+          <div class="desc">Encuadre del curso, conceptos base, panorama de amenazas 2026, IA ofensiva, identidad como perímetro y principios Zero Trust</div>
         </div>
         <div class="go-group">
           <a class="go" href="2026-2-S01-seguridad-redes-panorama-amenazas-zero-trust.html" target="_blank">Ver HTML →</a>
@@ -158,7 +159,7 @@
         <div class="num">2</div>
         <div>
           <div class="title">Semana 2 · Cómo funciona una red y sus controles</div>
-          <div class="desc">Viaje del paquete, NAT, routing, IPv4/IPv6, modelo TCP/IP, firewall/NGFW/IDS conceptual</div>
+          <div class="desc">Viaje del paquete, TCP/IP, direccionamiento IPv4/IPv6, NAT, routing estático/dinámico y su seguridad, firewall/NGFW/IDS conceptual</div>
         </div>
         <div class="go-group">
           <a class="go" href="2026-2-S02-seguridad-redes-red-basica-controles.html" target="_blank">Ver HTML →</a>
@@ -169,8 +170,8 @@
       <div class="week-card multi">
         <div class="num">3</div>
         <div>
-          <div class="title">Segmentación de redes</div>
-          <div class="desc">VLANs, subnetting, DMZ, routing a fondo → puente a microsegmentación Zero Trust</div>
+          <div class="title">Semana 3 · Segmentación de redes</div>
+          <div class="desc">VLAN/802.1Q, ataques de capa 2, subnetting por función, DMZ, routing entre zonas y microsegmentación</div>
         </div>
         <div class="go-group">
           <a class="go" href="2026-2-S03-seguridad-redes-segmentacion.html" target="_blank">Ver HTML →</a>
@@ -181,8 +182,8 @@
       <div class="week-card multi">
         <div class="num">4</div>
         <div>
-          <div class="title">Firewalls de host e IDS/IPS</div>
-          <div class="desc">ufw/iptables a fondo, IDS/IPS conceptual, Security Groups AWS como comparación</div>
+          <div class="title">Semana 4 · Firewalls de host e IDS/IPS</div>
+          <div class="desc">netfilter, iptables/nftables/ufw práctico, IDS/IPS a fondo, firewall como servicio en nube y defensa en capas</div>
         </div>
         <div class="go-group">
           <a class="go" href="2026-2-S04-seguridad-redes-firewalls-host-ids.html" target="_blank">Ver HTML →</a>
@@ -193,53 +194,123 @@
       <div class="week-card multi">
         <div class="num">5</div>
         <div>
-          <div class="title">Hardening perimetral y políticas de control de acceso</div>
-          <div class="desc">Cierre de Unidad 1 — hardening sistemático, checklist perimetral, RBAC/ABAC, caso aplicado Corporación Industrial del Caribe</div>
+          <div class="title">Semana 5 · Hardening perimetral y políticas de control de acceso</div>
+          <div class="desc">Bastionado de dispositivos de red, acceso administrativo seguro (AAA), ACL avanzadas y defensa en profundidad; cierre de Unidad 1</div>
         </div>
-<div class="go-group">
-           <a class="go" href="2026-2-S05-seguridad-redes-hardening-perimetral-politicas.html" target="_blank">Ver HTML →</a>
-           <a class="go" href="2026-2-S05-seguridad-redes-hardening-perimetral-politicas.pdf" target="_blank">Ver PDF →</a>
-           <a class="go" href="videos/2026-2-S05-seguridad-redes-hardening-perimetral-politicas.mp4" target="_blank">Ver video →</a>
-         </div>
+        <div class="go-group">
+          <a class="go" href="2026-2-S05-seguridad-redes-hardening-perimetral-politicas.html" target="_blank">Ver HTML →</a>
+          <a class="go" href="2026-2-S05-seguridad-redes-hardening-perimetral-politicas.pdf" target="_blank">Ver PDF →</a>
+          <a class="go" href="videos/2026-2-S05-seguridad-redes-hardening-perimetral-politicas.mp4" target="_blank">Ver video →</a>
+        </div>
+      </div>
+      <div class="week-card multi">
+        <div class="num">6</div>
+        <div>
+          <div class="title">Semana 6 · Repaso Unidad 1</div>
+          <div class="desc">Repaso integrador de la Unidad 1 con ejercicios tipo examen práctico</div>
+        </div>
+        <div class="go-group">
+          <a class="go" href="2026-2-S06-seguridad-redes-repaso-unidad-1.html" target="_blank">Ver HTML →</a>
+        </div>
       </div>
       <div class="week-card multi">
         <div class="num">7</div>
         <div>
-          <div class="title">Cifrado en tránsito</div>
-          <div class="desc">TLS/SSL, PKI y certificados, VPN site-to-site vs. acceso remoto, IPsec — contraparte del cifrado en reposo visto en el Lab 5.1 (KMS)</div>
+          <div class="title">Semana 7 · Cifrado en tránsito</div>
+          <div class="desc">Criptografía aplicada, TLS 1.3, PKI y certificados, VPN/IPsec, WireGuard y SSH, cifrado en reposo y gestión de llaves</div>
         </div>
         <div class="go-group">
           <a class="go" href="2026-2-S07-seguridad-redes-cifrado-transito.html" target="_blank">Ver HTML →</a>
           <a class="go" href="2026-2-S07-seguridad-redes-cifrado-transito.pdf" target="_blank">Ver PDF →</a>
-          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte1.mp4" target="_blank">Ver video Parte 1 →</a>
-          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte2.mp4" target="_blank">Ver video Parte 2 →</a>
-          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte3.mp4" target="_blank">Ver video Parte 3 →</a>
-          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte4.mp4" target="_blank">Ver video Parte 4 →</a>
+          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte1.mp4" target="_blank">Video Parte 1 →</a>
+          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte2.mp4" target="_blank">Video Parte 2 →</a>
+          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte3.mp4" target="_blank">Video Parte 3 →</a>
+          <a class="go" href="videos/2026-2-S07-seguridad-redes-cifrado-transito-parte4.mp4" target="_blank">Video Parte 4 →</a>
         </div>
       </div>
       <div class="week-card multi">
         <div class="num">8</div>
         <div>
-          <div class="title">Identidad y acceso: autenticación, autorización y Zero Trust</div>
-          <div class="desc">MFA, RBAC/ABAC, mínimo privilegio, Zero Trust a fondo (microsegmentación, verificación continua, ZTNA vs. VPN) — ejercicio propio de control de acceso</div>
+          <div class="title">Semana 8 · Identidad y acceso: autenticación, autorización y Zero Trust</div>
+          <div class="desc">Autenticación, MFA, 802.1X y Wi-Fi seguro, autorización RBAC/ABAC, mínimo privilegio y Zero Trust a fondo</div>
         </div>
         <div class="go-group">
           <a class="go" href="2026-2-S08-seguridad-redes-identidad-acceso.html" target="_blank">Ver HTML →</a>
           <a class="go" href="2026-2-S08-seguridad-redes-identidad-acceso.pdf" target="_blank">Ver PDF →</a>
-          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte1.mp4" target="_blank">Ver video Parte 1 →</a>
-          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte2.mp4" target="_blank">Ver video Parte 2 →</a>
-          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte3.mp4" target="_blank">Ver video Parte 3 →</a>
-          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte4.mp4" target="_blank">Ver video Parte 4 →</a>
+          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte1.mp4" target="_blank">Video Parte 1 →</a>
+          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte2.mp4" target="_blank">Video Parte 2 →</a>
+          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte3.mp4" target="_blank">Video Parte 3 →</a>
+          <a class="go" href="videos/2026-2-S08-seguridad-redes-identidad-acceso-parte4.mp4" target="_blank">Video Parte 4 →</a>
+        </div>
+      </div>
+      <div class="week-card multi">
+        <div class="num">9</div>
+        <div>
+          <div class="title">Semana 9 · Monitoreo y logging de red: SIEM e IDS/IPS avanzado</div>
+          <div class="desc">Fuentes de evidencia, syslog y NetFlow, SIEM y correlación, Suricata y Zeek, detección con ATT&amp;CK y monitoreo en nube</div>
+        </div>
+        <div class="go-group">
+          <a class="go" href="2026-2-S09-seguridad-redes-monitoreo-logging-siem.html" target="_blank">Ver HTML →</a>
         </div>
       </div>
       <div class="week-card pending">
-        <div class="num">9+</div>
+        <div class="num">10</div>
         <div>
-          <div class="title">Resto del curso</div>
-          <div class="desc">Semanas 9 a 15-16 — se publican a medida que se terminan</div>
+          <div class="title">Semana 10 · Hardening y gestión de vulnerabilidades</div>
+          <div class="desc">Ciclo de gestión de vulnerabilidades, CVE/CVSS v4/EPSS/KEV, escaneo con nmap y Greenbone, parcheo y hardening de hosts</div>
         </div>
         <div class="go">Próximamente</div>
       </div>
+      <div class="week-card pending">
+        <div class="num">11</div>
+        <div>
+          <div class="title">Semana 11 · Repaso Unidad 2</div>
+          <div class="desc">Repaso integrador de la Unidad 2 con ejercicios tipo examen práctico</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <div class="week-card pending">
+        <div class="num">12</div>
+        <div>
+          <div class="title">Semana 12 · Amenazas modernas: ransomware, APT y movimiento lateral</div>
+          <div class="desc">Ransomware moderno, APT, movimiento lateral y casos colombianos, con detección y contención desde la red</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <div class="week-card pending">
+        <div class="num">13</div>
+        <div>
+          <div class="title">Semana 13 · Respuesta a incidentes y remediación automatizada</div>
+          <div class="desc">NIST SP 800-61r3 y CSF 2.0, playbooks, evidencia, reporte, SOAR y remediación automatizada</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <div class="week-card pending">
+        <div class="num">14</div>
+        <div>
+          <div class="title">Semana 14 · IA ofensiva vs. IA defensiva en redes</div>
+          <div class="desc">IA ofensiva, NDR/UEBA con ML, ataques a la IA (ATLAS, OWASP LLM) y SASE/SSE</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <div class="week-card pending">
+        <div class="num">15</div>
+        <div>
+          <div class="title">Semana 15 · Ethical hacking asistido por IA</div>
+          <div class="desc">Metodologías de pruebas, marco legal colombiano, reglas de enfrentamiento y herramientas asistidas por IA</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <div class="week-card pending">
+        <div class="num">16–17</div>
+        <div>
+          <div class="title">Semanas 16–17 · Cierre de Unidad 3 y repaso general</div>
+          <div class="desc">Síntesis del curso con NIST CSF 2.0, ejercicios integradores y rutas de certificación</div>
+        </div>
+        <div class="go">Próximamente</div>
+      </div>
+      <!-- SEMANAS:FIN -->
+    </div>
     </div>
   </section>
 

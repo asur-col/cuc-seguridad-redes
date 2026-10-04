@@ -1,0 +1,54 @@
+{
+  "semana": 12,
+  "etiqueta": "Semana 12",
+  "unidad": "Unidad 3",
+  "titulo": "Amenazas modernas de red: ransomware, APT, movimiento lateral",
+  "titulo_corto": "Amenazas modernas: ransomware, APT y movimiento lateral",
+  "fechas": "26 oct–1 nov",
+  "archivo": "2026-2-S12-seguridad-redes-amenazas-modernas",
+  "descripcion": "Ransomware moderno, APT, movimiento lateral y casos colombianos, con detección y contención desde la red",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Ransomware moderno",
+      "temas": [
+        "RaaS",
+        "Doble extorsión",
+        "Cadena típica",
+        "Respaldos"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "APT",
+      "temas": [
+        "Ciclo",
+        "C2",
+        "Persistencia",
+        "Exfiltración"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Movimiento lateral",
+      "temas": [
+        "Credenciales",
+        "SMB, RDP, WinRM",
+        "Active Directory",
+        "Contención"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Casos colombianos y análisis",
+      "temas": [
+        "IFX 2023",
+        "Salud 2022",
+        "Energía 2022",
+        "Análisis de tráfico"
+      ],
+      "guion": ""
+    }
+  ]
+}

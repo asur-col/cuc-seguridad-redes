@@ -1,0 +1,54 @@
+{
+  "semana": 4,
+  "etiqueta": "Semana 4",
+  "unidad": "Unidad 1",
+  "titulo": "Firewalls de host (ufw/iptables) práctico + IDS/IPS a fondo; Security Groups AWS como firewall-as-a-service",
+  "titulo_corto": "Firewalls de host e IDS/IPS",
+  "fechas": "24–30 ago",
+  "archivo": "2026-2-S04-seguridad-redes-firewalls-host-ids",
+  "descripcion": "netfilter, iptables/nftables/ufw práctico, IDS/IPS a fondo, firewall como servicio en nube y defensa en capas",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "netfilter por dentro",
+      "temas": [
+        "Tablas y cadenas",
+        "Recorrido del paquete",
+        "conntrack",
+        "iptables vs nftables"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Firewall de host en práctica",
+      "temas": [
+        "Política por defecto",
+        "Orden de reglas",
+        "ufw",
+        "Verificación"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "IDS/IPS a fondo",
+      "temas": [
+        "Taxonomía",
+        "Firmas vs anomalías",
+        "Snort y Suricata",
+        "Ubicación"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Firewall como servicio y práctica",
+      "temas": [
+        "Grupos de seguridad",
+        "Stateful vs stateless",
+        "Defensa en capas",
+        "Laboratorio"
+      ],
+      "guion": ""
+    }
+  ]
+}

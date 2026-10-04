@@ -1,0 +1,300 @@
+<!-- PATRÓN 1 · Topología por zonas (el más usado del curso) -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-41 Rev.1 (2009), §4.1">
+  <div class="kicker">Patrón 1 · Topología</div>
+  <h2>Una red segmentada en zonas alrededor del firewall</h2>
+  <p class="sub">Cada zona tiene un propósito y el firewall decide qué tráfico cruza entre ellas.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 520">
+      <defs>
+        <marker id="e1-a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+        <marker id="e1-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8C8C8C"/></marker>
+      </defs>
+      <!-- Internet -->
+      <use href="#i-internet" x="552" y="0" width="80" height="80" style="color:#5F5F5F"/>
+      <text x="592" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#5F5F5F">Internet</text>
+      <line x1="592" y1="98" x2="592" y2="168" stroke="#5F5F5F" stroke-width="3"/>
+      <text x="604" y="138" font-size="12" fill="#5F5F5F">WAN 200.0.113.2/30</text>
+      <!-- Firewall -->
+      <rect x="532" y="170" width="120" height="104" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+      <use href="#i-firewall" x="562" y="178" width="60" height="60" style="color:#A6192E"/>
+      <text x="592" y="258" text-anchor="middle" font-size="14" font-weight="700" fill="#A6192E">Firewall</text>
+      <!-- Zonas -->
+      <g font-size="13">
+        <rect x="20" y="340" width="260" height="170" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="150" y="364" text-anchor="middle" font-weight="700" fill="#8A6D1D">USUARIOS · VLAN 10</text>
+        <text x="150" y="382" text-anchor="middle" fill="#5F5F5F">10.10.10.0/24</text>
+        <use href="#i-pc" x="48" y="396" width="56" height="56" style="color:#2A2A2A"/>
+        <use href="#i-portatil" x="122" y="396" width="56" height="56" style="color:#2A2A2A"/>
+        <use href="#i-movil" x="196" y="396" width="56" height="56" style="color:#2A2A2A"/>
+        <text x="150" y="490" text-anchor="middle" fill="#5F5F5F">navegan; no alcanzan la BD</text>
+
+        <rect x="312" y="340" width="260" height="170" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="442" y="364" text-anchor="middle" font-weight="700" fill="#8A6D1D">DMZ · VLAN 20</text>
+        <text x="442" y="382" text-anchor="middle" fill="#5F5F5F">10.10.20.0/24</text>
+        <use href="#i-servidor-web" x="372" y="396" width="56" height="56" style="color:#2A2A2A"/>
+        <use href="#i-correo" x="456" y="396" width="56" height="56" style="color:#2A2A2A"/>
+        <text x="442" y="490" text-anchor="middle" fill="#5F5F5F">publicada: solo 443/tcp</text>
+
+        <rect x="604" y="340" width="260" height="170" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="734" y="364" text-anchor="middle" font-weight="700" fill="#A6192E">INTERNA · VLAN 30</text>
+        <text x="734" y="382" text-anchor="middle" fill="#5F5F5F">10.10.30.0/24</text>
+        <use href="#i-bd" x="664" y="396" width="56" height="56" style="color:#A6192E"/>
+        <use href="#i-servidor" x="748" y="396" width="56" height="56" style="color:#A6192E"/>
+        <text x="734" y="490" text-anchor="middle" fill="#5F5F5F">solo la DMZ, solo 3306/tcp</text>
+
+        <rect x="896" y="340" width="268" height="170" rx="14" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2" stroke-dasharray="6 5"/>
+        <text x="1030" y="364" text-anchor="middle" font-weight="700" fill="#5F5F5F">ADMIN · VLAN 99</text>
+        <text x="1030" y="382" text-anchor="middle" fill="#5F5F5F">10.10.99.0/24</text>
+        <use href="#i-admin" x="1002" y="396" width="56" height="56" style="color:#5F5F5F"/>
+        <text x="1030" y="490" text-anchor="middle" fill="#5F5F5F">SSH/HTTPS de gestión</text>
+      </g>
+      <!-- enlaces -->
+      <path d="M560 274 L150 338" stroke="#D4AF37" stroke-width="3" fill="none"/>
+      <path d="M576 274 L442 338" stroke="#D4AF37" stroke-width="3" fill="none"/>
+      <path d="M608 274 L734 338" stroke="#A6192E" stroke-width="3" fill="none"/>
+      <path d="M624 274 L1030 338" stroke="#8C8C8C" stroke-width="3" fill="none" stroke-dasharray="7 5"/>
+      <!-- flujo permitido DMZ -> BD -->
+      <path d="M520 430 C 560 420, 580 420, 656 424" stroke="#A6192E" stroke-width="2.5" fill="none" marker-end="url(#e1-a)"/>
+      <text x="590" y="414" text-anchor="middle" font-size="12" font-weight="700" fill="#A6192E">3306</text>
+    </svg>
+  </div>
+  <aside class="notes">Este es el patrón más importante del curso: la topología por zonas. En el centro está el firewall, que es el único punto por donde el tráfico cruza de una zona a otra. Arriba, Internet, conectada por el enlace WAN. Abajo, cuatro zonas, cada una con su VLAN y su subred. Los usuarios navegan pero no alcanzan la base de datos. La DMZ publica únicamente el puerto cuatrocientos cuarenta y tres. La zona interna solo acepta conexiones desde la DMZ y solo al puerto de la base de datos. Y la zona de administración, dibujada con línea punteada, es la única desde la que se gestiona el firewall. Fíjense en la flecha vino: es el único flujo permitido hacia la base de datos. Todo lo que no está dibujado como permitido, está bloqueado.</aside>
+</section>
+
+<!-- PATRÓN 2 · Diagrama de secuencia (protocolos, handshakes) -->
+<section class="slide" data-fuente="IETF RFC 9293 (2022), §3.5 — Establecimiento de conexión TCP">
+  <div class="kicker">Patrón 2 · Secuencia</div>
+  <h2>El saludo de tres vías de TCP, mensaje a mensaje</h2>
+  <p class="sub">Dos ejes verticales, el tiempo hacia abajo; cada flecha es un segmento con sus banderas.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col-2">
+        <svg class="dgm" viewBox="0 0 760 470">
+          <defs><marker id="e2-a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+          <marker id="e2-d" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+          <use href="#i-portatil" x="80" y="0" width="64" height="64" style="color:#2A2A2A"/>
+          <text x="112" y="80" text-anchor="middle" font-size="14" font-weight="700">Cliente</text>
+          <text x="112" y="97" text-anchor="middle" font-size="12" fill="#5F5F5F">10.10.10.25:51514</text>
+          <use href="#i-servidor-web" x="616" y="0" width="64" height="64" style="color:#2A2A2A"/>
+          <text x="648" y="80" text-anchor="middle" font-size="14" font-weight="700">Servidor</text>
+          <text x="648" y="97" text-anchor="middle" font-size="12" fill="#5F5F5F">10.10.20.10:443</text>
+          <line x1="112" y1="108" x2="112" y2="460" stroke="#8C8C8C" stroke-width="2" stroke-dasharray="5 5"/>
+          <line x1="648" y1="108" x2="648" y2="460" stroke="#8C8C8C" stroke-width="2" stroke-dasharray="5 5"/>
+          <line x1="112" y1="150" x2="644" y2="200" stroke="#A6192E" stroke-width="3" marker-end="url(#e2-a)"/>
+          <rect x="300" y="146" width="160" height="28" rx="6" fill="#fff" stroke="#A6192E"/>
+          <text x="380" y="166" text-anchor="middle" font-size="14" font-weight="700" fill="#A6192E">SYN · seq=x</text>
+          <line x1="648" y1="230" x2="116" y2="280" stroke="#8A6D1D" stroke-width="3" marker-end="url(#e2-d)"/>
+          <rect x="270" y="226" width="220" height="28" rx="6" fill="#fff" stroke="#8A6D1D"/>
+          <text x="380" y="246" text-anchor="middle" font-size="14" font-weight="700" fill="#8A6D1D">SYN+ACK · seq=y, ack=x+1</text>
+          <line x1="112" y1="310" x2="644" y2="360" stroke="#A6192E" stroke-width="3" marker-end="url(#e2-a)"/>
+          <rect x="290" y="306" width="180" height="28" rx="6" fill="#fff" stroke="#A6192E"/>
+          <text x="380" y="326" text-anchor="middle" font-size="14" font-weight="700" fill="#A6192E">ACK · ack=y+1</text>
+          <rect x="200" y="400" width="360" height="40" rx="10" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+          <text x="380" y="426" text-anchor="middle" font-size="15" font-weight="700" fill="#2E7D4F">ESTABLISHED: ya fluyen datos</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card white"><h4>Lectura de seguridad</h4>
+          <ul><li>Un firewall <b>stateful</b> registra esta conversación y deja pasar sus respuestas.</li>
+          <li>Un <b>SYN flood</b> envía miles de SYN y nunca el ACK final: llena la tabla de conexiones a medio abrir.</li>
+          <li><code>nmap -sS</code> envía solo el SYN: si vuelve SYN+ACK, el puerto está abierto.</li></ul></div>
+        <div class="note"><b>Regla práctica:</b> si una regla permite "establecidas", depende de que esta secuencia haya ocurrido.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Segundo patrón: el diagrama de secuencia, que usamos cada vez que explicamos un protocolo. Tenemos dos ejes verticales, el cliente a la izquierda y el servidor a la derecha, y el tiempo corre hacia abajo. Primero el cliente envía un segmento con la bandera SYN y un número de secuencia inicial. El servidor responde con SYN más ACK, confirmando ese número y proponiendo el suyo. Finalmente el cliente confirma con ACK y la conexión queda establecida. ¿Por qué nos importa en seguridad? Porque un firewall con estado usa justamente esta secuencia para reconocer el tráfico de respuesta, porque un ataque de inundación SYN abusa de la espera del último paso, y porque el escaneo SYN de nmap interpreta la respuesta del segundo paso para saber si un puerto está abierto.</aside>
+</section>
+
+<!-- PATRÓN 3 · Pipeline / flujo de procesamiento -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §2.3">
+  <div class="kicker">Patrón 3 · Pipeline</div>
+  <h2>Del evento a la alerta: el recorrido de un registro</h2>
+  <p class="sub">Etapas en línea, de izquierda a derecha; debajo, qué puede fallar en cada una.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="e3-a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="14" text-anchor="middle">
+        <g>
+          <rect x="10" y="40" width="200" height="170" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+          <use href="#i-firewall" x="44" y="56" width="44" height="44" style="color:#A6192E"/>
+          <use href="#i-servidor" x="96" y="56" width="44" height="44" style="color:#A6192E"/>
+          <use href="#i-ids" x="148" y="56" width="44" height="44" style="color:#A6192E"/>
+          <text x="110" y="130" font-weight="700" fill="#A6192E">1 · Fuentes</text>
+          <text x="110" y="152" fill="#2A2A2A">firewall, hosts, IDS</text>
+          <text x="110" y="172" fill="#2A2A2A">generan eventos</text>
+        </g>
+        <g>
+          <rect x="252" y="40" width="200" height="170" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+          <use href="#i-log" x="326" y="54" width="52" height="52" style="color:#A6192E"/>
+          <text x="352" y="130" font-weight="700" fill="#A6192E">2 · Transporte</text>
+          <text x="352" y="152">syslog 514/udp</text>
+          <text x="352" y="172">o TLS 6514/tcp</text>
+        </g>
+        <g>
+          <rect x="494" y="40" width="200" height="170" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+          <use href="#i-engranaje" x="568" y="54" width="52" height="52" style="color:#A6192E"/>
+          <text x="594" y="130" font-weight="700" fill="#A6192E">3 · Normalización</text>
+          <text x="594" y="152">campos comunes:</text>
+          <text x="594" y="172">hora, origen, acción</text>
+        </g>
+        <g>
+          <rect x="736" y="40" width="200" height="170" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+          <use href="#i-siem" x="810" y="54" width="52" height="52" style="color:#A6192E"/>
+          <text x="836" y="130" font-weight="700" fill="#A6192E">4 · Correlación</text>
+          <text x="836" y="152">reglas sobre varios</text>
+          <text x="836" y="172">eventos a la vez</text>
+        </g>
+        <g>
+          <rect x="978" y="40" width="196" height="170" rx="14" fill="#A6192E"/>
+          <use href="#i-alerta" x="1050" y="54" width="52" height="52" style="color:#D4AF37"/>
+          <text x="1076" y="130" font-weight="700" fill="#D4AF37">5 · Alerta</text>
+          <text x="1076" y="152" fill="#fff">al analista,</text>
+          <text x="1076" y="172" fill="#fff">con contexto</text>
+        </g>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#e3-a)">
+        <line x1="212" y1="125" x2="248" y2="125"/><line x1="454" y1="125" x2="490" y2="125"/>
+        <line x1="696" y1="125" x2="732" y2="125"/><line x1="938" y1="125" x2="974" y2="125"/>
+      </g>
+      <g font-size="13" text-anchor="middle" fill="#5F5F5F">
+        <rect x="10" y="250" width="1164" height="2" fill="#D4AF37"/>
+        <text x="592" y="282" font-size="14" font-weight="700" fill="#8A6D1D">QUÉ FALLA EN LA PRÁCTICA</text>
+        <text x="110" y="318">no se habilitó el registro</text>
+        <text x="352" y="318">UDP pierde mensajes</text>
+        <text x="594" y="318">relojes desincronizados</text>
+        <text x="836" y="318">reglas sin afinar</text>
+        <text x="1076" y="318">fatiga de alertas</text>
+        <text x="110" y="340" fill="#A6192E">→ habilitar y verificar</text>
+        <text x="352" y="340" fill="#A6192E">→ TCP/TLS + cola</text>
+        <text x="594" y="340" fill="#A6192E">→ NTP en todo</text>
+        <text x="836" y="340" fill="#A6192E">→ casos de uso</text>
+        <text x="1076" y="340" fill="#A6192E">→ priorizar</text>
+      </g>
+    </svg>
+    <div class="note"><b>Idea clave:</b> una alerta es tan buena como la etapa más débil de la cadena que la produjo.</div>
+  </div>
+  <aside class="notes">Tercer patrón: el pipeline, ideal para procesos que avanzan por etapas. Aquí seguimos un registro desde que nace hasta que se convierte en una alerta. Primero las fuentes: el firewall, los servidores y el detector de intrusos generan eventos. Segundo, el transporte, normalmente syslog, que puede ir por UDP o, mejor, por TCP con TLS. Tercero, la normalización, que lleva todos los formatos a campos comunes como la hora, el origen y la acción. Cuarto, la correlación, donde las reglas miran varios eventos a la vez. Y quinto, la alerta que recibe el analista. Debajo de cada etapa está lo que suele fallar: registros que nunca se habilitaron, mensajes UDP perdidos, relojes desincronizados, reglas sin afinar y demasiadas alertas. La idea clave es que la alerta es tan buena como el eslabón más débil.</aside>
+</section>
+
+<!-- PATRÓN 4 · Comparación lado a lado con mini-topologías -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-94 (2007), §2.2">
+  <div class="kicker">Patrón 4 · Comparación</div>
+  <h2>IDS fuera de banda frente a IPS en línea</h2>
+  <p class="sub">Misma red, dos ubicaciones del sensor: cambia lo que puede hacer y lo que arriesga.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 300">
+          <defs><marker id="e4-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+          <text x="280" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#8A6D1D">IDS · copia del tráfico</text>
+          <use href="#i-internet" x="10" y="60" width="70" height="70" style="color:#5F5F5F"/>
+          <use href="#i-firewall" x="140" y="66" width="58" height="58" style="color:#A6192E"/>
+          <use href="#i-switch" x="270" y="66" width="58" height="58" style="color:#2A2A2A"/>
+          <use href="#i-servidor" x="460" y="62" width="64" height="64" style="color:#2A2A2A"/>
+          <g stroke="#5F5F5F" stroke-width="3"><line x1="80" y1="95" x2="138" y2="95"/><line x1="200" y1="95" x2="268" y2="95"/><line x1="330" y1="95" x2="458" y2="95"/></g>
+          <path d="M299 126 V 196" stroke="#8A6D1D" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#e4-g)"/>
+          <text x="310" y="166" font-size="12" fill="#8A6D1D">SPAN</text>
+          <use href="#i-ids" x="268" y="198" width="62" height="62" style="color:#8A6D1D"/>
+          <text x="299" y="282" text-anchor="middle" font-size="13" fill="#2A2A2A">detecta y alerta; si falla, la red sigue</text>
+        </svg>
+        <div class="card gold"><b>Ventaja:</b> cero impacto en la latencia. <b>Límite:</b> cuando alerta, el paquete ya llegó.</div>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 300">
+          <text x="280" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#A6192E">IPS · en el camino</text>
+          <use href="#i-internet" x="10" y="60" width="70" height="70" style="color:#5F5F5F"/>
+          <use href="#i-firewall" x="120" y="66" width="58" height="58" style="color:#A6192E"/>
+          <use href="#i-ips" x="236" y="64" width="62" height="62" style="color:#A6192E"/>
+          <use href="#i-switch" x="352" y="66" width="58" height="58" style="color:#2A2A2A"/>
+          <use href="#i-servidor" x="470" y="62" width="64" height="64" style="color:#2A2A2A"/>
+          <g stroke="#5F5F5F" stroke-width="3"><line x1="80" y1="95" x2="118" y2="95"/><line x1="180" y1="95" x2="234" y2="95"/><line x1="300" y1="95" x2="350" y2="95"/><line x1="412" y1="95" x2="468" y2="95"/></g>
+          <use href="#i-bloqueo" x="250" y="150" width="34" height="34" style="color:#A6192E"/>
+          <text x="267" y="210" text-anchor="middle" font-size="13" fill="#A6192E" font-weight="700">descarta antes de entregar</text>
+          <text x="280" y="282" text-anchor="middle" font-size="13" fill="#2A2A2A">bloquea; si falla sin bypass, corta la red</text>
+        </svg>
+        <div class="card"><b>Ventaja:</b> detiene el ataque. <b>Límite:</b> agrega latencia y un falso positivo bloquea tráfico legítimo.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Cuarto patrón: la comparación lado a lado, con la misma red dibujada dos veces para que la diferencia salte a la vista. A la izquierda, un detector de intrusos fuera de banda: recibe una copia del tráfico por un puerto espejo del switch. Puede alertar, pero cuando lo hace el paquete ya llegó a su destino; a cambio, si el sensor falla, la red sigue funcionando. A la derecha, un sistema de prevención en línea: todo el tráfico pasa a través de él, así que puede descartar un paquete antes de entregarlo. El precio es la latencia, el riesgo de bloquear tráfico legítimo por un falso positivo, y que si falla sin un mecanismo de bypass, corta la comunicación.</aside>
+</section>
+
+<!-- PATRÓN 5 · Consola + diagrama (comandos reales) -->
+<section class="slide" data-fuente="nftables wiki — Simple ruleset for a server (netfilter.org)">
+  <div class="kicker">Patrón 5 · Consola</div>
+  <h2>Una política de host mínima con nftables</h2>
+  <p class="sub">Comandos reales a la izquierda; a la derecha, el camino que sigue el paquete por esas reglas.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># /etc/nftables.conf — servidor web en la DMZ</span>
+<span class="k">table</span> inet filtro {
+  <span class="k">chain</span> entrada {
+    type filter hook input priority 0; <span class="v">policy drop</span>;
+    ct state established,related <span class="p">accept</span>
+    iif lo <span class="p">accept</span>
+    tcp dport 443 <span class="p">accept</span>
+    ip saddr 10.10.99.0/24 tcp dport 22 <span class="p">accept</span>
+    log prefix "DROP-IN " <span class="v">drop</span>
+  }
+}</pre>
+        <div class="note"><b>Orden:</b> la primera regla que coincide decide; lo demás cae en <code>policy drop</code>.</div>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 400">
+          <defs><marker id="e5-a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <use href="#i-paquete" x="246" y="0" width="64" height="48" style="color:#2A2A2A"/>
+          <g font-size="13" text-anchor="middle">
+            <rect x="150" y="62" width="260" height="38" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="280" y="86">¿conexión ya establecida?</text>
+            <rect x="150" y="124" width="260" height="38" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="280" y="148">¿interfaz loopback?</text>
+            <rect x="150" y="186" width="260" height="38" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="280" y="210">¿TCP 443?</text>
+            <rect x="150" y="248" width="260" height="38" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="280" y="272">¿SSH desde ADMIN?</text>
+            <rect x="150" y="320" width="260" height="44" rx="8" fill="#A6192E"/><text x="280" y="347" fill="#fff" font-weight="700">registrar y descartar</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#e5-a)"><line x1="280" y1="48" x2="280" y2="60"/><line x1="280" y1="100" x2="280" y2="122"/><line x1="280" y1="162" x2="280" y2="184"/><line x1="280" y1="224" x2="280" y2="246"/><line x1="280" y1="286" x2="280" y2="318"/></g>
+          <g stroke="#2E7D4F" stroke-width="2.5"><line x1="410" y1="81" x2="470" y2="81"/><line x1="410" y1="143" x2="470" y2="143"/><line x1="410" y1="205" x2="470" y2="205"/><line x1="410" y1="267" x2="470" y2="267"/><line x1="470" y1="81" x2="470" y2="267"/></g>
+          <use href="#i-ok" x="480" y="150" width="48" height="48" style="color:#2E7D4F"/>
+          <text x="504" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#2E7D4F">aceptar</text>
+          <text x="430" y="76" font-size="11" fill="#2E7D4F">sí</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Quinto patrón: consola más diagrama. Cuando mostramos comandos reales, al lado dibujamos qué hacen. A la izquierda está una política mínima de nftables para un servidor web en la DMZ. La cadena de entrada tiene política por defecto de descarte. Luego acepta las conexiones ya establecidas, el tráfico de loopback, el puerto cuatrocientos cuarenta y tres, y SSH únicamente desde la red de administración. Lo que no coincida se registra con un prefijo y se descarta. A la derecha vemos el mismo conjunto como un árbol de decisión: el paquete baja pregunta por pregunta, y en cuanto una regla coincide, se acepta. Si ninguna coincide, termina en el registro y el descarte. Recuerden: la primera coincidencia decide.</aside>
+</section>
+
+<!-- PATRÓN 6 · Línea de tiempo / cadena de ataque + caso colombiano -->
+<section class="slide" data-fuente="INCIBE-CERT (2023) · Infobae, 19-sep-2023 · MITRE ATT&amp;CK® Enterprise">
+  <div class="kicker">Patrón 6 · Caso colombiano</div>
+  <h2>IFX Networks, septiembre de 2023: un proveedor, cientos de afectados</h2>
+  <p class="sub">Línea de tiempo arriba; abajo, la lección de red que deja cada momento.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 360">
+      <line x1="40" y1="90" x2="1144" y2="90" stroke="#D4AF37" stroke-width="5"/>
+      <g font-size="13" text-anchor="middle">
+        <circle cx="140" cy="90" r="16" fill="#A6192E"/><text x="140" y="95" fill="#fff" font-weight="700">1</text>
+        <text x="140" y="50" font-weight="700" fill="#A6192E">12 sep 2023</text>
+        <text x="140" y="130">ransomware cifra máquinas</text><text x="140" y="148">virtuales del proveedor</text>
+        <circle cx="430" cy="90" r="16" fill="#A6192E"/><text x="430" y="95" fill="#fff" font-weight="700">2</text>
+        <text x="430" y="50" font-weight="700" fill="#A6192E">13–15 sep</text>
+        <text x="430" y="130">caen servicios de Rama Judicial,</text><text x="430" y="148">superintendencias y ministerios</text>
+        <circle cx="720" cy="90" r="16" fill="#A6192E"/><text x="720" y="95" fill="#fff" font-weight="700">3</text>
+        <text x="720" y="50" font-weight="700" fill="#A6192E">19 sep</text>
+        <text x="720" y="130">Fiscalía señala a</text><text x="720" y="148">RansomHouse como posible autor</text>
+        <circle cx="1010" cy="90" r="16" fill="#A6192E"/><text x="1010" y="95" fill="#fff" font-weight="700">4</text>
+        <text x="1010" y="50" font-weight="700" fill="#A6192E">semanas después</text>
+        <text x="1010" y="130">recuperación gradual;</text><text x="1010" y="148">&gt;760 entidades en la región</text>
+      </g>
+      <rect x="40" y="190" width="1104" height="150" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+      <use href="#i-sede" x="70" y="214" width="56" height="56" style="color:#A6192E"/>
+      <use href="#i-nube" x="70" y="272" width="56" height="56" style="color:#A6192E"/>
+      <g font-size="15">
+        <text x="150" y="230" font-weight="700" fill="#A6192E">Lección de red</text>
+        <text x="150" y="258">· El riesgo de un tercero es tu riesgo: segmentar y monitorear también los enlaces con el proveedor.</text>
+        <text x="150" y="284">· Sin respaldos aislados del entorno afectado, la recuperación depende del atacante o del proveedor.</text>
+        <text x="150" y="310">· Plan de continuidad: ¿qué servicio crítico puede operar si el centro de datos externo cae una semana?</text>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">Sexto patrón: la línea de tiempo, que usamos para los casos colombianos. El doce de septiembre de dos mil veintitrés, un ataque de ransomware cifró máquinas virtuales en la nube de IFX Networks, un proveedor de servicios de centro de datos. En los días siguientes quedaron fuera de servicio sistemas de la Rama Judicial, de varias superintendencias y de ministerios. El diecinueve de septiembre, la Fiscalía señaló al grupo RansomHouse como posible responsable, y la recuperación tomó semanas, con más de setecientas sesenta entidades afectadas en la región. ¿Qué nos enseña desde la red? Que el riesgo de un tercero es nuestro riesgo, que los respaldos deben estar aislados del entorno que puede caer, y que hay que planear cómo opera un servicio crítico si el centro de datos externo no está disponible.</aside>
+</section>

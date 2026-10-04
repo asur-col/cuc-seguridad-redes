@@ -1,0 +1,54 @@
+{
+  "semana": 3,
+  "etiqueta": "Semana 3",
+  "unidad": "Unidad 1",
+  "titulo": "Segmentación de redes: VLANs, subnetting, DMZ, routing a fondo → puente a microsegmentación Zero Trust",
+  "titulo_corto": "Segmentación de redes",
+  "fechas": "17–23 ago",
+  "archivo": "2026-2-S03-seguridad-redes-segmentacion",
+  "descripcion": "VLAN/802.1Q, ataques de capa 2, subnetting por función, DMZ, routing entre zonas y microsegmentación",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "VLANs y la red plana",
+      "temas": [
+        "Red plana",
+        "802.1Q",
+        "Troncales",
+        "Inter-VLAN"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ataques de capa 2 y defensas",
+      "temas": [
+        "VLAN hopping",
+        "ARP spoofing",
+        "DHCP snooping",
+        "Port security"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Subnetting, DMZ y routing entre zonas",
+      "temas": [
+        "Subredes por función",
+        "DMZ",
+        "Routing entre zonas",
+        "ACL entre zonas"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Microsegmentación, caso y práctica",
+      "temas": [
+        "Microsegmentación",
+        "Caso salud CO",
+        "OPNsense",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

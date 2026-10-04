@@ -1,0 +1,54 @@
+{
+  "semana": 16,
+  "etiqueta": "Semanas 16–17",
+  "unidad": "Unidad 3",
+  "titulo": "Cierre de Unidad 3 + repaso general",
+  "titulo_corto": "Cierre de Unidad 3 y repaso general",
+  "fechas": "23 nov–6 dic",
+  "archivo": "2026-2-S16-seguridad-redes-cierre-repaso-general",
+  "descripcion": "Síntesis del curso con NIST CSF 2.0, ejercicios integradores y rutas de certificación",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "El curso en un mapa",
+      "temas": [
+        "CSF 2.0",
+        "Unidad 1",
+        "Unidad 2",
+        "Unidad 3"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicios integradores I",
+      "temas": [
+        "Diseño",
+        "Filtrado",
+        "Cifrado",
+        "Identidad"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicios integradores II",
+      "temas": [
+        "Monitoreo",
+        "Vulnerabilidades",
+        "Incidentes",
+        "IA"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Cierre y rutas de aprendizaje",
+      "temas": [
+        "Repaso final",
+        "Certificaciones",
+        "Práctica continua",
+        "Despedida"
+      ],
+      "guion": ""
+    }
+  ]
+}

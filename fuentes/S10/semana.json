@@ -1,0 +1,54 @@
+{
+  "semana": 10,
+  "etiqueta": "Semana 10",
+  "unidad": "Unidad 2",
+  "titulo": "Hardening y gestión de vulnerabilidades: parcheo, CVEs, escaneo de vulnerabilidades",
+  "titulo_corto": "Hardening y gestión de vulnerabilidades",
+  "fechas": "12–18 oct",
+  "archivo": "2026-2-S10-seguridad-redes-hardening-vulnerabilidades",
+  "descripcion": "Ciclo de gestión de vulnerabilidades, CVE/CVSS v4/EPSS/KEV, escaneo con nmap y Greenbone, parcheo y hardening de hosts",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "El ciclo de gestión de vulnerabilidades",
+      "temas": [
+        "CVE y CWE",
+        "CVSS v4.0",
+        "EPSS",
+        "CISA KEV"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Descubrimiento y escaneo",
+      "temas": [
+        "nmap",
+        "Estados de puertos",
+        "Escaneo autenticado",
+        "Greenbone/OpenVAS"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Priorización, parcheo y hardening",
+      "temas": [
+        "Priorizar",
+        "Parcheo",
+        "Mitigaciones",
+        "CIS"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Caso y práctica de escaneo",
+      "temas": [
+        "Caso CO",
+        "Leer un reporte",
+        "Priorizar",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

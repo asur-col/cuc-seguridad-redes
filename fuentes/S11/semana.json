@@ -1,0 +1,54 @@
+{
+  "semana": 11,
+  "etiqueta": "Semana 11",
+  "unidad": "Unidad 2",
+  "titulo": "Repaso Unidad 2",
+  "titulo_corto": "Repaso Unidad 2",
+  "fechas": "19–25 oct",
+  "archivo": "2026-2-S11-seguridad-redes-repaso-unidad-2",
+  "descripcion": "Repaso integrador de la Unidad 2 con ejercicios tipo examen práctico",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Mapa de la Unidad 2",
+      "temas": [
+        "Cifrado",
+        "Identidad",
+        "Monitoreo",
+        "Vulnerabilidades"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicios de cifrado e identidad",
+      "temas": [
+        "TLS",
+        "PKI",
+        "VPN",
+        "Control de acceso"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicios de monitoreo y vulnerabilidades",
+      "temas": [
+        "Logs",
+        "Reglas",
+        "Escaneo",
+        "Priorización"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Caso integrador y errores frecuentes",
+      "temas": [
+        "Caso integrador",
+        "Errores frecuentes",
+        "Autoevaluación",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

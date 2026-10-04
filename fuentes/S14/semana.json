@@ -1,0 +1,54 @@
+{
+  "semana": 14,
+  "etiqueta": "Semana 14",
+  "unidad": "Unidad 3",
+  "titulo": "IA ofensiva vs. IA defensiva en redes: NDR con machine learning, phishing/deepfakes generados por IA, SASE consciente de IA",
+  "titulo_corto": "IA ofensiva vs. IA defensiva en redes",
+  "fechas": "9–15 nov",
+  "archivo": "2026-2-S14-seguridad-redes-ia-ofensiva-defensiva",
+  "descripcion": "IA ofensiva, NDR/UEBA con ML, ataques a la IA (ATLAS, OWASP LLM) y SASE/SSE",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "IA ofensiva",
+      "temas": [
+        "Phishing generado",
+        "Deepfakes",
+        "Malware asistido",
+        "Reconocimiento"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "IA defensiva: NDR y UEBA",
+      "temas": [
+        "Línea base",
+        "Anomalías",
+        "Falsos positivos",
+        "Copilotos SOC"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Atacar la IA y SASE",
+      "temas": [
+        "MITRE ATLAS",
+        "OWASP LLM",
+        "Inyección de prompts",
+        "SASE/SSE"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Caso colombiano y práctica",
+      "temas": [
+        "Fraude por voz",
+        "Detección",
+        "Políticas",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

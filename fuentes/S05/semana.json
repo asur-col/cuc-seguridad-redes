@@ -1,0 +1,54 @@
+{
+  "semana": 5,
+  "etiqueta": "Semana 5",
+  "unidad": "Unidad 1",
+  "titulo": "Hardening perimetral y políticas de control de acceso: bastionado de firewalls/routers, ACLs avanzadas, defensa en profundidad",
+  "titulo_corto": "Hardening perimetral y políticas de control de acceso",
+  "fechas": "31 ago–6 sep",
+  "archivo": "2026-2-S05-seguridad-redes-hardening-perimetral-politicas",
+  "descripcion": "Bastionado de dispositivos de red, acceso administrativo seguro (AAA), ACL avanzadas y defensa en profundidad; cierre de Unidad 1",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Bastionado de dispositivos de red",
+      "temas": [
+        "Planos de gestión, control y datos",
+        "Servicios inseguros",
+        "CIS Benchmarks",
+        "Configuración base"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Acceso administrativo seguro",
+      "temas": [
+        "SSH",
+        "AAA",
+        "TACACS+ vs RADIUS",
+        "Bastión"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "ACL avanzadas",
+      "temas": [
+        "Estándar vs extendida",
+        "Wildcard",
+        "Ubicación",
+        "ACL IPv6"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Defensa en profundidad, caso y cierre U1",
+      "temas": [
+        "Checklist perimetral",
+        "Gestión de cambios",
+        "Caso CO",
+        "Cierre U1"
+      ],
+      "guion": ""
+    }
+  ]
+}

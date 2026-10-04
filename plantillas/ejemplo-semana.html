@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seguridad en Redes — Semana 0 · Plantilla de referencia: patrones de diagrama</title>
+<meta name="description" content="Ejemplos de los patrones de diagrama del estándar CUC.">
+<link rel="stylesheet" href="../assets/cuc-deck.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+
+<defs>
+<style>.ic{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.icf{fill:currentColor;stroke:none}.icw{fill:#fff;stroke:currentColor;stroke-width:3;stroke-linejoin:round}</style>
+</defs>
+
+
+<symbol id="i-router" viewBox="0 0 64 64"><g class="ic"><ellipse class="icw" cx="32" cy="38" rx="26" ry="12"/><path d="M6 30v8M58 30v8"/><ellipse class="icw" cx="32" cy="30" rx="26" ry="12"/><path d="M20 26l8 4-8 4M44 26l-8 4 8 4M28 22l4-5 4 5M28 38l4 5 4-5"/></g></symbol>
+<symbol id="i-switch" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="5" y="20" width="54" height="24" rx="4"/><path d="M14 28h20l-4-3M50 36H30l4 3"/><path d="M40 28h10M14 36h10"/></g></symbol>
+<symbol id="i-switch-l3" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="5" y="22" width="54" height="26" rx="4"/><path d="M14 31h14l-3-3M50 39H36l3 3"/><path d="M24 22v-8h16v8M32 14V8"/><circle cx="32" cy="7" r="2"/></g></symbol>
+<symbol id="i-firewall" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="8" width="48" height="48" rx="4"/><path d="M8 20h48M8 32h48M8 44h48M22 8v12M42 8v12M32 20v12M18 32v12M46 32v12M30 44v12"/></g></symbol>
+<symbol id="i-ngfw" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="10" width="40" height="44" rx="4"/><path d="M6 21h40M6 32h40M6 43h40M18 10v11M34 10v11M26 21v11M14 32v11M38 32v11M24 43v11"/><circle class="icw" cx="47" cy="44" r="11"/><path d="M42 44l4 4 7-8"/></g></symbol>
+<symbol id="i-ids" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="16" width="52" height="30" rx="4"/><circle cx="24" cy="31" r="8"/><path d="M30 37l6 6"/><path d="M40 26h12M40 32h12M40 38h8"/><path d="M20 46v6h24v-6"/></g></symbol>
+<symbol id="i-ips" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="16" width="52" height="30" rx="4"/><circle cx="24" cy="31" r="8"/><path d="M19 26l10 10"/><path d="M38 31h16l-4-4M54 31l-4 4"/></g></symbol>
+<symbol id="i-sensor" viewBox="0 0 64 64"><g class="ic"><circle cx="32" cy="34" r="6"/><path d="M20 22a17 17 0 0 0 0 24M44 22a17 17 0 0 1 0 24M12 14a28 28 0 0 0 0 40M52 14a28 28 0 0 1 0 40"/></g></symbol>
+<symbol id="i-tap" viewBox="0 0 64 64"><g class="ic"><path d="M4 26h56"/><rect class="icw" x="22" y="18" width="20" height="16" rx="3"/><path d="M32 34v16M26 44l6 6 6-6"/></g></symbol>
+<symbol id="i-ap" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="14" y="38" width="36" height="14" rx="4"/><circle class="icf" cx="22" cy="45" r="2"/><path d="M32 38v-8M22 22a14 14 0 0 1 20 0M16 16a22 22 0 0 1 32 0"/><circle class="icf" cx="32" cy="28" r="2.5"/></g></symbol>
+<symbol id="i-balanceador" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="16" cy="32" r="10"/><path d="M26 32h6M32 32l14-16h10M32 32h24M32 32l14 16h10"/><path d="M52 12l4 4-4 4M52 28l4 4-4 4M52 44l4 4-4 4"/></g></symbol>
+<symbol id="i-proxy" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="20" y="12" width="24" height="40" rx="4"/><path d="M4 24h16M44 24h16M4 40h16M44 40h16M26 22h12M26 30h12M26 38h12"/></g></symbol>
+<symbol id="i-vpn" viewBox="0 0 64 64"><g class="ic"><path d="M4 32h56" stroke-dasharray="4 5"/><path class="icw" d="M14 22h36a10 10 0 0 1 0 20H14a10 10 0 0 1 0-20z"/><rect class="icw" x="25" y="27" width="14" height="11" rx="2"/><path d="M28 27v-3a4 4 0 0 1 8 0v3"/></g></symbol>
+<symbol id="i-tunel" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M8 20h48v24H8z"/><path d="M8 20c-4 0-4 24 0 24M56 20c4 0 4 24 0 24M16 32h32l-5-5M48 32l-5 5"/></g></symbol>
+<symbol id="i-internet" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M18 48h30a11 11 0 0 0 1-22 15 15 0 0 0-28-4A12 12 0 0 0 18 48z"/></g></symbol>
+<symbol id="i-nube" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M18 46h30a11 11 0 0 0 1-22 15 15 0 0 0-28-4A12 12 0 0 0 18 46z"/><path d="M24 36h16M32 28v16"/></g></symbol>
+<symbol id="i-wan" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="32" r="24"/><path d="M8 32h48M32 8c-9 8-9 40 0 48M32 8c9 8 9 40 0 48M12 20h40M12 44h40"/></g></symbol>
+<symbol id="i-cable" viewBox="0 0 64 64"><g class="ic"><path d="M6 32h52"/><rect class="icw" x="4" y="24" width="12" height="16" rx="2"/><rect class="icw" x="48" y="24" width="12" height="16" rx="2"/></g></symbol>
+
+
+<symbol id="i-servidor" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="14" y="6" width="36" height="16" rx="3"/><rect class="icw" x="14" y="24" width="36" height="16" rx="3"/><rect class="icw" x="14" y="42" width="36" height="16" rx="3"/><path d="M20 14h4M20 32h4M20 50h4"/><circle class="icf" cx="43" cy="14" r="2"/><circle class="icf" cx="43" cy="32" r="2"/><circle class="icf" cx="43" cy="50" r="2"/></g></symbol>
+<symbol id="i-servidor-web" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="10" width="48" height="38" rx="4"/><path d="M8 20h48"/><circle class="icf" cx="14" cy="15" r="1.6"/><circle class="icf" cx="20" cy="15" r="1.6"/><path d="M20 30l-6 5 6 5M44 30l6 5-6 5M36 27l-8 16"/><path d="M24 48v6h16v-6"/></g></symbol>
+<symbol id="i-bd" viewBox="0 0 64 64"><g class="ic"><ellipse class="icw" cx="32" cy="14" rx="20" ry="7"/><path d="M12 14v36c0 4 9 7 20 7s20-3 20-7V14"/><path d="M12 26c0 4 9 7 20 7s20-3 20-7M12 38c0 4 9 7 20 7s20-3 20-7"/></g></symbol>
+<symbol id="i-pc" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="10" width="48" height="32" rx="3"/><path d="M26 42l-3 10h18l-3-10M18 52h28"/></g></symbol>
+<symbol id="i-portatil" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="12" y="14" width="40" height="28" rx="3"/><path d="M4 48h56l-4-6H8z"/></g></symbol>
+<symbol id="i-movil" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="20" y="6" width="24" height="52" rx="5"/><path d="M28 12h8"/><circle class="icf" cx="32" cy="51" r="2"/></g></symbol>
+<symbol id="i-impresora" viewBox="0 0 64 64"><g class="ic"><path d="M18 24V8h28v16"/><rect class="icw" x="8" y="24" width="48" height="22" rx="3"/><rect class="icw" x="18" y="38" width="28" height="18"/><path d="M24 44h16M24 50h10"/></g></symbol>
+<symbol id="i-iot" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="18" y="18" width="28" height="28" rx="3"/><rect x="26" y="26" width="12" height="12"/><path d="M24 18v-8M32 18v-8M40 18v-8M24 46v8M32 46v8M40 46v8M18 24h-8M18 32h-8M18 40h-8M46 24h8M46 32h8M46 40h8"/></g></symbol>
+<symbol id="i-camara" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M8 18l40 8-4 14-38-8z"/><circle cx="20" cy="26" r="3"/><path d="M46 33l10 2M24 34l-4 20h12"/></g></symbol>
+<symbol id="i-plc" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="12" width="48" height="40" rx="3"/><path d="M8 22h48"/><rect x="14" y="28" width="10" height="18"/><rect x="27" y="28" width="10" height="18"/><rect x="40" y="28" width="10" height="18"/></g></symbol>
+<symbol id="i-contenedor" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M32 6l24 12v28L32 58 8 46V18z"/><path d="M8 18l24 12 24-12M32 30v28"/></g></symbol>
+<symbol id="i-vm" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="8" width="52" height="40" rx="3"/><rect x="14" y="16" width="16" height="12"/><rect x="34" y="16" width="16" height="12"/><rect x="14" y="31" width="16" height="10"/><rect x="34" y="31" width="16" height="10"/><path d="M22 48v6h20v-6"/></g></symbol>
+<symbol id="i-dns" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="12" width="48" height="40" rx="4"/><path d="M8 24h48"/><text x="32" y="45" text-anchor="middle" font-family="Roboto,Arial,sans-serif" font-size="15" font-weight="700" class="icf">DNS</text></g></symbol>
+<symbol id="i-correo" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="14" width="48" height="36" rx="3"/><path d="M8 16l24 18 24-18"/></g></symbol>
+<symbol id="i-api" viewBox="0 0 64 64"><g class="ic"><path d="M22 18l-12 14 12 14M42 18l12 14-12 14M36 14l-8 36"/></g></symbol>
+<symbol id="i-sede" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M10 56V20l22-12 22 12v36z"/><path d="M4 56h56M22 28h6M36 28h6M22 38h6M36 38h6M28 56V46h8v10"/></g></symbol>
+<symbol id="i-datacenter" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="10" width="16" height="46" rx="2"/><rect class="icw" x="24" y="10" width="16" height="46" rx="2"/><rect class="icw" x="42" y="10" width="16" height="46" rx="2"/><path d="M10 18h8M10 26h8M10 34h8M28 18h8M28 26h8M28 34h8M46 18h8M46 26h8M46 34h8"/></g></symbol>
+
+
+<symbol id="i-usuario" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="20" r="11"/><path class="icw" d="M10 56c0-12 10-20 22-20s22 8 22 20z"/></g></symbol>
+<symbol id="i-grupo" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="20" cy="22" r="8"/><circle class="icw" cx="44" cy="22" r="8"/><path class="icw" d="M4 52c0-10 7-16 16-16s16 6 16 16zM28 52c0-10 7-16 16-16s16 6 16 16z"/></g></symbol>
+<symbol id="i-admin" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="28" cy="20" r="11"/><path class="icw" d="M6 56c0-12 10-20 22-20 4 0 7 1 10 2"/><circle class="icw" cx="47" cy="47" r="9"/><path d="M47 34v4M47 56v4M34 47h4M56 47h4M38 38l3 3M53 53l3 3M38 56l3-3M53 41l3-3"/></g></symbol>
+<symbol id="i-atacante" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M14 30c0-14 8-22 18-22s18 8 18 22v4H14z"/><path d="M14 30h36"/><path class="icw" d="M8 58c0-12 10-20 24-20s24 8 24 20z"/><path d="M22 22h20" stroke-width="5"/></g></symbol>
+<symbol id="i-bot" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="12" y="20" width="40" height="30" rx="6"/><circle class="icf" cx="24" cy="34" r="3.5"/><circle class="icf" cx="40" cy="34" r="3.5"/><path d="M26 43h12M32 20v-8"/><circle cx="32" cy="9" r="3"/><path d="M12 32H6M52 32h6"/></g></symbol>
+<symbol id="i-ia" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="14" y="14" width="36" height="36" rx="4"/><text x="32" y="39" text-anchor="middle" font-family="Roboto,Arial,sans-serif" font-size="16" font-weight="700" class="icf">IA</text><path d="M22 14V6M32 14V6M42 14V6M22 50v8M32 50v8M42 50v8M14 22H6M14 32H6M14 42H6M50 22h8M50 32h8M50 42h8"/></g></symbol>
+
+
+<symbol id="i-candado" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="12" y="28" width="40" height="30" rx="4"/><path d="M20 28v-8a12 12 0 0 1 24 0v8"/><circle class="icf" cx="32" cy="41" r="3.5"/><path d="M32 44v6"/></g></symbol>
+<symbol id="i-candado-abierto" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="12" y="28" width="40" height="30" rx="4"/><path d="M20 28v-8a12 12 0 0 1 23-5"/><circle class="icf" cx="32" cy="41" r="3.5"/><path d="M32 44v6"/></g></symbol>
+<symbol id="i-llave" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="20" cy="32" r="12"/><circle class="icf" cx="16" cy="32" r="3"/><path d="M32 32h26M48 32v8M56 32v6"/></g></symbol>
+<symbol id="i-certificado" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="10" width="44" height="34" rx="3"/><path d="M14 20h28M14 28h20M14 36h12"/><circle class="icw" cx="46" cy="42" r="9"/><path d="M41 50l-3 10 8-4 8 4-3-10"/></g></symbol>
+<symbol id="i-escudo" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M32 6l22 8v16c0 14-9 24-22 28C19 54 10 44 10 30V14z"/><path d="M22 32l7 7 13-14"/></g></symbol>
+<symbol id="i-escudo-alerta" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M32 6l22 8v16c0 14-9 24-22 28C19 54 10 44 10 30V14z"/><path d="M32 20v16"/><circle class="icf" cx="32" cy="44" r="2.5"/></g></symbol>
+<symbol id="i-alerta" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M32 6l28 50H4z"/><path d="M32 24v16"/><circle class="icf" cx="32" cy="48" r="2.5"/></g></symbol>
+<symbol id="i-bloqueo" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="32" r="24"/><path d="M15 15l34 34"/></g></symbol>
+<symbol id="i-ok" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="32" r="24"/><path d="M20 33l8 8 16-17"/></g></symbol>
+<symbol id="i-huella" viewBox="0 0 64 64"><g class="ic"><path d="M18 46c-4-6-5-12-4-18a18 18 0 0 1 36 0c0 8-1 14-4 20M24 52c-3-6-4-12-3-20a11 11 0 0 1 22 0c0 8-1 14-3 20M32 56c-2-6-3-14-2-24"/></g></symbol>
+<symbol id="i-token" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="10" y="16" width="44" height="32" rx="6"/><text x="32" y="38" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="600" class="icf">482 913</text></g></symbol>
+<symbol id="i-malware" viewBox="0 0 64 64"><g class="ic"><ellipse class="icw" cx="32" cy="36" rx="13" ry="16"/><circle class="icw" cx="32" cy="16" r="7"/><path d="M19 30H8M19 40H8M45 30h11M45 40h11M21 22l-8-6M43 22l8-6M22 48l-8 8M42 48l8 8M32 24v28"/></g></symbol>
+<symbol id="i-ransomware" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M14 6h26l12 12v40H14z"/><path d="M40 6v12h12"/><rect class="icw" x="22" y="34" width="20" height="16" rx="2"/><path d="M26 34v-4a6 6 0 0 1 12 0v4"/></g></symbol>
+<symbol id="i-phishing" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="12" width="38" height="28" rx="3"/><path d="M6 14l19 14 19-14"/><path d="M52 22v22a8 8 0 0 1-16 0v-4"/><path d="M52 22l-4 4"/></g></symbol>
+<symbol id="i-bug" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="20" y="18" width="24" height="34" rx="12"/><path d="M32 26v26M26 18l-4-8M38 18l4-8M20 30H8M20 42H8M44 30h12M44 42h12"/></g></symbol>
+<symbol id="i-parche" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="10" y="22" width="44" height="20" rx="10" transform="rotate(-45 32 32)"/><circle class="icf" cx="28" cy="28" r="2"/><circle class="icf" cx="36" cy="36" r="2"/><circle class="icf" cx="36" cy="28" r="2"/><circle class="icf" cx="28" cy="36" r="2"/></g></symbol>
+
+
+<symbol id="i-siem" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="8" width="52" height="38" rx="4"/><path d="M12 36l10-10 8 6 10-14 8 8 6-4"/><path d="M24 46l-2 10h20l-2-10"/></g></symbol>
+<symbol id="i-log" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M14 6h26l12 12v40H14z"/><path d="M40 6v12h12M22 28h22M22 36h22M22 44h14"/></g></symbol>
+<symbol id="i-grafica" viewBox="0 0 64 64"><g class="ic"><path d="M8 8v48h48"/><path d="M16 44l10-14 10 8 14-20"/></g></symbol>
+<symbol id="i-lupa" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="26" cy="26" r="16"/><path d="M38 38l18 18"/></g></symbol>
+<symbol id="i-escaner" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="14"/><circle class="icf" cx="32" cy="32" r="3"/><path d="M32 32l17-17"/></g></symbol>
+<symbol id="i-paquete" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="8" y="18" width="48" height="28" rx="3"/><path d="M20 18v28M8 26h12M8 38h12"/><path d="M28 28h20M28 36h14"/></g></symbol>
+<symbol id="i-terminal" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="6" y="10" width="52" height="44" rx="4"/><path d="M6 20h52M14 30l8 6-8 6M26 44h14"/></g></symbol>
+<symbol id="i-engranaje" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="32" r="10"/><path d="M32 6v8M32 50v8M6 32h8M50 32h8M13 13l6 6M45 45l6 6M13 51l6-6M45 19l6-6"/><circle cx="32" cy="32" r="18"/></g></symbol>
+<symbol id="i-automatizacion" viewBox="0 0 64 64"><g class="ic"><path d="M48 18A22 22 0 0 0 12 26M16 46a22 22 0 0 0 36-8"/><path d="M48 8v10H38M16 56V46h10"/><path d="M28 24l12 8-12 8z" class="icf"/></g></symbol>
+<symbol id="i-reloj" viewBox="0 0 64 64"><g class="ic"><circle class="icw" cx="32" cy="32" r="24"/><path d="M32 18v14l10 6"/></g></symbol>
+<symbol id="i-lista" viewBox="0 0 64 64"><g class="ic"><rect class="icw" x="10" y="6" width="44" height="52" rx="4"/><path d="M18 20l3 3 6-6M32 20h14M18 34l3 3 6-6M32 34h14M18 48l3 3 6-6M32 48h14"/></g></symbol>
+<symbol id="i-documento" viewBox="0 0 64 64"><g class="ic"><path class="icw" d="M14 6h26l12 12v40H14z"/><path d="M40 6v12h12M22 30h22M22 38h22M22 46h22"/></g></symbol>
+<symbol id="i-ley" viewBox="0 0 64 64"><g class="ic"><path d="M32 8v48M18 56h28M10 16h44"/><path d="M16 16l-8 18a8 8 0 0 0 16 0zM48 16l-8 18a8 8 0 0 0 16 0z"/></g></symbol>
+<symbol id="i-respaldo" viewBox="0 0 64 64"><g class="ic"><ellipse class="icw" cx="32" cy="14" rx="20" ry="7"/><path d="M12 14v30c0 4 9 7 20 7s20-3 20-7V14"/><path d="M24 32l8-8 8 8M32 24v18"/></g></symbol>
+</svg>
+
+<div id="progress"></div>
+<div id="stage">
+<section class="slide cover divider-1" data-parte="1">
+  <div class="topline-g"></div><div class="topline-v"></div>
+  <img class="logo-main" src="../assets/logo-cuc.png" alt="Universidad de la Costa">
+  <div class="cover-kicker">Semana 0 · Unidad 0 · Seguridad en Redes</div>
+  <h1>Plantilla de referencia: patrones de diagrama</h1>
+  <div class="bar"></div>
+  <div class="author"><b>Ing. Rodolfo Cañas Cervantes</b><br>Universidad de la Costa (CUC) · Ingeniería de Sistemas<br>Semana 0 · Periodo 2026-2 · Barranquilla, Colombia</div>
+  <div class="cover-parte">Parte 1 de 4 · Patrones de diagrama</div>
+  <div class="temas"><span>Topología por zonas</span><span>Secuencia</span><span>Pipeline</span><span>Comparación</span></div>
+  <aside class="notes">Bienvenidos. Esta es la presentación de ejemplo que muestra los patrones de diagrama del curso.</aside>
+</section>
+<section class="slide" data-parte-de="1"><div class="s-head"><div class="kicker">Patrón 1 · Topología</div><h2>Una red segmentada en zonas alrededor del firewall</h2><div class="rule"></div><div class="sub">Cada zona tiene un propósito y el firewall decide qué tráfico cruza entre ellas.</div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body">
+<svg class="dgm" viewbox="0 0 1184 520">
+<defs>
+<marker id="e1-a" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"></path></marker>
+<marker id="e1-g" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#8C8C8C"></path></marker>
+</defs>
+<!-- Internet -->
+<use height="80" href="#i-internet" style="color:#5F5F5F" width="80" x="552" y="0"></use>
+<text fill="#5F5F5F" font-size="14" font-weight="700" text-anchor="middle" x="592" y="92">Internet</text>
+<line stroke="#5F5F5F" stroke-width="3" x1="592" x2="592" y1="98" y2="168"></line>
+<text fill="#5F5F5F" font-size="12" x="604" y="138">WAN 200.0.113.2/30</text>
+<!-- Firewall -->
+<rect fill="#F9EEF0" height="104" rx="12" stroke="#A6192E" stroke-width="2.5" width="120" x="532" y="170"></rect>
+<use height="60" href="#i-firewall" style="color:#A6192E" width="60" x="562" y="178"></use>
+<text fill="#A6192E" font-size="14" font-weight="700" text-anchor="middle" x="592" y="258">Firewall</text>
+<!-- Zonas -->
+<g font-size="13">
+<rect fill="#FBF6E7" height="170" rx="14" stroke="#D4AF37" stroke-width="2" width="260" x="20" y="340"></rect>
+<text fill="#8A6D1D" font-weight="700" text-anchor="middle" x="150" y="364">USUARIOS · VLAN 10</text>
+<text fill="#5F5F5F" text-anchor="middle" x="150" y="382">10.10.10.0/24</text>
+<use height="56" href="#i-pc" style="color:#2A2A2A" width="56" x="48" y="396"></use>
+<use height="56" href="#i-portatil" style="color:#2A2A2A" width="56" x="122" y="396"></use>
+<use height="56" href="#i-movil" style="color:#2A2A2A" width="56" x="196" y="396"></use>
+<text fill="#5F5F5F" text-anchor="middle" x="150" y="490">navegan; no alcanzan la BD</text>
+<rect fill="#FBF6E7" height="170" rx="14" stroke="#D4AF37" stroke-width="2" width="260" x="312" y="340"></rect>
+<text fill="#8A6D1D" font-weight="700" text-anchor="middle" x="442" y="364">DMZ · VLAN 20</text>
+<text fill="#5F5F5F" text-anchor="middle" x="442" y="382">10.10.20.0/24</text>
+<use height="56" href="#i-servidor-web" style="color:#2A2A2A" width="56" x="372" y="396"></use>
+<use height="56" href="#i-correo" style="color:#2A2A2A" width="56" x="456" y="396"></use>
+<text fill="#5F5F5F" text-anchor="middle" x="442" y="490">publicada: solo 443/tcp</text>
+<rect fill="#F9EEF0" height="170" rx="14" stroke="#A6192E" stroke-width="2" width="260" x="604" y="340"></rect>
+<text fill="#A6192E" font-weight="700" text-anchor="middle" x="734" y="364">INTERNA · VLAN 30</text>
+<text fill="#5F5F5F" text-anchor="middle" x="734" y="382">10.10.30.0/24</text>
+<use height="56" href="#i-bd" style="color:#A6192E" width="56" x="664" y="396"></use>
+<use height="56" href="#i-servidor" style="color:#A6192E" width="56" x="748" y="396"></use>
+<text fill="#5F5F5F" text-anchor="middle" x="734" y="490">solo la DMZ, solo 3306/tcp</text>
+<rect fill="#F4F4F2" height="170" rx="14" stroke="#8C8C8C" stroke-dasharray="6 5" stroke-width="2" width="268" x="896" y="340"></rect>
+<text fill="#5F5F5F" font-weight="700" text-anchor="middle" x="1030" y="364">ADMIN · VLAN 99</text>
+<text fill="#5F5F5F" text-anchor="middle" x="1030" y="382">10.10.99.0/24</text>
+<use height="56" href="#i-admin" style="color:#5F5F5F" width="56" x="1002" y="396"></use>
+<text fill="#5F5F5F" text-anchor="middle" x="1030" y="490">SSH/HTTPS de gestión</text>
+</g>
+<!-- enlaces -->
+<path d="M560 274 L150 338" fill="none" stroke="#D4AF37" stroke-width="3"></path>
+<path d="M576 274 L442 338" fill="none" stroke="#D4AF37" stroke-width="3"></path>
+<path d="M608 274 L734 338" fill="none" stroke="#A6192E" stroke-width="3"></path>
+<path d="M624 274 L1030 338" fill="none" stroke="#8C8C8C" stroke-dasharray="7 5" stroke-width="3"></path>
+<!-- flujo permitido DMZ -> BD -->
+<path d="M520 430 C 560 420, 580 420, 656 424" fill="none" marker-end="url(#e1-a)" stroke="#A6192E" stroke-width="2.5"></path>
+<text fill="#A6192E" font-size="12" font-weight="700" text-anchor="middle" x="590" y="414">3306</text>
+</svg>
+</div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 1 de 4</span><span class="src">Diagrama propio · concepto: NIST SP 800-41 Rev.1 (2009), §4.1</span><span class="pg">2 / 13</span></div><aside class="notes">Este es el patrón más importante del curso: la topología por zonas. En el centro está el firewall, que es el único punto por donde el tráfico cruza de una zona a otra. Arriba, Internet, conectada por el enlace WAN. Abajo, cuatro zonas, cada una con su VLAN y su subred. Los usuarios navegan pero no alcanzan la base de datos. La DMZ publica únicamente el puerto cuatrocientos cuarenta y tres. La zona interna solo acepta conexiones desde la DMZ y solo al puerto de la base de datos. Y la zona de administración, dibujada con línea punteada, es la única desde la que se gestiona el firewall. Fíjense en la flecha vino: es el único flujo permitido hacia la base de datos. Todo lo que no está dibujado como permitido, está bloqueado.</aside></section>
+<section class="slide" data-parte-de="1"><div class="s-head"><div class="kicker">Patrón 2 · Secuencia</div><h2>El saludo de tres vías de TCP, mensaje a mensaje</h2><div class="rule"></div><div class="sub">Dos ejes verticales, el tiempo hacia abajo; cada flecha es un segmento con sus banderas.</div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body">
+<div class="cols">
+<div class="col-2">
+<svg class="dgm" viewbox="0 0 760 470">
+<defs><marker id="e2-a" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"></path></marker>
+<marker id="e2-d" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"></path></marker></defs>
+<use height="64" href="#i-portatil" style="color:#2A2A2A" width="64" x="80" y="0"></use>
+<text font-size="14" font-weight="700" text-anchor="middle" x="112" y="80">Cliente</text>
+<text fill="#5F5F5F" font-size="12" text-anchor="middle" x="112" y="97">10.10.10.25:51514</text>
+<use height="64" href="#i-servidor-web" style="color:#2A2A2A" width="64" x="616" y="0"></use>
+<text font-size="14" font-weight="700" text-anchor="middle" x="648" y="80">Servidor</text>
+<text fill="#5F5F5F" font-size="12" text-anchor="middle" x="648" y="97">10.10.20.10:443</text>
+<line stroke="#8C8C8C" stroke-dasharray="5 5" stroke-width="2" x1="112" x2="112" y1="108" y2="460"></line>
+<line stroke="#8C8C8C" stroke-dasharray="5 5" stroke-width="2" x1="648" x2="648" y1="108" y2="460"></line>
+<line marker-end="url(#e2-a)" stroke="#A6192E" stroke-width="3" x1="112" x2="644" y1="150" y2="200"></line>
+<rect fill="#fff" height="28" rx="6" stroke="#A6192E" width="160" x="300" y="146"></rect>
+<text fill="#A6192E" font-size="14" font-weight="700" text-anchor="middle" x="380" y="166">SYN · seq=x</text>
+<line marker-end="url(#e2-d)" stroke="#8A6D1D" stroke-width="3" x1="648" x2="116" y1="230" y2="280"></line>
+<rect fill="#fff" height="28" rx="6" stroke="#8A6D1D" width="220" x="270" y="226"></rect>
+<text fill="#8A6D1D" font-size="14" font-weight="700" text-anchor="middle" x="380" y="246">SYN+ACK · seq=y, ack=x+1</text>
+<line marker-end="url(#e2-a)" stroke="#A6192E" stroke-width="3" x1="112" x2="644" y1="310" y2="360"></line>
+<rect fill="#fff" height="28" rx="6" stroke="#A6192E" width="180" x="290" y="306"></rect>
+<text fill="#A6192E" font-size="14" font-weight="700" text-anchor="middle" x="380" y="326">ACK · ack=y+1</text>
+<rect fill="#E8F3EC" height="40" rx="10" stroke="#2E7D4F" stroke-width="2" width="360" x="200" y="400"></rect>
+<text fill="#2E7D4F" font-size="15" font-weight="700" text-anchor="middle" x="380" y="426">ESTABLISHED: ya fluyen datos</text>
+</svg>
+</div>
+<div class="col">
+<div class="card white"><h4>Lectura de seguridad</h4>
+<ul><li>Un firewall <b>stateful</b> registra esta conversación y deja pasar sus respuestas.</li>
+<li>Un <b>SYN flood</b> envía miles de SYN y nunca el ACK final: llena la tabla de conexiones a medio abrir.</li>
+<li><code>nmap -sS</code> envía solo el SYN: si vuelve SYN+ACK, el puerto está abierto.</li></ul></div>
+<div class="note"><b>Regla práctica:</b> si una regla permite "establecidas", depende de que esta secuencia haya ocurrido.</div>
+</div>
+</div>
+</div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 1 de 4</span><span class="src">IETF RFC 9293 (2022), §3.5 — Establecimiento de conexión TCP</span><span class="pg">3 / 13</span></div><aside class="notes">Segundo patrón: el diagrama de secuencia, que usamos cada vez que explicamos un protocolo. Tenemos dos ejes verticales, el cliente a la izquierda y el servidor a la derecha, y el tiempo corre hacia abajo. Primero el cliente envía un segmento con la bandera SYN y un número de secuencia inicial. El servidor responde con SYN más ACK, confirmando ese número y proponiendo el suyo. Finalmente el cliente confirma con ACK y la conexión queda establecida. ¿Por qué nos importa en seguridad? Porque un firewall con estado usa justamente esta secuencia para reconocer el tráfico de respuesta, porque un ataque de inundación SYN abusa de la espera del último paso, y porque el escaneo SYN de nmap interpreta la respuesta del segundo paso para saber si un puerto está abierto.</aside></section>
+<section class="slide" data-parte-de="1"><div class="s-head"><div class="kicker">Patrón 3 · Pipeline</div><h2>Del evento a la alerta: el recorrido de un registro</h2><div class="rule"></div><div class="sub">Etapas en línea, de izquierda a derecha; debajo, qué puede fallar en cada una.</div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body">
+<svg class="dgm" viewbox="0 0 1184 460">
+<defs><marker id="e3-a" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"></path></marker></defs>
+<g font-size="14" text-anchor="middle">
+<g>
+<rect fill="#F9EEF0" height="170" rx="14" stroke="#A6192E" stroke-width="2" width="200" x="10" y="40"></rect>
+<use height="44" href="#i-firewall" style="color:#A6192E" width="44" x="44" y="56"></use>
+<use height="44" href="#i-servidor" style="color:#A6192E" width="44" x="96" y="56"></use>
+<use height="44" href="#i-ids" style="color:#A6192E" width="44" x="148" y="56"></use>
+<text fill="#A6192E" font-weight="700" x="110" y="130">1 · Fuentes</text>
+<text fill="#2A2A2A" x="110" y="152">firewall, hosts, IDS</text>
+<text fill="#2A2A2A" x="110" y="172">generan eventos</text>
+</g>
+<g>
+<rect fill="#F9EEF0" height="170" rx="14" stroke="#A6192E" stroke-width="2" width="200" x="252" y="40"></rect>
+<use height="52" href="#i-log" style="color:#A6192E" width="52" x="326" y="54"></use>
+<text fill="#A6192E" font-weight="700" x="352" y="130">2 · Transporte</text>
+<text x="352" y="152">syslog 514/udp</text>
+<text x="352" y="172">o TLS 6514/tcp</text>
+</g>
+<g>
+<rect fill="#F9EEF0" height="170" rx="14" stroke="#A6192E" stroke-width="2" width="200" x="494" y="40"></rect>
+<use height="52" href="#i-engranaje" style="color:#A6192E" width="52" x="568" y="54"></use>
+<text fill="#A6192E" font-weight="700" x="594" y="130">3 · Normalización</text>
+<text x="594" y="152">campos comunes:</text>
+<text x="594" y="172">hora, origen, acción</text>
+</g>
+<g>
+<rect fill="#F9EEF0" height="170" rx="14" stroke="#A6192E" stroke-width="2" width="200" x="736" y="40"></rect>
+<use height="52" href="#i-siem" style="color:#A6192E" width="52" x="810" y="54"></use>
+<text fill="#A6192E" font-weight="700" x="836" y="130">4 · Correlación</text>
+<text x="836" y="152">reglas sobre varios</text>
+<text x="836" y="172">eventos a la vez</text>
+</g>
+<g>
+<rect fill="#A6192E" height="170" rx="14" width="196" x="978" y="40"></rect>
+<use height="52" href="#i-alerta" style="color:#D4AF37" width="52" x="1050" y="54"></use>
+<text fill="#D4AF37" font-weight="700" x="1076" y="130">5 · Alerta</text>
+<text fill="#fff" x="1076" y="152">al analista,</text>
+<text fill="#fff" x="1076" y="172">con contexto</text>
+</g>
+</g>
+<g marker-end="url(#e3-a)" stroke="#A6192E" stroke-width="3">
+<line x1="212" x2="248" y1="125" y2="125"></line><line x1="454" x2="490" y1="125" y2="125"></line>
+<line x1="696" x2="732" y1="125" y2="125"></line><line x1="938" x2="974" y1="125" y2="125"></line>
+</g>
+<g fill="#5F5F5F" font-size="13" text-anchor="middle">
+<rect fill="#D4AF37" height="2" width="1164" x="10" y="250"></rect>
+<text fill="#8A6D1D" font-size="14" font-weight="700" x="592" y="282">QUÉ FALLA EN LA PRÁCTICA</text>
+<text x="110" y="318">no se habilitó el registro</text>
+<text x="352" y="318">UDP pierde mensajes</text>
+<text x="594" y="318">relojes desincronizados</text>
+<text x="836" y="318">reglas sin afinar</text>
+<text x="1076" y="318">fatiga de alertas</text>
+<text fill="#A6192E" x="110" y="340">→ habilitar y verificar</text>
+<text fill="#A6192E" x="352" y="340">→ TCP/TLS + cola</text>
+<text fill="#A6192E" x="594" y="340">→ NTP en todo</text>
+<text fill="#A6192E" x="836" y="340">→ casos de uso</text>
+<text fill="#A6192E" x="1076" y="340">→ priorizar</text>
+</g>
+</svg>
+<div class="note"><b>Idea clave:</b> una alerta es tan buena como la etapa más débil de la cadena que la produjo.</div>
+</div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 1 de 4</span><span class="src">Diagrama propio · concepto: NIST SP 800-92 (2006), §2.3</span><span class="pg">4 / 13</span></div><aside class="notes">Tercer patrón: el pipeline, ideal para procesos que avanzan por etapas. Aquí seguimos un registro desde que nace hasta que se convierte en una alerta. Primero las fuentes: el firewall, los servidores y el detector de intrusos generan eventos. Segundo, el transporte, normalmente syslog, que puede ir por UDP o, mejor, por TCP con TLS. Tercero, la normalización, que lleva todos los formatos a campos comunes como la hora, el origen y la acción. Cuarto, la correlación, donde las reglas miran varios eventos a la vez. Y quinto, la alerta que recibe el analista. Debajo de cada etapa está lo que suele fallar: registros que nunca se habilitaron, mensajes UDP perdidos, relojes desincronizados, reglas sin afinar y demasiadas alertas. La idea clave es que la alerta es tan buena como el eslabón más débil.</aside></section>
+<section class="slide" data-parte-de="1"><div class="s-head"><div class="kicker">Patrón 4 · Comparación</div><h2>IDS fuera de banda frente a IPS en línea</h2><div class="rule"></div><div class="sub">Misma red, dos ubicaciones del sensor: cambia lo que puede hacer y lo que arriesga.</div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body">
+<div class="cols">
+<div class="col">
+<svg class="dgm" viewbox="0 0 560 300">
+<defs><marker id="e4-g" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"></path></marker></defs>
+<text fill="#8A6D1D" font-size="16" font-weight="700" text-anchor="middle" x="280" y="22">IDS · copia del tráfico</text>
+<use height="70" href="#i-internet" style="color:#5F5F5F" width="70" x="10" y="60"></use>
+<use height="58" href="#i-firewall" style="color:#A6192E" width="58" x="140" y="66"></use>
+<use height="58" href="#i-switch" style="color:#2A2A2A" width="58" x="270" y="66"></use>
+<use height="64" href="#i-servidor" style="color:#2A2A2A" width="64" x="460" y="62"></use>
+<g stroke="#5F5F5F" stroke-width="3"><line x1="80" x2="138" y1="95" y2="95"></line><line x1="200" x2="268" y1="95" y2="95"></line><line x1="330" x2="458" y1="95" y2="95"></line></g>
+<path d="M299 126 V 196" marker-end="url(#e4-g)" stroke="#8A6D1D" stroke-dasharray="6 5" stroke-width="3"></path>
+<text fill="#8A6D1D" font-size="12" x="310" y="166">SPAN</text>
+<use height="62" href="#i-ids" style="color:#8A6D1D" width="62" x="268" y="198"></use>
+<text fill="#2A2A2A" font-size="13" text-anchor="middle" x="299" y="282">detecta y alerta; si falla, la red sigue</text>
+</svg>
+<div class="card gold"><b>Ventaja:</b> cero impacto en la latencia. <b>Límite:</b> cuando alerta, el paquete ya llegó.</div>
+</div>
+<div class="col">
+<svg class="dgm" viewbox="0 0 560 300">
+<text fill="#A6192E" font-size="16" font-weight="700" text-anchor="middle" x="280" y="22">IPS · en el camino</text>
+<use height="70" href="#i-internet" style="color:#5F5F5F" width="70" x="10" y="60"></use>
+<use height="58" href="#i-firewall" style="color:#A6192E" width="58" x="120" y="66"></use>
+<use height="62" href="#i-ips" style="color:#A6192E" width="62" x="236" y="64"></use>
+<use height="58" href="#i-switch" style="color:#2A2A2A" width="58" x="352" y="66"></use>
+<use height="64" href="#i-servidor" style="color:#2A2A2A" width="64" x="470" y="62"></use>
+<g stroke="#5F5F5F" stroke-width="3"><line x1="80" x2="118" y1="95" y2="95"></line><line x1="180" x2="234" y1="95" y2="95"></line><line x1="300" x2="350" y1="95" y2="95"></line><line x1="412" x2="468" y1="95" y2="95"></line></g>
+<use height="34" href="#i-bloqueo" style="color:#A6192E" width="34" x="250" y="150"></use>
+<text fill="#A6192E" font-size="13" font-weight="700" text-anchor="middle" x="267" y="210">descarta antes de entregar</text>
+<text fill="#2A2A2A" font-size="13" text-anchor="middle" x="280" y="282">bloquea; si falla sin bypass, corta la red</text>
+</svg>
+<div class="card"><b>Ventaja:</b> detiene el ataque. <b>Límite:</b> agrega latencia y un falso positivo bloquea tráfico legítimo.</div>
+</div>
+</div>
+</div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 1 de 4</span><span class="src">Diagrama propio · concepto: NIST SP 800-94 (2007), §2.2</span><span class="pg">5 / 13</span></div><aside class="notes">Cuarto patrón: la comparación lado a lado, con la misma red dibujada dos veces para que la diferencia salte a la vista. A la izquierda, un detector de intrusos fuera de banda: recibe una copia del tráfico por un puerto espejo del switch. Puede alertar, pero cuando lo hace el paquete ya llegó a su destino; a cambio, si el sensor falla, la red sigue funcionando. A la derecha, un sistema de prevención en línea: todo el tráfico pasa a través de él, así que puede descartar un paquete antes de entregarlo. El precio es la latencia, el riesgo de bloquear tráfico legítimo por un falso positivo, y que si falla sin un mecanismo de bypass, corta la comunicación.</aside></section>
+<section class="slide" data-parte-de="1"><div class="s-head"><div class="kicker">Patrón 5 · Consola</div><h2>Una política de host mínima con nftables</h2><div class="rule"></div><div class="sub">Comandos reales a la izquierda; a la derecha, el camino que sigue el paquete por esas reglas.</div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body">
+<div class="cols">
+<div class="col">
+<pre class="con"><span class="c"># /etc/nftables.conf — servidor web en la DMZ</span>
+<span class="k">table</span> inet filtro {
+  <span class="k">chain</span> entrada {
+    type filter hook input priority 0; <span class="v">policy drop</span>;
+    ct state established,related <span class="p">accept</span>
+    iif lo <span class="p">accept</span>
+    tcp dport 443 <span class="p">accept</span>
+    ip saddr 10.10.99.0/24 tcp dport 22 <span class="p">accept</span>
+    log prefix "DROP-IN " <span class="v">drop</span>
+  }
+}</pre>
+<div class="note"><b>Orden:</b> la primera regla que coincide decide; lo demás cae en <code>policy drop</code>.</div>
+</div>
+<div class="col">
+<svg class="dgm" viewbox="0 0 560 400">
+<defs><marker id="e5-a" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"></path></marker></defs>
+<use height="48" href="#i-paquete" style="color:#2A2A2A" width="64" x="246" y="0"></use>
+<g font-size="13" text-anchor="middle">
+<rect fill="#F9EEF0" height="38" rx="8" stroke="#A6192E" width="260" x="150" y="62"></rect><text x="280" y="86">¿conexión ya establecida?</text>
+<rect fill="#F9EEF0" height="38" rx="8" stroke="#A6192E" width="260" x="150" y="124"></rect><text x="280" y="148">¿interfaz loopback?</text>
+<rect fill="#F9EEF0" height="38" rx="8" stroke="#A6192E" width="260" x="150" y="186"></rect><text x="280" y="210">¿TCP 443?</text>
+<rect fill="#F9EEF0" height="38" rx="8" stroke="#A6192E" width="260" x="150" y="248"></rect><text x="280" y="272">¿SSH desde ADMIN?</text>
+<rect fill="#A6192E" height="44" rx="8" width="260" x="150" y="320"></rect><text fill="#fff" font-weight="700" x="280" y="347">registrar y descartar</text>
+</g>
+<g marker-end="url(#e5-a)" stroke="#A6192E" stroke-width="2.5"><line x1="280" x2="280" y1="48" y2="60"></line><line x1="280" x2="280" y1="100" y2="122"></line><line x1="280" x2="280" y1="162" y2="184"></line><line x1="280" x2="280" y1="224" y2="246"></line><line x1="280" x2="280" y1="286" y2="318"></line></g>
+<g stroke="#2E7D4F" stroke-width="2.5"><line x1="410" x2="470" y1="81" y2="81"></line><line x1="410" x2="470" y1="143" y2="143"></line><line x1="410" x2="470" y1="205" y2="205"></line><line x1="410" x2="470" y1="267" y2="267"></line><line x1="470" x2="470" y1="81" y2="267"></line></g>
+<use height="48" href="#i-ok" style="color:#2E7D4F" width="48" x="480" y="150"></use>
+<text fill="#2E7D4F" font-size="13" font-weight="700" text-anchor="middle" x="504" y="216">aceptar</text>
+<text fill="#2E7D4F" font-size="11" x="430" y="76">sí</text>
+</svg>
+</div>
+</div>
+</div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 1 de 4</span><span class="src">nftables wiki — Simple ruleset for a server (netfilter.org)</span><span class="pg">6 / 13</span></div><aside class="notes">Quinto patrón: consola más diagrama. Cuando mostramos comandos reales, al lado dibujamos qué hacen. A la izquierda está una política mínima de nftables para un servidor web en la DMZ. La cadena de entrada tiene política por defecto de descarte. Luego acepta las conexiones ya establecidas, el tráfico de loopback, el puerto cuatrocientos cuarenta y tres, y SSH únicamente desde la red de administración. Lo que no coincida se registra con un prefijo y se descarta. A la derecha vemos el mismo conjunto como un árbol de decisión: el paquete baja pregunta por pregunta, y en cuanto una regla coincide, se acepta. Si ninguna coincide, termina en el registro y el descarte. Recuerden: la primera coincidencia decide.</aside></section>
+<section class="slide" data-parte-de="1"><div class="s-head"><div class="kicker">Patrón 6 · Caso colombiano</div><h2>IFX Networks, septiembre de 2023: un proveedor, cientos de afectados</h2><div class="rule"></div><div class="sub">Línea de tiempo arriba; abajo, la lección de red que deja cada momento.</div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body">
+<svg class="dgm" viewbox="0 0 1184 360">
+<line stroke="#D4AF37" stroke-width="5" x1="40" x2="1144" y1="90" y2="90"></line>
+<g font-size="13" text-anchor="middle">
+<circle cx="140" cy="90" fill="#A6192E" r="16"></circle><text fill="#fff" font-weight="700" x="140" y="95">1</text>
+<text fill="#A6192E" font-weight="700" x="140" y="50">12 sep 2023</text>
+<text x="140" y="130">ransomware cifra máquinas</text><text x="140" y="148">virtuales del proveedor</text>
+<circle cx="430" cy="90" fill="#A6192E" r="16"></circle><text fill="#fff" font-weight="700" x="430" y="95">2</text>
+<text fill="#A6192E" font-weight="700" x="430" y="50">13–15 sep</text>
+<text x="430" y="130">caen servicios de Rama Judicial,</text><text x="430" y="148">superintendencias y ministerios</text>
+<circle cx="720" cy="90" fill="#A6192E" r="16"></circle><text fill="#fff" font-weight="700" x="720" y="95">3</text>
+<text fill="#A6192E" font-weight="700" x="720" y="50">19 sep</text>
+<text x="720" y="130">Fiscalía señala a</text><text x="720" y="148">RansomHouse como posible autor</text>
+<circle cx="1010" cy="90" fill="#A6192E" r="16"></circle><text fill="#fff" font-weight="700" x="1010" y="95">4</text>
+<text fill="#A6192E" font-weight="700" x="1010" y="50">semanas después</text>
+<text x="1010" y="130">recuperación gradual;</text><text x="1010" y="148">&gt;760 entidades en la región</text>
+</g>
+<rect fill="#F9EEF0" height="150" rx="14" stroke="#A6192E" stroke-width="2" width="1104" x="40" y="190"></rect>
+<use height="56" href="#i-sede" style="color:#A6192E" width="56" x="70" y="214"></use>
+<use height="56" href="#i-nube" style="color:#A6192E" width="56" x="70" y="272"></use>
+<g font-size="15">
+<text fill="#A6192E" font-weight="700" x="150" y="230">Lección de red</text>
+<text x="150" y="258">· El riesgo de un tercero es tu riesgo: segmentar y monitorear también los enlaces con el proveedor.</text>
+<text x="150" y="284">· Sin respaldos aislados del entorno afectado, la recuperación depende del atacante o del proveedor.</text>
+<text x="150" y="310">· Plan de continuidad: ¿qué servicio crítico puede operar si el centro de datos externo cae una semana?</text>
+</g>
+</svg>
+</div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 1 de 4</span><span class="src">INCIBE-CERT (2023) · Infobae, 19-sep-2023 · MITRE ATT&amp;CK® Enterprise</span><span class="pg">7 / 13</span></div><aside class="notes">Sexto patrón: la línea de tiempo, que usamos para los casos colombianos. El doce de septiembre de dos mil veintitrés, un ataque de ransomware cifró máquinas virtuales en la nube de IFX Networks, un proveedor de servicios de centro de datos. En los días siguientes quedaron fuera de servicio sistemas de la Rama Judicial, de varias superintendencias y de ministerios. El diecinueve de septiembre, la Fiscalía señaló al grupo RansomHouse como posible responsable, y la recuperación tomó semanas, con más de setecientas sesenta entidades afectadas en la región. ¿Qué nos enseña desde la red? Que el riesgo de un tercero es nuestro riesgo, que los respaldos deben estar aislados del entorno que puede caer, y que hay que planear cómo opera un servicio crítico si el centro de datos externo no está disponible.</aside></section>
+<section class="slide divider" data-parte="2">
+  <div class="topline-g"></div><div class="topline-v"></div>
+  <div class="parte-n">Parte 2 de 4</div>
+  <div class="parte-big">2</div>
+  <h1>Parte dos</h1>
+  <div class="semana">Semana 0 · Plantilla de referencia: patrones de diagrama</div>
+  <div class="temas"><span>a</span></div>
+  <img class="logo-div" src="../assets/logo-cuc.png" alt="CUC">
+  <aside class="notes">Parte dos.</aside>
+</section>
+<section class="slide" data-parte-de="2"><div class="s-head"><div class="kicker">Relleno</div><h2>Diapositiva de la parte 2</h2><div class="rule"></div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body"><ul class="lista"><li><b>Texto</b> de ejemplo.</li></ul></div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 2 de 4</span><span class="src">—</span><span class="pg">9 / 13</span></div><aside class="notes">Relleno.</aside></section>
+<section class="slide divider" data-parte="3">
+  <div class="topline-g"></div><div class="topline-v"></div>
+  <div class="parte-n">Parte 3 de 4</div>
+  <div class="parte-big">3</div>
+  <h1>Parte tres</h1>
+  <div class="semana">Semana 0 · Plantilla de referencia: patrones de diagrama</div>
+  <div class="temas"><span>b</span></div>
+  <img class="logo-div" src="../assets/logo-cuc.png" alt="CUC">
+  <aside class="notes">Parte tres.</aside>
+</section>
+<section class="slide" data-parte-de="3"><div class="s-head"><div class="kicker">Relleno</div><h2>Diapositiva de la parte 3</h2><div class="rule"></div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body"><ul class="lista"><li><b>Texto</b> de ejemplo.</li></ul></div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 3 de 4</span><span class="src">—</span><span class="pg">11 / 13</span></div><aside class="notes">Relleno.</aside></section>
+<section class="slide divider" data-parte="4">
+  <div class="topline-g"></div><div class="topline-v"></div>
+  <div class="parte-n">Parte 4 de 4</div>
+  <div class="parte-big">4</div>
+  <h1>Parte cuatro</h1>
+  <div class="semana">Semana 0 · Plantilla de referencia: patrones de diagrama</div>
+  <div class="temas"><span>c</span></div>
+  <img class="logo-div" src="../assets/logo-cuc.png" alt="CUC">
+  <aside class="notes">Parte cuatro.</aside>
+</section>
+<section class="slide" data-parte-de="4"><div class="s-head"><div class="kicker">Relleno</div><h2>Diapositiva de la parte 4</h2><div class="rule"></div><img class="logo-corner" src="../assets/logo-cuc.png" alt="CUC"></div><div class="s-body"><ul class="lista"><li><b>Texto</b> de ejemplo.</li></ul></div><div class="s-foot"><span>Seguridad en Redes · Semana 0 · Parte 4 de 4</span><span class="src">—</span><span class="pg">13 / 13</span></div><aside class="notes">Relleno.</aside></section>
+</div>
+<div id="nav"><button id="prev" aria-label="Anterior">‹</button><span id="counter"></span><button id="next" aria-label="Siguiente">›</button></div>
+<script src="../assets/cuc-deck.js"></script>
+</body>
+</html>

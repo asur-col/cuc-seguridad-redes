@@ -1,0 +1,54 @@
+{
+  "semana": 6,
+  "etiqueta": "Semana 6",
+  "unidad": "Unidad 1",
+  "titulo": "Repaso Unidad 1",
+  "titulo_corto": "Repaso Unidad 1",
+  "fechas": "7–13 sep",
+  "archivo": "2026-2-S06-seguridad-redes-repaso-unidad-1",
+  "descripcion": "Repaso integrador de la Unidad 1 con ejercicios tipo examen práctico",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Mapa de la Unidad 1",
+      "temas": [
+        "Amenazas",
+        "Red y controles",
+        "Segmentación",
+        "Filtrado y detección"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicios de direccionamiento y segmentación",
+      "temas": [
+        "Subnetting",
+        "VLAN",
+        "DMZ",
+        "Reglas entre zonas"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicios de firewall, IDS y hardening",
+      "temas": [
+        "nftables",
+        "Snort",
+        "ACL",
+        "Hardening"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Caso integrador y errores frecuentes",
+      "temas": [
+        "Caso integrador",
+        "Errores frecuentes",
+        "Autoevaluación",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

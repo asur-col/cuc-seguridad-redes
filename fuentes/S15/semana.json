@@ -1,0 +1,54 @@
+{
+  "semana": 15,
+  "etiqueta": "Semana 15",
+  "unidad": "Unidad 3",
+  "titulo": "Ethical hacking asistido por IA: introducción, herramientas, marco legal/ético",
+  "titulo_corto": "Ethical hacking asistido por IA",
+  "fechas": "16–22 nov",
+  "archivo": "2026-2-S15-seguridad-redes-ethical-hacking-ia",
+  "descripcion": "Metodologías de pruebas, marco legal colombiano, reglas de enfrentamiento y herramientas asistidas por IA",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Metodologías de pruebas",
+      "temas": [
+        "PTES",
+        "NIST SP 800-115",
+        "OSSTMM",
+        "Tipos de prueba"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Marco legal y ético",
+      "temas": [
+        "Ley 1273 de 2009",
+        "Convenio de Budapest",
+        "Reglas de enfrentamiento",
+        "Autorización"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Herramientas y asistentes de IA",
+      "temas": [
+        "Reconocimiento",
+        "Escaneo",
+        "Explotación controlada",
+        "Límites de la IA"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Reporte y práctica controlada",
+      "temas": [
+        "Hallazgos",
+        "Reporte",
+        "Entorno controlado",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

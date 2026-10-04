@@ -1,0 +1,54 @@
+{
+  "semana": 8,
+  "etiqueta": "Semana 8",
+  "unidad": "Unidad 2",
+  "titulo": "Identidad y acceso en red: autenticación, MFA, mínimo privilegio — identidad como perímetro (Zero Trust a fondo)",
+  "titulo_corto": "Identidad y acceso: autenticación, autorización y Zero Trust",
+  "fechas": "21–27 sep",
+  "archivo": "2026-2-S08-seguridad-redes-identidad-acceso",
+  "descripcion": "Autenticación, MFA, 802.1X y Wi-Fi seguro, autorización RBAC/ABAC, mínimo privilegio y Zero Trust a fondo",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Autenticación, MFA y acceso a la red",
+      "temas": [
+        "Factores",
+        "MFA",
+        "802.1X/RADIUS",
+        "Wi-Fi WPA3"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Autorización y mínimo privilegio",
+      "temas": [
+        "RBAC",
+        "ABAC",
+        "Just-in-time",
+        "Revisión de accesos"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Zero Trust a fondo",
+      "temas": [
+        "Principios",
+        "PDP y PEP",
+        "ZTNA vs VPN",
+        "Madurez"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Ejercicio de control de acceso",
+      "temas": [
+        "Escenario",
+        "Matriz de acceso",
+        "Revisión",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "semana": 2,
+  "etiqueta": "Semana 2",
+  "unidad": "Unidad 1",
+  "titulo": "Cómo funciona una red básica (NAT, routing estático/dinámico) + direccionamiento IPv4/IPv6 + modelo TCP/IP + firewall/NGFW/IDS conceptual",
+  "titulo_corto": "Cómo funciona una red y sus controles",
+  "fechas": "10–16 ago",
+  "archivo": "2026-2-S02-seguridad-redes-red-basica-controles",
+  "descripcion": "Viaje del paquete, TCP/IP, direccionamiento IPv4/IPv6, NAT, routing estático/dinámico y su seguridad, firewall/NGFW/IDS conceptual",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "El viaje del paquete",
+      "temas": [
+        "Ethernet y ARP",
+        "IP y TCP/UDP",
+        "Puertos",
+        "DNS"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Direccionamiento y NAT",
+      "temas": [
+        "IPv4 y subredes",
+        "IPv6",
+        "NAT/PAT",
+        "ICMP"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Routing y su seguridad",
+      "temas": [
+        "Estático vs dinámico",
+        "OSPF",
+        "BGP",
+        "RPKI"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Controles por capa y práctica",
+      "temas": [
+        "Firewall",
+        "Stateful",
+        "NGFW",
+        "IDS conceptual"
+      ],
+      "guion": ""
+    }
+  ]
+}

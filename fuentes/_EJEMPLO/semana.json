@@ -1,0 +1,17 @@
+{
+  "semana": 0,
+  "etiqueta": "Semana 0",
+  "unidad": "Unidad 0",
+  "titulo": "Plantilla de referencia: patrones de diagrama",
+  "titulo_corto": "Plantilla",
+  "fechas": "—",
+  "archivo": "plantillas/ejemplo-semana",
+  "descripcion": "Ejemplos de los patrones de diagrama del estándar CUC.",
+  "portada_guion": "Bienvenidos. Esta es la presentación de ejemplo que muestra los patrones de diagrama del curso.",
+  "partes": [
+    {"titulo": "Patrones de diagrama", "temas": ["Topología por zonas", "Secuencia", "Pipeline", "Comparación"], "guion": "Parte uno."},
+    {"titulo": "Parte dos", "temas": ["a"], "guion": "Parte dos."},
+    {"titulo": "Parte tres", "temas": ["b"], "guion": "Parte tres."},
+    {"titulo": "Parte cuatro", "temas": ["c"], "guion": "Parte cuatro."}
+  ]
+}

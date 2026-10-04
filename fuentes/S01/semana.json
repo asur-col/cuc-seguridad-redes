@@ -1,0 +1,54 @@
+{
+  "semana": 1,
+  "etiqueta": "Semana 1",
+  "unidad": "Unidad 1",
+  "titulo": "Encuadre + de la red tradicional al perímetro Zero Trust: panorama de amenazas 2026 (IA ofensiva, identidad como nuevo perímetro)",
+  "titulo_corto": "Panorama de amenazas y Zero Trust",
+  "fechas": "5–9 ago",
+  "archivo": "2026-2-S01-seguridad-redes-panorama-amenazas-zero-trust",
+  "descripcion": "Encuadre del curso, conceptos base, panorama de amenazas 2026, IA ofensiva, identidad como perímetro y principios Zero Trust",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Encuadre y conceptos base",
+      "temas": [
+        "El curso",
+        "CIA y AAA",
+        "Activo, amenaza, vulnerabilidad, riesgo",
+        "Defensa en profundidad"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Panorama de amenazas 2026",
+      "temas": [
+        "Actores",
+        "Superficie de ataque",
+        "Cadena de ataque",
+        "Incidentes por mala configuración"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "IA ofensiva e identidad como perímetro",
+      "temas": [
+        "Phishing a escala",
+        "Deepfakes",
+        "Credenciales",
+        "Del castillo y foso a Zero Trust"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Caso colombiano y práctica",
+      "temas": [
+        "IFX Networks 2023",
+        "CONPES 3995 y ColCERT",
+        "Reconocimiento con nmap",
+        "Qué sigue"
+      ],
+      "guion": ""
+    }
+  ]
+}

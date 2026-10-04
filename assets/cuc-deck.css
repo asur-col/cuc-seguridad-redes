@@ -1,0 +1,116 @@
+/* Plantilla institucional CUC para las presentaciones de Seguridad en Redes.
+   Lienzo fijo 1280x720. Lo usa herramientas/construir.py (no editar las semanas a mano). */
+@import url("fuentes.css");
+
+:root{
+  --vino:#A6192E; --vino-osc:#7E1223; --dorado:#D4AF37; --dorado-osc:#8A6D1D;
+  --texto:#2A2A2A; --gris:#5F5F5F; --gris-claro:#8C8C8C; --linea:#E3DCD0;
+  --vino-tint:#F9EEF0; --dorado-tint:#FBF6E7; --gris-tint:#F4F4F2;
+  --ok:#2E7D4F; --ok-tint:#E8F3EC; --mal:#B3261E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:#E9E6E1;font-family:Roboto,"Segoe UI",Arial,sans-serif;color:var(--texto);}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#stage{width:1280px;height:720px;position:relative;flex:0 0 auto;transform-origin:center center;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.18);}
+.slide{position:absolute;inset:0;background:#fff;display:none;padding:30px 48px 50px;overflow:hidden;}
+.slide.active{display:block;}
+aside.notes{display:none!important;}
+
+/* ---------- cabecera ---------- */
+.s-head{position:relative;padding-right:150px;min-height:62px;}
+.s-head .kicker{font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--dorado-osc);margin-bottom:2px;}
+.s-head h2{font-size:28px;font-weight:700;color:var(--vino);line-height:1.12;}
+.s-head .rule{width:110px;height:4px;border-radius:3px;background:linear-gradient(90deg,var(--vino),var(--dorado));margin-top:7px;}
+.s-head .sub{font-size:15px;color:var(--gris);line-height:1.35;margin-top:6px;max-width:1000px;}
+.logo-corner{position:absolute;top:0;right:0;height:40px;}
+.s-body{margin-top:12px;height:calc(720px - 30px - 50px - 100px);position:relative;}
+.s-body.fill{display:flex;flex-direction:column;justify-content:center;}
+
+/* ---------- pie ---------- */
+.s-foot{position:absolute;left:48px;right:48px;bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:11px;color:#6b6b6b;border-top:2px solid var(--dorado);padding-top:5px;}
+.s-foot .src{font-style:italic;text-align:center;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-foot .pg{font-weight:700;color:var(--vino);white-space:nowrap;}
+
+/* ---------- portada y divisoria ---------- */
+.cover,.divider{text-align:center;padding-top:40px;}
+.cover .topline-g,.divider .topline-g{position:absolute;top:0;left:0;right:0;height:5px;background:var(--dorado);}
+.cover .topline-v,.divider .topline-v{position:absolute;top:5px;left:0;right:0;height:8px;background:var(--vino);}
+.cover img.logo-main{height:96px;margin:22px 0 22px;}
+.cover .cover-kicker{font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dorado-osc);margin-bottom:10px;}
+.cover h1{font-size:40px;color:var(--vino);font-weight:700;line-height:1.15;max-width:1080px;margin:0 auto;}
+.cover .bar{width:240px;height:6px;border-radius:3px;margin:20px auto;background:var(--dorado);}
+.cover .author{font-size:16px;line-height:1.6;}
+.cover .author b{color:var(--vino);}
+.cover .cover-parte{margin-top:22px;font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--vino);}
+.cover .temas{margin-top:14px;}
+.divider{background:linear-gradient(135deg,#fff 0%,#fff 55%,var(--vino-tint) 100%);}
+.divider .parte-n{margin-top:70px;font-size:20px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--dorado-osc);}
+.divider .parte-big{font-size:120px;font-weight:900;color:var(--vino);line-height:1;margin:8px 0 4px;}
+.divider h1{font-size:38px;color:var(--texto);font-weight:700;max-width:1000px;margin:0 auto;line-height:1.15;}
+.divider .semana{margin-top:18px;font-size:16px;color:var(--gris);}
+.temas{margin:26px auto 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:1050px;}
+.temas span{background:#fff;border:1.5px solid var(--dorado);border-radius:999px;padding:5px 14px;font-size:14px;color:var(--vino-osc);font-weight:500;}
+.divider img.logo-div{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);height:46px;}
+
+/* ---------- componentes ---------- */
+.cols{display:flex;gap:18px;align-items:stretch;}
+.col{flex:1;min-width:0;}
+.col-2{flex:2;min-width:0;}
+.card{background:var(--vino-tint);border-left:6px solid var(--dorado);border-radius:10px;padding:12px 16px;font-size:15px;line-height:1.4;}
+.card b{color:var(--vino);}
+.card.dark{background:var(--vino);color:#fff;}
+.card.dark b{color:var(--dorado);}
+.card.gold{background:var(--dorado-tint);border:1.5px solid var(--dorado);border-left:6px solid var(--dorado);}
+.card.white{background:#fff;border:1.5px solid #ddd;border-left:6px solid var(--vino);}
+.card h4{font-size:16px;color:var(--vino);margin-bottom:5px;}
+.card.dark h4{color:var(--dorado);}
+.card ul{margin-left:18px;} .card li{margin-bottom:3px;}
+.note{margin-top:10px;background:var(--dorado-tint);border:1.5px solid var(--dorado);border-radius:8px;padding:9px 14px;font-size:14.5px;line-height:1.4;}
+.note b{color:var(--vino);}
+.warn{margin-top:10px;background:#fff4f4;border:1.5px solid var(--vino);border-radius:8px;padding:9px 14px;font-size:14.5px;line-height:1.4;}
+.warn b{color:var(--vino);}
+.pill{display:inline-block;background:var(--dorado);color:#3a2c00;font-size:12.5px;font-weight:700;border-radius:999px;padding:3px 12px;margin:0 6px 6px 0;}
+.pill.vino{background:var(--vino);color:#fff;}
+.kpi{display:flex;gap:14px;}
+.kpi .k{flex:1;text-align:center;background:#fff;border:2px solid var(--vino);border-radius:12px;padding:12px 8px;}
+.kpi .k .n{font-size:32px;font-weight:900;color:var(--vino);line-height:1.05;}
+.kpi .k .l{font-size:13px;color:var(--gris);margin-top:5px;line-height:1.3;}
+.lista{list-style:none;font-size:16px;line-height:1.45;}
+.lista li{padding-left:22px;position:relative;margin-bottom:7px;}
+.lista li::before{content:"";position:absolute;left:4px;top:8px;width:9px;height:9px;border-radius:2px;background:var(--dorado);}
+.lista li b{color:var(--vino);}
+table.t{width:100%;border-collapse:collapse;font-size:14px;line-height:1.3;}
+table.t th{background:var(--vino);color:#fff;text-align:left;padding:7px 10px;font-weight:600;}
+table.t td{padding:6px 10px;border-bottom:1px solid var(--linea);vertical-align:top;}
+table.t tr:nth-child(even) td{background:var(--gris-tint);}
+table.t td b{color:var(--vino);}
+pre.con,code.con{font-family:"IBM Plex Mono",monospace;}
+pre.con{background:#1E1B1A;color:#EDE6D6;border-radius:10px;padding:12px 16px;font-size:13.5px;line-height:1.45;border-left:6px solid var(--dorado);white-space:pre-wrap;}
+pre.con .c{color:#9C9385;} pre.con .k{color:#F0C75E;} pre.con .v{color:#F08A9A;} pre.con .p{color:#8FD19E;}
+code{font-family:"IBM Plex Mono",monospace;font-size:.92em;background:var(--gris-tint);padding:0 4px;border-radius:4px;}
+.dgm{display:block;width:100%;height:auto;}
+.dgm text{font-family:Roboto,Arial,sans-serif;}
+.caso{background:linear-gradient(90deg,var(--vino),var(--vino-osc));color:#fff;border-radius:12px;padding:12px 18px;font-size:15px;line-height:1.45;}
+.caso b{color:var(--dorado);}
+.lab-box{background:linear-gradient(90deg,var(--vino),var(--vino-osc));color:#fff;border-radius:12px;padding:12px 18px;font-size:15px;line-height:1.5;}
+.lab-box b{color:var(--dorado);}
+.refs{font-size:13px;line-height:1.5;}
+.refs li{margin:0 0 6px 18px;}
+
+/* ---------- navegación ---------- */
+#nav{position:fixed;bottom:12px;right:16px;display:flex;gap:8px;align-items:center;z-index:10;opacity:.25;transition:opacity .2s;}
+#nav:hover{opacity:1;}
+#nav button{width:36px;height:36px;border:none;border-radius:50%;background:var(--vino);color:#fff;font-size:18px;cursor:pointer;}
+#nav #counter{font-size:13px;min-width:56px;text-align:center;background:#fff;border-radius:8px;padding:2px 6px;}
+#progress{position:fixed;top:0;left:0;height:4px;background:var(--dorado);width:0;z-index:10;transition:width .25s;}
+body.captura #nav,body.captura #progress{display:none;}
+body.captura{background:#fff;}
+body.captura #stage{box-shadow:none;}
+
+@media print{
+  @page{size:1280px 720px;margin:0;}
+  html,body{background:#fff;height:auto;overflow:visible;display:block;}
+  #stage{transform:none!important;box-shadow:none;width:1280px;height:auto;}
+  .slide{display:block!important;position:relative;width:1280px;height:720px;page-break-after:always;break-after:page;}
+  #nav,#progress{display:none;}
+}

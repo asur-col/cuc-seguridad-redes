@@ -1,0 +1,54 @@
+{
+  "semana": 13,
+  "etiqueta": "Semana 13",
+  "unidad": "Unidad 3",
+  "titulo": "Respuesta a incidentes y remediación automatizada",
+  "titulo_corto": "Respuesta a incidentes y remediación automatizada",
+  "fechas": "2–8 nov",
+  "archivo": "2026-2-S13-seguridad-redes-respuesta-incidentes",
+  "descripcion": "NIST SP 800-61r3 y CSF 2.0, playbooks, evidencia, reporte, SOAR y remediación automatizada",
+  "publicada": false,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "El ciclo de respuesta",
+      "temas": [
+        "CSF 2.0",
+        "800-61r3",
+        "Contención",
+        "Recuperación"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Playbooks, evidencia y comunicación",
+      "temas": [
+        "Playbooks",
+        "Roles",
+        "Cadena de custodia",
+        "Reporte ColCERT"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Automatización y SOAR",
+      "temas": [
+        "Evento, regla, acción",
+        "SOAR",
+        "Riesgos",
+        "Idempotencia"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "Remediación automatizada en práctica",
+      "temas": [
+        "fail2ban",
+        "API del firewall",
+        "Nube",
+        "Simulacro"
+      ],
+      "guion": ""
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "semana": 9,
+  "etiqueta": "Semana 9",
+  "unidad": "Unidad 2",
+  "titulo": "Monitoreo y logging de red: SIEM, IDS/IPS avanzado",
+  "titulo_corto": "Monitoreo y logging de red: SIEM e IDS/IPS avanzado",
+  "fechas": "28 sep–4 oct",
+  "archivo": "2026-2-S09-seguridad-redes-monitoreo-logging-siem",
+  "descripcion": "Fuentes de evidencia, syslog y NetFlow, SIEM y correlación, Suricata y Zeek, detección con ATT&CK y monitoreo en nube",
+  "publicada": true,
+  "portada_guion": "",
+  "partes": [
+    {
+      "titulo": "Fuentes de evidencia",
+      "temas": [
+        "Qué registrar",
+        "Syslog",
+        "NetFlow/IPFIX",
+        "PCAP y NTP"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "SIEM y correlación",
+      "temas": [
+        "Ingesta y normalización",
+        "Correlación",
+        "Casos de uso",
+        "ATT&CK"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "IDS/IPS avanzado y NDR",
+      "temas": [
+        "Suricata",
+        "Zeek",
+        "Afinamiento",
+        "DNS y beaconing"
+      ],
+      "guion": ""
+    },
+    {
+      "titulo": "SOC, caso colombiano y práctica",
+      "temas": [
+        "SOC y CSIRT",
+        "Auditoría en nube",
+        "ColCERT",
+        "Suricata + syslog"
+      ],
+      "guion": ""
+    }
+  ]
+}
