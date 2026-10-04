@@ -9,7 +9,8 @@ Estado: **propuesta — espera aprobación del docente.**
 - **~14 diapositivas de contenido por parte** (≈56 + 4 divisorias). Meta: ≥ 90 % con gráfico y **≥ 60 % con diagrama real** (topología, flujo, secuencia, arquitectura), no rejillas de tarjetas.
 - Estilo institucional CUC: vino `#A6192E`, dorado `#D4AF37`, lienzo 1280×720, plantilla común en `assets/`.
 - Enfoque: concepto genérico de industria → ejemplo con 2–3 tecnologías/proveedores distintos → práctica en la **plataforma propia**: VirtualBox + OPNsense + Alpine (topología del Lab 1, que crece cada semana), Cisco Packet Tracer y salas gratuitas de TryHackMe. **Ningún lab exige cuenta en la nube.**
-- Parte 4: caso aplicado colombiano + cierre con el lab.
+- Parte 4: caso aplicado colombiano + cierre con la práctica (demostración guiada en la plataforma propia).
+- **Alcance: solo material académico.** No se crean ni modifican actividades evaluables, ponderaciones, guías de laboratorio ni la columna "Actividad / Evaluación" del calendario.
 - Cada diapositiva lleva su guion en `<aside class="notes">` (~130–160 palabras ≈ 1 min con voz sintética); 14 diapositivas ≈ 15 min por parte.
 - Fuente en el pie de cada diapositiva con cifra/norma; lista APA al cierre de cada parte.
 - Entregables por semana: `2026-2-SNN-....html`, `....pdf`, `videos/....-parte1..4.mp4`.
@@ -30,9 +31,9 @@ Estado: **propuesta — espera aprobación del docente.**
 
 ## Oleada 1 — Urgente (receso 5–11 oct)
 
-| Semana | Por qué | Lab de cierre (plataforma propia) |
+| Semana | Por qué | Práctica de cierre en la presentación (plataforma propia) |
 |---|---|---|
-| **S09** Monitoreo y logging: SIEM, IDS/IPS avanzado | Atrasada (semana actual), Actividad 2 de U2 (10 %) | Suricata en OPNsense (IDS → IPS) + syslog remoto a colector Alpine (rsyslog) + consultas y alerta; Wazuh opcional |
+| **S09** Monitoreo y logging: SIEM, IDS/IPS avanzado | Atrasada (semana actual) | Suricata en OPNsense (IDS → IPS) + syslog remoto a colector Alpine (rsyslog) + consultas y alerta; Wazuh opcional |
 | **S10** Hardening y gestión de vulnerabilidades | Se dicta el 12 oct | Formativo: nmap (descubrimiento, estados) + Greenbone/OpenVAS contra las Alpine/DMZ del Lab 1; priorizar con CVSS v4 + EPSS + KEV |
 | **S11** Repaso U2 | Parcial 2 (19–25 oct) | Ejercicios tipo examen práctico sobre la topología del Lab 1 |
 
@@ -65,8 +66,7 @@ Volumen ya cumple; se trabaja calidad: reemplazar íconos AWS por la biblioteca 
 
 ## Preguntas abiertas para el docente
 
-1. **Columna "Actividad / Evaluación" del calendario**: hoy menciona "Lab 4.1/5.1/6.1/7.1 AWS Academy". Como no usas AWS, ¿la reemplazo por los labs propios (p. ej. "Actividad 2 (U2): lab propio de monitoreo con Suricata + syslog") o la dejo intacta por ser parte del calendario oficial? (Los **títulos de tema** no se tocan en ningún caso.)
-2. **Orden**: ¿apruebas que la Oleada 1 (S09–S11) vaya antes de reescribir S01–S05, dado que S09 está atrasada?
-3. **Repasos** (S06, S11, S16–17): ¿presentación completa de 4 partes o un formato corto (1–2 partes) de ejercicios?
-4. **Voz**: ¿edge-tts con voz colombiana (`es-CO-GonzaloNeural` / `es-CO-SalomeNeural`) en tu equipo, u opción 100 % offline (Piper/Kokoro)?
-5. **Presentaciones viejas (.pptx)**: compártelas cuando quieras; se mapean a esta tabla antes de la oleada que corresponda.
+1. **Orden**: ¿apruebas que la Oleada 1 (S09–S11) vaya antes de reescribir S01–S05, dado que S09 está atrasada?
+2. **Repasos** (S06, S11, S16–17): ¿presentación completa de 4 partes o un formato corto (1–2 partes) de ejercicios?
+3. **Voz**: ¿edge-tts con voz colombiana (`es-CO-GonzaloNeural` / `es-CO-SalomeNeural`) en tu equipo, u opción 100 % offline (Piper/Kokoro)?
+4. **Presentaciones viejas (.pptx)**: compártelas cuando quieras; se mapean a esta tabla antes de la oleada que corresponda.

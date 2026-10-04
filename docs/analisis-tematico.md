@@ -4,6 +4,8 @@
 Fecha del corte: **domingo 4 de octubre de 2026** (último día de la Semana 9).
 
 > Regla de oro: los títulos del calendario de `index.html` son oficiales y **no cambian**. Todas las mejoras propuestas van **dentro** de cada semana.
+>
+> **Alcance: solo material académico** (presentaciones, guiones, PDF, videos). Las actividades evaluables, sus ponderaciones y la columna "Actividad / Evaluación" del calendario quedan fuera del análisis y no se modifican. Cuando este documento dice "lab" de cierre, se refiere a la práctica demostrativa que muestra la presentación sobre la plataforma propia, no a una actividad calificada.
 
 ---
 
@@ -16,7 +18,7 @@ Fecha del corte: **domingo 4 de octubre de 2026** (último día de la Semana 9).
 | 1–5 | 5 ago – 6 sep | Publicadas (formato corto) | Ya dictadas. |
 | 6 | 7–13 sep | Repaso U1 / Parcial 1 | Sin presentación (no se necesita para el calendario, pero sí conviene un repaso). |
 | 7–8 | 14–27 sep | Publicadas (formato 4×15 min) | Ya dictadas. |
-| **9** | **28 sep – 4 oct (hoy)** | **NO publicada** | **Atrasada.** Monitoreo/SIEM + Actividad 2 de U2 (10 %). Es la prioridad n.º 1. |
+| **9** | **28 sep – 4 oct (hoy)** | **NO publicada** | **Atrasada.** Monitoreo/SIEM. Es la prioridad n.º 1. |
 | Receso | 5–11 oct | — | Ventana para ponerse al día. |
 | 10 | 12–18 oct | Pendiente | Se necesita el lunes 12 oct. |
 | 11 | 19–25 oct | Pendiente (repaso U2, Parcial 2) | — |
@@ -79,7 +81,6 @@ Estándar objetivo (Fase 2): **4 partes × ~14 diapositivas de contenido = ~56 +
 | T8 | Baja | `index.html` | Contador "5 de 13 publicadas" (hay 7). Las tarjetas de S3 y S4 no llevan el prefijo "Semana N ·" como las demás. |
 | T9 | Baja | Todas | No hay guion de narración en el repo (los MP4 tienen audio, pero el texto fuente no está versionado) → los videos no se pueden regenerar. |
 | T11 | Alta | S04, S07, (S08) | **Dependencia de AWS en material publicado**: S04 cierra con "Lanzar la instancia con su Security Group" (lab en AWS); la Parte 4 de S07 completa (diap. 44–52) gira en torno a AWS KMS y su laboratorio; S08 usa íconos AWS. El curso no usa AWS en la práctica → reorientar a concepto genérico + labs propios. |
-| T10 | Baja | Lab 3 | "Ponderación y semana por definir": conviene mapearlo (encaja en S05 — hardening de dispositivos/ACL — o como refuerzo de S03). |
 
 ---
 
@@ -90,7 +91,6 @@ Estándar objetivo (Fase 2): **4 partes × ~14 diapositivas de contenido = ~56 +
 | Referente | Por qué aplica | Cómo se usa |
 |---|---|---|
 | **Plataforma de labs propia del curso** (ver `laboratorios/`): Lab 1 VirtualBox + OPNsense + Alpine (4 zonas, NAT/PAT, app web + BD), Lab 2 TryHackMe gratuito (Snort), Lab 3 Cisco Packet Tracer (routing multi-sitio + SSH/ACL/port security/Syslog) | **Es la práctica real del curso**; no depende de ningún proveedor de nube | Cada semana cierra en su Parte 4 con un lab sobre esta plataforma, idealmente **extendiendo la topología del Lab 1** (misma red, nueva capa de seguridad cada semana). |
-| AWS Academy Cloud Security Foundations (aparece en la columna "Actividad" del calendario: Lab 4.1/5.1/6.1/7.1) | Solo como referente de temario, **no como dependencia** | Las nubes (AWS, Azure, GCP) aparecen como *un ejemplo más* del concepto genérico, nunca como requisito del lab. Ver pregunta abierta en el plan. |
 | **Cisco Networking Academy — Network Security** (22 módulos: amenazas, acceso seguro a dispositivos, AAA, ACL, tecnologías de firewall, ZPF, IPS, seguridad de endpoint, capa 2, criptografía, PKI, VPN/IPsec, ASA, pruebas de seguridad) | Referente de industria más cercano a "seguridad de **redes**" | Mapa de cobertura por semana (tabla 2.2). |
 | **CompTIA Security+ SY0-701** (5 dominios: Conceptos generales 12 %, Amenazas/vulnerabilidades/mitigaciones 22 %, Arquitectura 18 %, Operaciones 28 %, Gestión del programa 20 %) | Certificación vendor-neutral de entrada; da el peso relativo de operaciones (monitoreo, vulnerabilidades, IR) | Verificar que U2–U3 tengan peso operativo. |
 | **ACM/IEEE CS2023** — KA *Networking and Communication* (unidad NC-Security) y KA *Security* (SEC: fundamentos, criptografía, análisis e ingeniería de seguridad, forense, gobierno) | Marco curricular | Validar que haya mentalidad de seguridad, cripto aplicada, análisis de riesgos, ética/legal. |
@@ -172,7 +172,7 @@ Cada parte ≈ 14 diapositivas de contenido; la Parte 4 cierra con caso colombia
 
 ### 2.5 Recomendaciones del análisis
 
-1. **Urgente:** producir S09 durante el receso (5–11 oct) — es la semana actual y lleva la Actividad 2 de U2 (10 %). Luego S10 antes del 12 de octubre.
+1. **Urgente:** producir S09 durante el receso (5–11 oct) — es la semana actual. Luego S10 antes del 12 de octubre.
 2. Unificar la plantilla (CSS/JS/logo/fuentes) en `assets/` para que las 13 semanas se vean y rendericen igual.
 3. Reemplazar íconos AWS-como-metáfora por una biblioteca propia de símbolos de red en SVG (router, switch, firewall, servidor, nube, usuario, IDS, SIEM, VPN, candado, base de datos, AP inalámbrico) con la paleta CUC.
 4. Diagramas: privilegiar topologías y diagramas de secuencia/flujo (paquete que recorre zonas, handshake, cadena de ataque, pipeline SIEM) sobre rejillas de tarjetas; meta ≥ 60 % de diagramas reales por semana.
