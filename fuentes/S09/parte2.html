@@ -1,0 +1,919 @@
+<!-- D1 · Mapa de la parte -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §3.1">
+  <div class="kicker">Mapa</div>
+  <h2>De la evidencia a la decisión en cuatro saltos</h2>
+  <p class="sub">La Parte 2 sigue el evento desde que entra al SIEM hasta que alguien actúa.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p2d1-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="24" width="240" height="80" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-log" x="24" y="42" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="146" y="60" font-weight="700" fill="#5F5F5F">Logs de texto</text>
+        <text x="146" y="86" fill="#2A2A2A">syslog con prioridad</text>
+
+        <rect x="8" y="116" width="240" height="80" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-grafica" x="24" y="134" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="146" y="152" font-weight="700" fill="#5F5F5F">Flujos de red</text>
+        <text x="146" y="178" fill="#2A2A2A">NetFlow e IPFIX</text>
+
+        <rect x="8" y="208" width="240" height="80" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-ids" x="24" y="226" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="146" y="244" font-weight="700" fill="#5F5F5F">Alertas del IDS</text>
+        <text x="146" y="270" fill="#2A2A2A">Suricata en modo alerta</text>
+
+        <rect x="300" y="24" width="560" height="264" rx="16" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="580" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#A6192E">SIEM · gestión de eventos de seguridad</text>
+        <rect x="320" y="76" width="520" height="44" rx="8" fill="#fff" stroke="#A6192E" stroke-width="2"/>
+        <text x="340" y="104" text-anchor="start" font-weight="700" fill="#A6192E">1 · Ingesta</text>
+        <text x="470" y="104" text-anchor="start" fill="#2A2A2A">conectores, cola y reintentos</text>
+        <rect x="320" y="128" width="520" height="44" rx="8" fill="#fff" stroke="#A6192E" stroke-width="2"/>
+        <text x="340" y="156" text-anchor="start" font-weight="700" fill="#A6192E">2 · Normalización</text>
+        <text x="520" y="156" text-anchor="start" fill="#2A2A2A">un esquema de campos para todos</text>
+        <rect x="320" y="180" width="520" height="44" rx="8" fill="#fff" stroke="#A6192E" stroke-width="2"/>
+        <text x="340" y="208" text-anchor="start" font-weight="700" fill="#A6192E">3 · Correlación</text>
+        <text x="490" y="208" text-anchor="start" fill="#2A2A2A">reglas con ventana y umbral</text>
+        <rect x="320" y="232" width="520" height="44" rx="8" fill="#fff" stroke="#A6192E" stroke-width="2"/>
+        <text x="340" y="260" text-anchor="start" font-weight="700" fill="#A6192E">4 · Presentación</text>
+        <text x="510" y="260" text-anchor="start" fill="#2A2A2A">alerta con contexto, no suelta</text>
+
+        <rect x="920" y="24" width="256" height="80" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-alerta" x="940" y="42" width="44" height="44" style="color:#8A6D1D"/>
+        <text x="1060" y="60" font-weight="700" fill="#8A6D1D">Alerta priorizada</text>
+        <text x="1060" y="86" fill="#2A2A2A">qué mirar primero</text>
+
+        <rect x="920" y="116" width="256" height="80" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-lupa" x="940" y="134" width="44" height="44" style="color:#8A6D1D"/>
+        <text x="1060" y="152" font-weight="700" fill="#8A6D1D">Caso para investigar</text>
+        <text x="1060" y="178" fill="#2A2A2A">con evidencia adjunta</text>
+
+        <rect x="920" y="208" width="256" height="80" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-documento" x="940" y="226" width="44" height="44" style="color:#8A6D1D"/>
+        <text x="1060" y="244" font-weight="700" fill="#8A6D1D">Informe</text>
+        <text x="1060" y="270" fill="#2A2A2A">para auditoría y dirección</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d1-f)">
+        <line x1="252" y1="64" x2="294" y2="64"/>
+        <line x1="252" y1="156" x2="294" y2="156"/>
+        <line x1="252" y1="248" x2="294" y2="248"/>
+        <line x1="864" y1="64" x2="914" y2="64"/>
+        <line x1="864" y1="156" x2="914" y2="156"/>
+        <line x1="864" y1="248" x2="914" y2="248"/>
+      </g>
+      <rect x="8" y="316" width="1168" height="136" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="32" y="348" font-size="15" font-weight="700" fill="#8A6D1D">Parte 2 · cuatro paradas</text>
+      <g font-size="14" fill="#2A2A2A">
+        <text x="32" y="382">1 · Cómo entran los eventos y cómo se normalizan</text>
+        <text x="32" y="416">2 · Cómo se guardan para poder buscarlos</text>
+        <text x="616" y="382">3 · Cómo una regla convierte eventos en alerta</text>
+        <text x="616" y="416">4 · Cómo se mide y se reduce el tiempo de respuesta</text>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">La parte uno dejó la evidencia lista: logs, flujos y alertas del IDS. Esta parte sigue el recorrido de esos datos hasta la decisión. A la izquierda entran las tres fuentes que ya conocen. En el centro, el SIEM, que las recibe en la etapa de ingesta, las lleva a un esquema común en la normalización, las cruza con reglas en la correlación y finalmente las presenta con contexto. A la derecha salen tres productos: una alerta priorizada, que dice qué mirar primero; un caso, cuando hay que investigar; y un informe, para auditoría y para dirección. Las cuatro paradas de esta parte son la ingesta, el almacenamiento, las reglas de correlación y el tiempo de respuesta. Terminaremos con la cadena de tácticas del atacante y con la prueba de que todo esto realmente funciona. Antes de seguir, recuerden la idea central: el SIEM no inventa información, la organiza y la explica.</aside>
+</section>
+
+<!-- D2 · Arquitectura por capas -->
+<section class="slide" data-fuente="NIST SP 800-92 (2006), §3.1–3.3 · Gestión de registros y gestión de seguridad">
+  <div class="kicker">Arquitectura</div>
+  <h2>El SIEM es una cadena de seis capas</h2>
+  <p class="sub">De la fuente al informe: cada capa falla por separado y se repara por separado.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 470">
+      <defs><marker id="s09p2d2-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="14">
+        <rect x="8" y="14" width="940" height="62" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-servidor" x="26" y="26" width="38" height="38" style="color:#5F5F5F"/>
+        <text x="80" y="44" font-weight="700" fill="#5F5F5F">1 · Fuentes</text>
+        <text x="80" y="66" font-size="13" fill="#2A2A2A">firewall, servidores, IDS, controlador de dominio, nube</text>
+
+        <rect x="8" y="84" width="940" height="62" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-automatizacion" x="26" y="96" width="38" height="38" style="color:#5F5F5F"/>
+        <text x="80" y="114" font-weight="700" fill="#5F5F5F">2 · Concentración</text>
+        <text x="80" y="136" font-size="13" fill="#2A2A2A">cola con reintentos, control de pérdida y límite de velocidad</text>
+
+        <rect x="8" y="154" width="940" height="62" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-engranaje" x="26" y="166" width="38" height="38" style="color:#A6192E"/>
+        <text x="80" y="184" font-weight="700" fill="#A6192E">3 · Normalización</text>
+        <text x="80" y="206" font-size="13" fill="#2A2A2A">un esquema de campos, una fecha y una prioridad para todos</text>
+
+        <rect x="8" y="224" width="940" height="62" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-bd" x="26" y="236" width="38" height="38" style="color:#A6192E"/>
+        <text x="80" y="264" font-weight="700" fill="#A6192E">4 · Almacenamiento</text>
+        <text x="80" y="286" font-size="13" fill="#2A2A2A">índice por fecha, retención por capa y respaldo aparte</text>
+
+        <rect x="8" y="294" width="940" height="62" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-siem" x="26" y="306" width="38" height="38" style="color:#8A6D1D"/>
+        <text x="80" y="334" font-weight="700" fill="#8A6D1D">5 · Análisis</text>
+        <text x="80" y="356" font-size="13" fill="#2A2A2A">reglas de correlación, búsquedas libres y paneles de vigilancia</text>
+
+        <rect x="8" y="364" width="940" height="62" rx="12" fill="#A6192E"/>
+        <use href="#i-alerta" x="26" y="376" width="38" height="38" style="color:#D4AF37"/>
+        <text x="80" y="404" font-weight="700" fill="#fff">6 · Presentación</text>
+        <text x="80" y="426" font-size="13" fill="#fff">alertas, informes y notificaciones a las personas correctas</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d2-f)">
+        <line x1="60" y1="78" x2="60" y2="82"/>
+        <line x1="60" y1="148" x2="60" y2="152"/>
+        <line x1="60" y1="218" x2="60" y2="222"/>
+        <line x1="60" y1="288" x2="60" y2="292"/>
+        <line x1="60" y1="358" x2="60" y2="362"/>
+      </g>
+      <g font-size="13" text-anchor="middle">
+        <rect x="964" y="40" width="212" height="108" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <use href="#i-usuario" x="1050" y="52" width="40" height="40" style="color:#5F5F5F"/>
+        <text x="1070" y="116" font-weight="700" fill="#5F5F5F">Operador</text>
+        <text x="1070" y="138" font-size="12" fill="#2A2A2A">vigila en tiempo real</text>
+
+        <rect x="964" y="180" width="212" height="108" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-admin" x="1050" y="192" width="40" height="40" style="color:#A6192E"/>
+        <text x="1070" y="256" font-weight="700" fill="#A6192E">Analista</text>
+        <text x="1070" y="278" font-size="12" fill="#2A2A2A">investiga y escala</text>
+
+        <rect x="964" y="320" width="212" height="108" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-grafica" x="1050" y="332" width="40" height="40" style="color:#8A6D1D"/>
+        <text x="1070" y="396" font-weight="700" fill="#8A6D1D">Auditoría</text>
+        <text x="1070" y="418" font-size="12" fill="#2A2A2A">pide informes y pruebas</text>
+      </g>
+      <g stroke="#8C8C8C" stroke-width="2" stroke-dasharray="6 5">
+        <line x1="964" y1="234" x2="952" y2="326"/>
+        <line x1="964" y1="374" x2="952" y2="396"/>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">El SIEM no es una caja negra: es una cadena de seis capas y cada una falla por su lado. La primera son las fuentes, que siguen siendo los mismos firewall, servidores y detectores de la parte uno. La segunda concentra todo en una cola con reintentos, que es donde se pierde la información cuando nadie la vigila. La tercera normaliza, y ahí se decide si después se puede consultar. La cuarta almacena con índice por fecha y retención definida. La quinta analiza, con reglas y búsquedas. Y la sexta presenta la alerta a la persona correcta. A la derecha están los tres perfiles que usan esta cadena: el operador que vigila, el analista que investiga y la auditoría que exige pruebas. Cuando la alerta llega tarde o llega incompleta, pregunten en qué capa se perdió: casi siempre el problema vive en una sola de las seis. Tengan por cada una un responsable y una comprobación periódica.</aside>
+</section>
+
+<!-- D3 · Ingesta y parseo -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §3.2 ingesta de registros">
+  <div class="kicker">Ingesta</div>
+  <h2>Ingesta: identificar el formato antes de extraer</h2>
+  <p class="sub">Un mismo puerto 514 recibe tramas de cinco productos distintos.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 470">
+      <defs><marker id="s09p2d3-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="8" y="10" width="1168" height="52" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="28" y="42" font-family="monospace" font-size="13" fill="#2A2A2A">&lt;165&gt;1 2026-10-04T08:14:02-05:00 opnsense-lab suricata 1234 IDSDROP [Origin ip="10.10.10.55"] escaneo bloqueado</text>
+      <g font-size="14" text-anchor="middle">
+        <rect x="8" y="86" width="274" height="140" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="145" y="118" font-weight="700" fill="#A6192E">1 · Identificar</text>
+        <text x="145" y="148" font-size="13" fill="#2A2A2A">hostname y app-name</text>
+        <text x="145" y="172" font-size="13" fill="#2A2A2A">dicen de qué producto</text>
+        <text x="145" y="196" font-size="13" fill="#2A2A2A">viene la trama</text>
+
+        <rect x="306" y="86" width="274" height="140" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="443" y="118" font-weight="700" fill="#A6192E">2 · Extraer</text>
+        <text x="443" y="148" font-size="13" fill="#2A2A2A">patrón con expresiones</text>
+        <text x="443" y="172" font-size="13" fill="#2A2A2A">regulares que separan</text>
+        <text x="443" y="196" font-size="13" fill="#2A2A2A">cada campo del texto</text>
+
+        <rect x="604" y="86" width="274" height="140" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="741" y="118" font-weight="700" fill="#A6192E">3 · Convertir</text>
+        <text x="741" y="148" font-size="13" fill="#2A2A2A">texto a número, fecha</text>
+        <text x="741" y="172" font-size="13" fill="#2A2A2A">y dirección IP válida</text>
+        <text x="741" y="196" font-size="13" fill="#2A2A2a">para poder ordenar</text>
+
+        <rect x="902" y="86" width="274" height="140" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="1039" y="118" font-weight="700" fill="#8A6D1D">4 · Limpiar</text>
+        <text x="1039" y="148" font-size="13" fill="#2A2A2A">descartar latidos y</text>
+        <text x="1039" y="172" font-size="13" fill="#2A2A2A">depuración antes de</text>
+        <text x="1039" y="196" font-size="13" fill="#2A2A2A">gastar índice</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d3-f)">
+        <line x1="286" y1="156" x2="300" y2="156"/>
+        <line x1="584" y1="156" x2="598" y2="156"/>
+        <line x1="882" y1="156" x2="896" y2="156"/>
+      </g>
+      <rect x="8" y="246" width="1168" height="98" rx="12" fill="#fff" stroke="#A6192E" stroke-width="2"/>
+      <text x="30" y="278" font-size="14" font-weight="700" fill="#A6192E">Campos que salen del parseo y alimentan todas las reglas</text>
+      <g font-family="monospace" font-size="13">
+        <rect x="30" y="296" width="150" height="34" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="105" y="318" text-anchor="middle" fill="#A6192E">event.time</text>
+        <rect x="196" y="296" width="150" height="34" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="271" y="318" text-anchor="middle" fill="#A6192E">host.name</text>
+        <rect x="362" y="296" width="150" height="34" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="437" y="318" text-anchor="middle" fill="#A6192E">log.level</text>
+        <rect x="528" y="296" width="170" height="34" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="613" y="318" text-anchor="middle" fill="#A6192E">source.ip</text>
+        <rect x="714" y="296" width="190" height="34" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="809" y="318" text-anchor="middle" fill="#A6192E">rule.id</text>
+        <rect x="920" y="296" width="234" height="34" rx="8" fill="#F9EEF0" stroke="#A6192E"/><text x="1037" y="318" text-anchor="middle" fill="#A6192E">event.action</text>
+      </g>
+      <rect x="8" y="360" width="1168" height="94" rx="12" fill="#F9EEF0" stroke="#B3261E" stroke-width="2"/>
+      <text x="30" y="392" font-size="15" font-weight="700" fill="#B3261E">Si el patrón falla, el evento entra como no parseado</text>
+      <text x="30" y="420" font-size="13" fill="#2A2A2A">Sigue ocupando espacio y tiempo, pero no participa en ninguna regla: es el fallo silencioso más común de la ingesta.</text>
+      <text x="30" y="444" font-size="13" fill="#5F5F5F">Control: cuente los eventos sin parsear por origen; si crecen, alguien cambió el formato del producto y nadie avisó.</text>
+    </svg>
+  </div>
+  <aside class="notes">La trama de arriba parece sencilla, pero en el mismo puerto quinientos catorce llegan formatos de productos distintos. El SIEM primero identifica de quién viene, usando el nombre del host y la aplicación de la propia trama. Después aplica el patrón de extracción, que separa el texto en campos individuales. Luego convierte: el número que era texto pasa a ser número, la fecha a marca de tiempo y la dirección a IP válida, para que se pueda ordenar. Por último limpia, descartando latidos y mensajes de depuración que solo gastarían espacio. De ahí salen los campos que ven abajo, y esos campos son los que alimentan todas las reglas. Si el patrón falla, el evento queda marcado como no parseado: ocupa espacio y no sirve para nada. Por eso conviene contar esos fallos por origen y revisarlos cada semana. En el laboratorio verán esto: si cambia el formato, el patrón deja de coincidir y la tasa de fallos se dispara sin que se note. Vigilar esos fallos es mantenimiento.</aside>
+</section>
+
+<!-- D4 · Normalización -->
+<section class="slide" data-fuente="Diagrama propio · esquemas abiertos: Elastic Common Schema (2018–) · OCSF (2023–)">
+  <div class="kicker">Normalización</div>
+  <h2>Tres dialectos, un solo esquema de campos</h2>
+  <p class="sub">La regla escribe una sola vez y funciona con todos los productos.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p2d4-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p2d4-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+      <g font-size="13">
+        <rect x="8" y="40" width="300" height="86" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="26" y="70" font-weight="700" fill="#5F5F5F">OPNsense · syslog</text>
+        <text x="26" y="96" font-family="monospace" fill="#2A2A2A">src=10.10.10.55 act=block</text>
+
+        <rect x="8" y="160" width="300" height="86" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="26" y="190" font-weight="700" fill="#5F5F5F">Servidor Linux · auth</text>
+        <text x="26" y="216" font-family="monospace" fill="#2A2A2A">user=rodolfo rhost=…</text>
+
+        <rect x="8" y="280" width="300" height="86" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="26" y="310" font-weight="700" fill="#5F5F5F">Servicio en la nube · API</text>
+        <text x="26" y="336" font-family="monospace" fill="#2A2A2A">actor.ip=200.30.9.44</text>
+
+        <rect x="400" y="90" width="360" height="230" rx="16" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="580" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="#A6192E">Esquema normalizado</text>
+        <g font-family="monospace" font-size="14" fill="#2A2A2A">
+          <text x="430" y="164">source.ip</text>
+          <text x="430" y="196">user.name</text>
+          <text x="430" y="228">event.action</text>
+          <text x="430" y="260">event.timestamp</text>
+          <text x="430" y="292">event.severity</text>
+        </g>
+
+        <rect x="840" y="90" width="336" height="230" rx="16" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+        <text x="1008" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Una regla, todos los orígenes</text>
+        <text x="866" y="170" font-size="13.5" fill="#2A2A2A">Si source.ip aparece en la lista</text>
+        <text x="866" y="196" font-size="13.5" fill="#2A2A2A">de bloqueo, entonces alertar.</text>
+        <text x="866" y="240" font-size="13.5" fill="#2A2A2A">Si user.name falla cinco veces</text>
+        <text x="866" y="266" font-size="13.5" fill="#2A2A2A">en un minuto, escalar a incidente.</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="2.5" fill="none" marker-end="url(#s09p2d4-f)">
+        <path d="M312 84 L400 130"/>
+        <path d="M312 204 L400 204"/>
+        <path d="M312 324 L400 280"/>
+      </g>
+      <line x1="764" y1="205" x2="834" y2="205" stroke="#8A6D1D" stroke-width="3" marker-end="url(#s09p2d4-g)"/>
+      <rect x="8" y="400" width="1168" height="46" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+      <text x="592" y="429" text-anchor="middle" font-size="14" fill="#2A2A2A">Esquemas abiertos como ECS u OCSF: elijo uno y documento cada equivalencia.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cada producto nombra los mismos datos a su manera. El firewall dice src, el servidor habla de usuario y el servicio en la nube lo llama actor. Sin normalización, cada regla tendría que entender los tres dialectos, y la lista crecería. La normalización traduce todo a un esquema único: la dirección de origen, el usuario, la acción, la marca de tiempo y la severidad quedan siempre en el mismo lugar con el mismo nombre. Entonces la regla de la derecha se escribe una sola vez y funciona con cualquiera de los tres orígenes. Existen esquemas abiertos, como el de Elastic, de dos mil dieciocho, u OCSF, de dos mil veintitrés. No hace falta adoptarlos todos: elijan uno y documenten la equivalencia. Lo que no pueden hacer es improvisar nombres por producto, porque ahí muere la correlación. Noten que la normalización también ordena hora y severidad, así que una consulta funciona aunque un producto reporte en UTC y otro en hora local. Ese detalle evita que los informes contradigan a la bitácora.</aside>
+</section>
+
+<!-- D5 · Índice y particiones -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §4.1 retención y §4.2">
+  <div class="kicker">Almacenamiento</div>
+  <h2>El índice se parte por día y se apaga por capa</h2>
+  <p class="sub">Lo reciente se busca al instante; lo viejo se retira entero, sin tocar el resto.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p2d5-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="8" y="16" width="560" height="46" rx="10" fill="#7E1223"/>
+      <text x="288" y="46" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Índice invertido: de la palabra al documento</text>
+      <g font-size="13">
+        <rect x="8" y="80" width="250" height="52" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="112" font-family="monospace" fill="#A6192E">source.ip=10.10.10.55</text>
+        <rect x="300" y="80" width="268" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="316" y="112" fill="#2A2A2A">documento 4821, 4907, 5010</text>
+
+        <rect x="8" y="144" width="250" height="52" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="176" font-family="monospace" fill="#A6192E">user.name=rodolfo</text>
+        <rect x="300" y="144" width="268" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="316" y="176" fill="#2A2A2A">documento 4788, 5120</text>
+
+        <rect x="8" y="208" width="250" height="52" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="240" font-family="monospace" fill="#A6192E">event.action=fallo</text>
+        <rect x="300" y="208" width="268" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="316" y="240" fill="#2A2A2A">documento 4788, 4907, 5120</text>
+
+        <rect x="8" y="272" width="250" height="52" rx="8" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="24" y="304" font-family="monospace" fill="#8A6D1D">host.name=opnsense-lab</text>
+        <rect x="300" y="272" width="268" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="316" y="304" fill="#2A2A2A">todos los documentos de hoy</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p2d5-f)">
+        <line x1="264" y1="106" x2="294" y2="106"/>
+        <line x1="264" y1="170" x2="294" y2="170"/>
+        <line x1="264" y1="234" x2="294" y2="234"/>
+        <line x1="264" y1="298" x2="294" y2="298"/>
+      </g>
+      <rect x="596" y="16" width="580" height="46" rx="10" fill="#7E1223"/>
+      <text x="886" y="46" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Particiones por día, retención por capa</text>
+      <g font-size="13">
+        <rect x="596" y="80" width="580" height="70" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="618" y="110" font-weight="700" fill="#A6192E">04 oct · reciente</text>
+        <text x="618" y="136" fill="#2A2A2A">índice completo, búsqueda instantánea, disco rápido</text>
+
+        <rect x="596" y="164" width="580" height="70" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+        <text x="618" y="194" font-weight="700" fill="#8A6D1D">27 sep a 03 oct · caliente</text>
+        <text x="618" y="220" fill="#2A2A2A">mismo índice, disco de mayor capacidad</text>
+
+        <rect x="596" y="248" width="580" height="70" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2.5"/>
+        <text x="618" y="278" font-weight="700" fill="#5F5F5F">meses anteriores · frío</text>
+        <text x="618" y="304" fill="#2A2A2A">archivo comprimido, se consulta bajo solicitud</text>
+      </g>
+      <g stroke="#8C8C8C" stroke-width="2" stroke-dasharray="6 5">
+        <line x1="886" y1="150" x2="886" y2="164"/>
+        <line x1="886" y1="234" x2="886" y2="248"/>
+      </g>
+      <rect x="8" y="344" width="1168" height="96" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="30" y="376" font-size="15" font-weight="700" fill="#7E1223">Borrar por partición completa: nunca fila por fila</text>
+      <text x="30" y="404" font-size="13" fill="#2A2A2A">Retirar un día entero no fragmenta el índice ni obliga a reescribir lo que sigue vivo.</text>
+      <text x="30" y="428" font-size="13" fill="#5F5F5F">Costo visible: el índice ocupa más que el archivo original porque además guarda la estructura de búsqueda.</text>
+    </svg>
+  </div>
+  <aside class="notes">Guardar el evento es solo el principio, porque después hay que poder buscarlo. El panel izquierdo muestra el índice invertido: en vez de leer archivos uno por uno, el sistema anota cada palabra y debajo deja los documentos donde aparece. Por eso una consulta por dirección de origen responde en milisegundos, aunque haya millones de registros. A la derecha están las particiones: un bloque por día, con su propio índice y su propia retención. Ese es el truco que permite borrar un mes entero sin tocar lo reciente, porque se retira la partición vieja completa y nadie reescribe nada. El precio es que el índice ocupa más que el archivo original, pues además guarda la estructura de búsqueda. Por eso la retención que diseñamos en la parte uno se aplica aquí, capa por capa. Recuerden además que una búsqueda sobre el mes pasado compite con las particiones frías y responde más despacio. Ajusten la expectativa antes de que alguien exija respuesta instantánea sobre dos años.</aside>
+</section>
+
+<!-- D6 · Reglas de correlación -->
+<section class="slide" data-fuente="Diagrama propio · concepto: correlación de eventos, NIST SP 800-92 (2006), §3.3">
+  <div class="kicker">Correlación</div>
+  <h2>Una regla es condición, ventana y umbral</h2>
+  <p class="sub">Cinco fallos de acceso en sesenta segundos no son cinco alertas, sino un patrón.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p2d6-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13.5" text-anchor="middle">
+        <rect x="8" y="14" width="270" height="80" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="143" y="46" font-weight="700" fill="#A6192E">Condición</text>
+        <text x="143" y="74" fill="#2A2A2A">autenticación fallida</text>
+        <rect x="304" y="14" width="270" height="80" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="439" y="46" font-weight="700" fill="#A6192E">Ventana</text>
+        <text x="439" y="74" fill="#2A2A2A">sesenta segundos móviles</text>
+        <rect x="600" y="14" width="270" height="80" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="735" y="46" font-weight="700" fill="#A6192E">Umbral</text>
+        <text x="735" y="74" fill="#2A2A2A">cinco o más del mismo origen</text>
+        <rect x="896" y="14" width="280" height="80" rx="12" fill="#A6192E"/>
+        <text x="1036" y="46" font-weight="700" fill="#D4AF37">Alerta única</text>
+        <text x="1036" y="74" fill="#fff">con la lista de eventos</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d6-f)">
+        <line x1="282" y1="54" x2="298" y2="54"/>
+        <line x1="578" y1="54" x2="594" y2="54"/>
+        <line x1="874" y1="54" x2="890" y2="54"/>
+      </g>
+      <text x="60" y="140" font-size="14" font-weight="700" fill="#7E1223">La misma regla, en línea de tiempo</text>
+      <rect x="300" y="164" width="740" height="56" rx="8" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="670" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#8A6D1D">ventana móvil de 60 segundos · origen 10.10.10.55</text>
+      <line x1="60" y1="266" x2="1140" y2="266" stroke="#8C8C8C" stroke-width="3"/>
+      <g font-size="12" text-anchor="middle">
+        <circle cx="140" cy="266" r="12" fill="#8C8C8C"/>
+        <text x="140" y="304" fill="#5F5F5F">fallo aislado</text>
+        <text x="140" y="322" fill="#5F5F5F">fuera de la ventana</text>
+        <circle cx="360" cy="266" r="13" fill="#A6192E"/><text x="360" y="271" fill="#fff" font-weight="700">1</text>
+        <text x="360" y="304" fill="#2A2A2A">:05</text>
+        <circle cx="520" cy="266" r="13" fill="#A6192E"/><text x="520" y="271" fill="#fff" font-weight="700">2</text>
+        <text x="520" y="304" fill="#2A2A2A">:18</text>
+        <circle cx="680" cy="266" r="13" fill="#A6192E"/><text x="680" y="271" fill="#fff" font-weight="700">3</text>
+        <text x="680" y="304" fill="#2A2A2A">:31</text>
+        <circle cx="840" cy="266" r="13" fill="#A6192E"/><text x="840" y="271" fill="#fff" font-weight="700">4</text>
+        <text x="840" y="304" fill="#2A2A2A">:44</text>
+        <circle cx="1000" cy="266" r="15" fill="#7E1223"/><text x="1000" y="271" fill="#fff" font-weight="700">5</text>
+        <text x="1000" y="304" fill="#A6192E" font-weight="700">:58 dispara</text>
+      </g>
+      <rect x="8" y="350" width="376" height="88" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+      <text x="28" y="380" font-size="14" font-weight="700" fill="#5F5F5F">Agrupar</text>
+      <text x="28" y="406" font-size="13" fill="#2A2A2A">un solo aviso por origen, no diez</text>
+      <text x="28" y="428" font-size="13" fill="#2A2A2A">avisos sueltos</text>
+      <rect x="404" y="350" width="376" height="88" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+      <text x="424" y="380" font-size="14" font-weight="700" fill="#5F5F5F">Suprimir</text>
+      <text x="424" y="406" font-size="13" fill="#2A2A2A">repetir la misma alerta cada cinco</text>
+      <text x="424" y="428" font-size="13" fill="#2A2A2A">minutos mientras siga el patrón</text>
+      <rect x="800" y="350" width="376" height="88" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="820" y="380" font-size="14" font-weight="700" fill="#8A6D1D">Enriquecer</text>
+      <text x="820" y="406" font-size="13" fill="#2A2A2A">añadir activo crítico, usuario y</text>
+      <text x="820" y="428" font-size="13" fill="#2A2A2A">geografía antes de notificar</text>
+    </svg>
+  </div>
+  <aside class="notes">Una regla de correlación tiene tres piezas y nada más. La condición dice qué evento buscamos, por ejemplo un fallo de autenticación. La ventana dice cuánto tiempo mira hacia atrás, y aquí usamos sesenta segundos móviles. El umbral dice cuántas coincidencias hacen falta, y fijamos cinco del mismo origen. En la línea de tiempo ven la diferencia: el fallo aislado está fuera de la ventana y no cuenta; los cinco de adentro disparan una sola alerta. Sin ese marco, cada intento generaría su propio aviso y la quinta señal se perdería entre las cuatro anteriores. Abajo quedan tres ajustes prácticos: agrupar por origen, suprimir las repetidas y enriquecer la alerta con el activo afectado antes de notificar a alguien. Una regla sin ventana y sin umbral es apenas un filtro, y un filtro no correlaciona nada. Antes de activarla en producción, pruébenla con un evento inyectado y confirmen que dispara una sola vez. Una regla nunca probada falla al revés: calla cuando debe hablar.</aside>
+</section>
+
+<!-- D7 · Secuencia evento → alerta -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §3.1 flujo de eventos">
+  <div class="kicker">Secuencia</div>
+  <h2>Del evento a la alerta en pantalla, paso a paso</h2>
+  <p class="sub">Cuatro actores y un orden estricto: si uno se cae, la alerta no aparece.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 440">
+      <defs><marker id="s09p2d7-a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p2d7-b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+      <g font-size="14" text-anchor="middle">
+        <use href="#i-firewall" x="90" y="6" width="60" height="60" style="color:#A6192E"/>
+        <text x="120" y="90" font-weight="700" fill="#A6192E">OPNsense</text>
+        <use href="#i-servidor" x="390" y="6" width="60" height="60" style="color:#A6192E"/>
+        <text x="420" y="90" font-weight="700" fill="#A6192E">Colector</text>
+        <use href="#i-siem" x="730" y="6" width="60" height="60" style="color:#A6192E"/>
+        <text x="760" y="90" font-weight="700" fill="#A6192E">SIEM</text>
+        <use href="#i-admin" x="1050" y="6" width="60" height="60" style="color:#8A6D1D"/>
+        <text x="1080" y="90" font-weight="700" fill="#8A6D1D">Analista</text>
+      </g>
+      <g stroke="#8C8C8C" stroke-width="2" stroke-dasharray="6 6">
+        <line x1="120" y1="104" x2="120" y2="430"/>
+        <line x1="420" y1="104" x2="420" y2="430"/>
+        <line x1="760" y1="104" x2="760" y2="430"/>
+        <line x1="1080" y1="104" x2="1080" y2="430"/>
+      </g>
+      <line x1="120" y1="150" x2="414" y2="150" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d7-a)"/>
+      <rect x="150" y="122" width="240" height="34" rx="8" fill="#fff" stroke="#A6192E"/>
+      <text x="270" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#A6192E">evento syslog con prioridad</text>
+      <line x1="420" y1="226" x2="754" y2="226" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d7-a)"/>
+      <rect x="450" y="198" width="280" height="34" rx="8" fill="#fff" stroke="#A6192E"/>
+      <text x="590" y="220" text-anchor="middle" font-size="13" font-weight="700" fill="#A6192E">cola: entrega con reintento</text>
+      <path d="M760 286 L792 286 L792 332 L766 332" stroke="#A6192E" stroke-width="3" fill="none" marker-end="url(#s09p2d7-a)"/>
+      <rect x="800" y="278" width="300" height="56" rx="8" fill="#F9EEF0" stroke="#A6192E"/>
+      <text x="816" y="302" font-size="13" font-weight="700" fill="#A6192E">parsea, normaliza y corre</text>
+      <text x="816" y="324" font-size="13" fill="#2A2A2A">la regla de correlación</text>
+      <line x1="766" y1="372" x2="1074" y2="372" stroke="#8A6D1D" stroke-width="3" marker-end="url(#s09p2d7-b)"/>
+      <rect x="800" y="344" width="300" height="34" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+      <text x="950" y="366" text-anchor="middle" font-size="13" font-weight="700" fill="#8A6D1D">alerta: 5 fallos en 60 s</text>
+      <line x1="1074" y1="418" x2="770" y2="418" stroke="#8A6D1D" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#s09p2d7-b)"/>
+      <rect x="800" y="396" width="300" height="30" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+      <text x="950" y="416" text-anchor="middle" font-size="13" fill="#5F5F5F">confirma y abre el caso</text>
+    </svg>
+  </div>
+  <aside class="notes">Sigamos ahora el recorrido completo, actor por actor. El firewall genera el evento y lo envía por syslog al colector. El colector lo pone en la cola y reintenta si el destino no responde; ahí es donde se pierden los mensajes cuando nadie vigila esa cola. El SIEM lo toma, lo analiza con el patrón de su producto, lo lleva al esquema común y ejecuta la regla de correlación. Cuando se cumple el umbral, envía la alerta al analista con la lista de eventos que la provocaron. El analista la abre, confirma si es real y decide: escala a incidente o la cierra como comportamiento conocido. Noten que cada flecha puede romperse. La calidad de la alerta depende del eslabón más lento, y casi siempre ese eslabón es la cola saturada o la regla mal afinada, no el producto que compraron. Noten también quién es dueño de cada tramo: la red entrega, la plataforma transporta, el SIEM interpreta y la persona decide. Si una alerta se pierde, esa frontera dice a quién preguntar primero.</aside>
+</section>
+
+<!-- D8 · Alerta, incidente y caso -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-61 Rev.3 (2025), gestión de incidentes">
+  <div class="kicker">Estados</div>
+  <h2>Alerta, incidente y caso: tres cosas distintas</h2>
+  <p class="sub">Cambia el volumen, el responsable y la exigencia de evidencia.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p2d8-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p2d8-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="20" width="250" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="133" y="52" font-size="15" font-weight="700" fill="#A6192E">Alerta</text>
+        <text x="133" y="78" fill="#2A2A2A">un umbral se cruzó</text>
+        <text x="133" y="100" fill="#5F5F5F">volumen alto, dueño: nadie</text>
+
+        <rect x="316" y="20" width="250" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="441" y="52" font-size="15" font-weight="700" fill="#A6192E">Triaje</text>
+        <text x="441" y="78" fill="#2A2A2A">confirmar o descartar</text>
+        <text x="441" y="100" fill="#5F5F5F">ventana de minutos</text>
+
+        <rect x="624" y="20" width="280" height="96" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+        <text x="764" y="52" font-size="15" font-weight="700" fill="#8A6D1D">¿Afecta a un activo crítico?</text>
+        <text x="764" y="80" fill="#2A2A2A">impacto confirmado</text>
+        <text x="764" y="102" fill="#5F5F5F">punto de decisión</text>
+
+        <rect x="960" y="20" width="216" height="96" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2.5" stroke-dasharray="7 6"/>
+        <text x="1068" y="52" font-size="15" font-weight="700" fill="#5F5F5F">Cierre documentado</text>
+        <text x="1068" y="80" fill="#2A2A2A">etiqueta y motivo</text>
+        <text x="1068" y="102" fill="#5F5F5F">benigno o conocido</text>
+
+        <rect x="624" y="200" width="280" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="764" y="232" font-size="15" font-weight="700" fill="#A6192E">Incidente</text>
+        <text x="764" y="260" fill="#2A2A2A">impacto y responsables</text>
+        <text x="764" y="282" fill="#5F5F5F">se activa la respuesta</text>
+
+        <rect x="316" y="200" width="250" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="441" y="232" font-size="15" font-weight="700" fill="#A6192E">Caso</text>
+        <text x="441" y="260" fill="#2A2A2A">evidencia y cronología</text>
+        <text x="441" y="282" fill="#5F5F5F">expediente auditable</text>
+
+        <rect x="8" y="200" width="250" height="96" rx="12" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2.5"/>
+        <text x="133" y="232" font-size="15" font-weight="700" fill="#2E7D4F">Resolución</text>
+        <text x="133" y="260" fill="#2A2A2A">contención y erradicación</text>
+        <text x="133" y="282" fill="#2A2A2A">lección para la regla</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d8-f)">
+        <line x1="262" y1="68" x2="310" y2="68"/>
+        <line x1="570" y1="68" x2="618" y2="68"/>
+        <path d="M764 118 L764 194"/>
+        <path d="M624 248 L572 248"/>
+        <path d="M316 248 L264 248"/>
+      </g>
+      <line x1="908" y1="68" x2="954" y2="68" stroke="#5F5F5F" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#s09p2d8-g)"/>
+      <g font-size="13" font-weight="700">
+        <text x="776" y="160" fill="#A6192E">sí</text>
+        <text x="918" y="58" fill="#5F5F5F">no</text>
+        <text x="584" y="238" fill="#A6192E">se documenta</text>
+        <text x="276" y="238" fill="#A6192E">se aprende</text>
+      </g>
+      <rect x="8" y="330" width="1168" height="60" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="32" y="358" font-size="15" font-weight="700" fill="#8A6D1D">Toda alerta termina en un estado explícito: ninguna queda abierta por costumbre.</text>
+      <text x="32" y="382" font-size="13" fill="#2A2A2A">Los cierres se etiquetan, porque mañana alimentan la supresión y la afinación de las reglas.</text>
+      <rect x="8" y="404" width="1168" height="44" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+      <text x="592" y="432" text-anchor="middle" font-size="13" fill="#5F5F5F">El caso conserva la evidencia que la Parte 1 aprendió a recolectar: logs, flujos y capturas.</text>
+    </svg>
+  </div>
+  <aside class="notes">Conviene separar tres palabras que se usan como sinónimos. La alerta es un aviso: un umbral se cruzó y algo merece una mirada, y su volumen es alto. El triaje decide en minutos si ese aviso es real, benigno o repetido. Si el evento afecta a un activo crítico, se convierte en incidente, con impacto confirmado y responsables asignados. El caso es el expediente: ahí viven la evidencia, la cronología, las decisiones y las fechas. A la derecha está la rama que menos se documenta y más se repite: la alerta que se cierra porque el comportamiento es benigno, siempre con etiqueta y motivo. El cierre debe ser explícito, porque una alerta que queda abierta por costumbre contamina la siguiente revisión y ensucia las métricas que veremos en un momento. Y recuerden que el caso es donde se usa la evidencia de la parte uno. Tengan presente que cada transición exige evidencia: para escalar, el impacto; para cerrar, el motivo. Sin eso, la auditoría devuelve el caso.</aside>
+</section>
+
+<!-- D9 · Embudo de alertas -->
+<section class="slide" data-fuente="Diagrama propio · el embudo es una idea de diseño; las proporciones son ilustrativas">
+  <div class="kicker">Fatiga</div>
+  <h2>El embudo: de miles de eventos a una decisión</h2>
+  <p class="sub">El valor no está en generar alertas, sino en reducirlas a lo accionable.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <g font-size="13" text-anchor="middle">
+        <rect x="30" y="20" width="700" height="68" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="380" y="48" font-weight="700" fill="#5F5F5F">Eventos recogidos</text>
+        <text x="380" y="74" fill="#2A2A2A">logs, flujos y alertas del IDS</text>
+
+        <rect x="110" y="98" width="540" height="68" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="380" y="126" font-weight="700" fill="#8A6D1D">Tras normalizar</text>
+        <text x="380" y="152" fill="#2A2A2A">solo los que se entendieron</text>
+
+        <rect x="180" y="176" width="400" height="68" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="380" y="204" font-weight="700" fill="#A6192E">Alertas de reglas</text>
+        <text x="380" y="230" fill="#2A2A2A">umbral cruzado en la ventana</text>
+
+        <rect x="240" y="254" width="280" height="68" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="380" y="282" font-weight="700" fill="#A6192E">Agrupadas por origen</text>
+        <text x="380" y="308" fill="#2A2A2A">sin duplicados ni latidos</text>
+
+        <rect x="290" y="332" width="180" height="68" rx="10" fill="#A6192E"/>
+        <text x="380" y="360" font-weight="700" fill="#D4AF37">Incidente</text>
+        <text x="380" y="386" fill="#fff">impacto real</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" fill="none">
+        <path d="M380 88 L380 96"/>
+        <path d="M380 166 L380 174"/>
+        <path d="M380 244 L380 252"/>
+        <path d="M380 322 L380 330"/>
+      </g>
+      <g font-size="13.5">
+        <rect x="780" y="20" width="396" height="120" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-bloqueo" x="800" y="40" width="40" height="40" style="color:#A6192E"/>
+        <text x="856" y="66" font-weight="700" fill="#A6192E">Suprimir</text>
+        <text x="800" y="102" fill="#2A2A2A">Lo conocido y benigno deja de</text>
+        <text x="800" y="126" fill="#2A2A2A">repentarse cada cinco minutos.</text>
+
+        <rect x="780" y="164" width="396" height="120" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-lista" x="800" y="184" width="40" height="40" style="color:#A6192E"/>
+        <text x="856" y="210" font-weight="700" fill="#A6192E">Agrupar</text>
+        <text x="800" y="246" fill="#2A2A2A">Los duplicados por origen y por</text>
+        <text x="800" y="270" fill="#2A2A2A">regla se convierten en uno solo.</text>
+
+        <rect x="780" y="308" width="396" height="120" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-alerta" x="800" y="328" width="40" height="40" style="color:#8A6D1D"/>
+        <text x="856" y="354" font-weight="700" fill="#8A6D1D">Priorizar</text>
+        <text x="800" y="390" fill="#2A2A2A">El activo crítico sube al toque</text>
+        <text x="800" y="414" fill="#2A2A2A">del embudo, el resto espera.</text>
+      </g>
+      <text x="30" y="434" font-size="12.5" fill="#5F5F5F">Las anchuras son ilustrativas: la relación real depende del volumen y de cuántas reglas están afinadas.</text>
+    </svg>
+  </div>
+  <aside class="notes">Este es el gráfico que ningún director olvida: el embudo. Arriba entran todos los eventos que la red produce. Al normalizarlos solo sobreviven los que se entendieron. Al aplicar las reglas, unos pocos cruzan un umbral. Al agruparlos por origen, las repetidas se juntan en una sola señal. Y abajo queda el incidente real, con impacto confirmado. Las proporciones dibujadas son ilustrativas: la relación real depende del sector, del volumen y de cuántas reglas mal afinadas estén encendidas. Lo que importa es la forma. Si la parte baja del embudo crece, ustedes no tienen más incidentes: tienen más ruido. Las tres cajas de la derecha son las herramientas clásicas para estrecharlo: suprimir lo conocido, agrupar lo duplicado y priorizar por activo crítico. Sin esas tres palancas, el embudo no se cierra y el analista se ahoga. Para mantenerlo estrecho: cada vez que cierren una alerta, pregunten si la regla que la produjo aún justifica su existencia. Las reglas que nadie revisa envejecen mal.</aside>
+</section>
+
+<!-- D10 · ATT&CK -->
+<section class="slide" data-fuente="MITRE ATT&amp;CK® Enterprise, técnicas T1078, T1110, T1046, T1021, T1071, T1572, T1041 (consultado 2026)">
+  <div class="kicker">ATT&amp;CK</div>
+  <h2>El atacante avanza por tácticas, ustedes vigilan cada paso</h2>
+  <p class="sub">La cadena de tácticas traduce el ataque en puntos concretos de detección.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p2d10-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="12" y="26" width="180" height="62" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="102" y="64" font-weight="700" fill="#A6192E">Acceso inicial</text>
+        <rect x="208" y="26" width="180" height="62" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="298" y="64" font-weight="700" fill="#A6192E">Credenciales</text>
+        <rect x="404" y="26" width="180" height="62" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="494" y="64" font-weight="700" fill="#A6192E">Descubrimiento</text>
+        <rect x="600" y="26" width="180" height="62" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="690" y="56" font-weight="700" fill="#A6192E">Movimiento</text>
+        <text x="690" y="78" font-weight="700" fill="#A6192E">lateral</text>
+        <rect x="796" y="26" width="180" height="62" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="886" y="56" font-weight="700" fill="#A6192E">Comando y</text>
+        <text x="886" y="78" font-weight="700" fill="#A6192E">control</text>
+        <rect x="992" y="26" width="180" height="62" rx="10" fill="#A6192E"/>
+        <text x="1082" y="64" font-weight="700" fill="#D4AF37">Exfiltración</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d10-f)">
+        <line x1="194" y1="57" x2="202" y2="57"/>
+        <line x1="390" y1="57" x2="398" y2="57"/>
+        <line x1="586" y1="57" x2="594" y2="57"/>
+        <line x1="782" y1="57" x2="790" y2="57"/>
+        <line x1="978" y1="57" x2="986" y2="57"/>
+      </g>
+      <g font-size="12" text-anchor="middle" font-family="monospace">
+        <rect x="12" y="106" width="180" height="46" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="102" y="134" fill="#8A6D1D">T1078 cuentas válidas</text>
+        <rect x="208" y="106" width="180" height="46" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="298" y="134" fill="#8A6D1D">T1110 fuerza bruta</text>
+        <rect x="404" y="106" width="180" height="46" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="494" y="134" fill="#8A6D1D">T1046 sondeo</text>
+        <rect x="600" y="106" width="180" height="46" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="690" y="134" fill="#8A6D1D">T1021 servicios remotos</text>
+        <rect x="796" y="106" width="180" height="46" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="886" y="134" fill="#8A6D1D">T1071 · T1572 túnel</text>
+        <rect x="992" y="106" width="180" height="46" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="1082" y="134" fill="#8A6D1D">T1041 salida por C2</text>
+      </g>
+      <g font-size="12" text-anchor="middle">
+        <text x="102" y="182" font-weight="700" fill="#7E1223">Lo que ve el SIEM</text>
+        <text x="102" y="206" fill="#2A2A2A">sesión válida inesperada</text>
+        <text x="298" y="206" fill="#2A2A2A">cuarenta fallos por origen</text>
+        <text x="494" y="206" fill="#2A2A2A">barrido de puertos</text>
+        <text x="690" y="206" fill="#2A2A2A">SSH entre zonas nuevas</text>
+        <text x="886" y="206" fill="#2A2A2A">salida en hora rara</text>
+        <text x="1082" y="206" fill="#2A2A2A">volumen alto hacia afuera</text>
+      </g>
+      <line x1="12" y1="240" x2="1172" y2="240" stroke="#D4AF37" stroke-width="3"/>
+      <rect x="12" y="262" width="1160" height="86" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+      <text x="36" y="294" font-size="15" font-weight="700" fill="#A6192E">El marco ATT&amp;CK es vocabulario, no producto</text>
+      <text x="36" y="322" font-size="13" fill="#2A2A2A">Agrupa las tácticas del atacante en categorías estables y les da un código común para hablar con otros equipos.</text>
+      <text x="36" y="342" font-size="13" fill="#5F5F5F">Ese código es el que aparece en las alertas y en los informes de cualquier fabricante.</text>
+      <rect x="12" y="366" width="1160" height="66" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="592" y="396" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Regla práctica: por cada táctica de su cadena, al menos una regla activa.</text>
+      <text x="592" y="422" text-anchor="middle" font-size="13" fill="#2A2A2A">Si una táctica no tiene detección, es exactamente por donde entrará alguien sin que nadie lo note.</text>
+    </svg>
+  </div>
+  <aside class="notes">El marco ATT&amp;CK no es una herramienta, es el vocabulario común del ataque. Lo usamos como una cadena de tácticas: el atacante obtiene acceso con cuentas válidas, roba credenciales con fuerza bruta, descubre la red, se mueve entre equipos, se comunica con afuera y finalmente se lleva los datos. Debajo de cada táctica hay técnicas con código, como la fuerza bruta numerada mil ciento diez o el sondeo de servicios numerado mil cuarenta y seis. Lo valioso no es memorizar los códigos, sino anotar qué ve el SIEM en cada paso. Cuarenta fallos del mismo origen, un barrido de puertos, una sesión entre zonas que nunca se hablaban. Por cada táctica de su cadena, al menos una regla activa. Si una táctica no tiene detección, es exactamente por donde entrará alguien sin que nadie se entere. El valor aparece cuando dos equipos describen el mismo ataque con palabras distintas. Con el código de la técnica delante, la conversación se acorta: todos hablan de la fuerza bruta mil ciento diez.</aside>
+</section>
+
+<!-- D11 · MTTD y MTTR -->
+<section class="slide" data-fuente="Diagrama propio · concepto: métricas de detección y respuesta, NIST SP 800-61 Rev.3 (2025)">
+  <div class="kicker">Métricas</div>
+  <h2>Medir el tiempo: detectar rápido y contener más rápido</h2>
+  <p class="sub">Dos relojes y varios frenos: dónde se pierde el tiempo en cada tramo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <g stroke="#7E1223" stroke-width="3">
+        <line x1="60" y1="40" x2="780" y2="40"/>
+        <line x1="60" y1="34" x2="60" y2="46"/>
+        <line x1="780" y1="34" x2="780" y2="46"/>
+      </g>
+      <text x="420" y="30" text-anchor="middle" font-size="13.5" font-weight="700" fill="#7E1223">MTTR · del evento hasta la contención</text>
+      <g stroke="#A6192E" stroke-width="3">
+        <line x1="60" y1="88" x2="280" y2="88"/>
+        <line x1="60" y1="82" x2="60" y2="94"/>
+        <line x1="280" y1="82" x2="280" y2="94"/>
+      </g>
+      <text x="170" y="78" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A6192E">MTTD · hasta la alerta</text>
+      <line x1="60" y1="176" x2="1124" y2="176" stroke="#5F5F5F" stroke-width="4"/>
+      <g font-size="13" text-anchor="middle">
+        <circle cx="60" cy="176" r="13" fill="#7E1223"/>
+        <text x="60" y="212" font-weight="700" fill="#7E1223">evento</text>
+        <circle cx="280" cy="176" r="13" fill="#A6192E"/>
+        <text x="280" y="212" font-weight="700" fill="#A6192E">alerta</text>
+        <circle cx="480" cy="176" r="13" fill="#A6192E"/>
+        <text x="480" y="212" font-weight="700" fill="#A6192E">caso abierto</text>
+        <circle cx="780" cy="176" r="13" fill="#2E7D4F"/>
+        <text x="780" y="212" font-weight="700" fill="#2E7D4F">contención</text>
+        <circle cx="1124" cy="176" r="13" fill="#5F5F5F"/>
+        <text x="1110" y="212" font-weight="700" fill="#5F5F5F">cierre</text>
+      </g>
+      <g font-size="12.5">
+        <rect x="70" y="234" width="196" height="76" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="86" y="260" font-weight="700" fill="#5F5F5F">Freno de detección</text>
+        <text x="86" y="284" fill="#2A2A2A">fuente que no registraba</text>
+        <text x="86" y="304" fill="#2A2A2A">o reloj desincronizado</text>
+
+        <rect x="290" y="234" width="176" height="76" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="306" y="260" font-weight="700" fill="#5F5F5F">Freno de análisis</text>
+        <text x="306" y="284" fill="#2A2A2A">cola sin vigilar y</text>
+        <text x="306" y="304" fill="#2A2A2A">reglas ruidosas</text>
+
+        <rect x="490" y="234" width="276" height="76" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="506" y="260" font-weight="700" fill="#5F5F5F">Freno de decisión</text>
+        <text x="506" y="284" fill="#2A2A2A">contacto sin definir y</text>
+        <text x="506" y="304" fill="#2A2A2A">procedimiento que nadie escribió</text>
+
+        <rect x="790" y="234" width="324" height="76" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="806" y="260" font-weight="700" fill="#5F5F5F">Freno de recuperación</text>
+        <text x="806" y="284" fill="#2A2A2A">cambio sin ventana y lección</text>
+        <text x="806" y="304" fill="#2A2A2a">que no vuelve a la regla</text>
+      </g>
+      <rect x="12" y="332" width="570" height="104" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+      <text x="36" y="362" font-size="15" font-weight="700" fill="#A6192E">Baja el MTTD</text>
+      <text x="36" y="390" font-size="13" fill="#2A2A2A">Todas las fuentes hablando, cola vigilada,</text>
+      <text x="36" y="414" font-size="13" fill="#2A2A2A">reglas probadas con eventos de prueba.</text>
+      <rect x="602" y="332" width="570" height="104" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="626" y="362" font-size="15" font-weight="700" fill="#8A6D1D">Baja el MTTR</text>
+      <text x="626" y="390" font-size="13" fill="#2A2A2A">Procedimiento escrito, contactos acordados</text>
+      <text x="626" y="414" font-size="13" fill="#2A2A2A">y ventana de cambios lista para usarse.</text>
+    </svg>
+  </div>
+  <aside class="notes">Medir es lo que separa una opinión de una mejora. El primer reloj es el tiempo medio de detección: desde que ocurre el evento hasta que aparece la alerta confirmada. El segundo es el tiempo medio de resolución, que va desde el mismo evento hasta que el impacto queda contenido. Entre medio están el triaje y la decisión, y cada tramo tiene su freno típico. Las fuentes que no registraban y la cola que nadie vigila alargan la detección. La espera de un contacto, la falta de procedimiento y los cambios sin ventana alargan la contención. Abajo quedan las dos recetas: para bajar la detección, cobertura y disciplina en la ingesta; para bajar la resolución, procedimiento escrito y contactos acordados antes de que ocurra nada. Lo que no se mide, no mejora, y lo que se mide tarde, tampoco. Una recomendación: elijan un solo par de métricas y revísenlas cada mes. Si el tiempo de detección baja pero el de resolución no, el problema está en la respuesta.</aside>
+</section>
+
+<!-- D12 · Triaje -->
+<section class="slide" data-fuente="Diagrama propio · concepto: triaje de alertas, NIST SP 800-61 Rev.3 (2025), §3.2">
+  <div class="kicker">Triaje</div>
+  <h2>Cuatro preguntas antes de escalar una alerta</h2>
+  <p class="sub">El triaje rápido separa el ruido del evento que sí cambia el riesgo.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 760 440">
+          <defs><marker id="s09p2d12-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+          <marker id="s09p2d12-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+          <g font-size="13">
+            <rect x="8" y="14" width="440" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="28" y="40" font-weight="700" fill="#A6192E">1 · ¿El activo afectado es crítico?</text>
+            <text x="28" y="62" font-size="12" fill="#5F5F5F">servidor de pagos, controlador de dominio, firewall</text>
+            <rect x="478" y="14" width="274" height="56" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="494" y="38" font-size="12" fill="#2A2A2A">prioridad baja:</text>
+            <text x="494" y="58" font-size="12" fill="#2A2A2A">espera en el panel</text>
+
+            <rect x="8" y="104" width="440" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="28" y="130" font-weight="700" fill="#A6192E">2 · ¿Hay correlación con otros eventos?</text>
+            <text x="28" y="152" font-size="12" fill="#5F5F5F">tres señales que coinciden pesan más que una sola</text>
+            <rect x="478" y="104" width="274" height="56" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="494" y="128" font-size="12" fill="#2A2A2A">evento aislado:</text>
+            <text x="494" y="148" font-size="12" fill="#2A2A2A">documentar y cerrar</text>
+
+            <rect x="8" y="194" width="440" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="28" y="220" font-weight="700" fill="#A6192E">3 · ¿Es conocido y benigno?</text>
+            <text x="28" y="242" font-size="12" fill="#5F5F5F">escaneo del proveedor, latido del agente, prueba propia</text>
+            <rect x="478" y="194" width="274" height="56" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+            <text x="494" y="218" font-size="12" fill="#8A6D1D">etiquetar benigno y</text>
+            <text x="494" y="238" font-size="12" fill="#8A6D1D">crear la supresión</text>
+
+            <rect x="8" y="284" width="440" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="28" y="310" font-weight="700" fill="#A6192E">4 · ¿Se repite o crece en el tiempo?</text>
+            <text x="28" y="332" font-size="12" fill="#5F5F5F">la repetición indica que la causa sigue ahí</text>
+
+            <rect x="8" y="374" width="440" height="56" rx="10" fill="#A6192E"/>
+            <text x="228" y="408" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Escalar a incidente</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d12-f)">
+            <line x1="228" y1="72" x2="228" y2="100"/>
+            <line x1="228" y1="162" x2="228" y2="190"/>
+            <line x1="228" y1="252" x2="228" y2="280"/>
+            <line x1="228" y1="342" x2="228" y2="370"/>
+          </g>
+          <g stroke="#5F5F5F" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#s09p2d12-g)">
+            <line x1="450" y1="42" x2="472" y2="42"/>
+            <line x1="450" y1="132" x2="472" y2="132"/>
+            <line x1="450" y1="222" x2="472" y2="222"/>
+          </g>
+        </svg>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 583 440">
+          <rect x="8" y="14" width="567" height="46" rx="10" fill="#7E1223"/>
+          <text x="292" y="44" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Qué debe llevar la alerta al triaje</text>
+          <g font-size="13.5" fill="#2A2A2A">
+            <use href="#i-ok" x="24" y="80" width="28" height="28" style="color:#2E7D4F"/>
+            <text x="66" y="100">El activo afectado y su criticidad.</text>
+            <use href="#i-ok" x="24" y="132" width="28" height="28" style="color:#2E7D4F"/>
+            <text x="66" y="152">Origen y destino, ya normalizados.</text>
+            <use href="#i-ok" x="24" y="184" width="28" height="28" style="color:#2E7D4F"/>
+            <text x="66" y="204">Hora verificada con la referencia NTP.</text>
+            <use href="#i-ok" x="24" y="236" width="28" height="28" style="color:#2E7D4F"/>
+            <text x="66" y="256">La regla que disparó y su umbral.</text>
+            <use href="#i-ok" x="24" y="288" width="28" height="28" style="color:#2E7D4F"/>
+            <text x="66" y="308">Evidencia adjunta: trama o captura.</text>
+          </g>
+          <rect x="8" y="340" width="567" height="90" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+          <text x="28" y="370" font-size="14" font-weight="700" fill="#8A6D1D">Etiquetas que alimentan la afinación</text>
+          <text x="28" y="396" font-size="13" fill="#2A2A2A">falso positivo · benigno conocido · escaneo propio · incidente</text>
+          <text x="28" y="420" font-size="13" fill="#5F5F5F">Cada etiqueta de hoy es una supresión o una mejora de mañana.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">El triaje es donde el tiempo humano vale más que la máquina. Cuatro preguntas bastan. Primero: el activo afectado es crítico; si no lo es, la alerta espera en el panel sin molestar. Segundo: hay correlación con otros eventos, porque un fallo solo pesa menos que tres señales que coinciden. Tercero: es un comportamiento conocido y benigno; si lo es, se etiqueta y se crea la supresión para que no vuelva a aparecer. Cuarto: se repite o crece en el tiempo, que es la señal de que la causa sigue ahí. Si las respuestas empujan hacia abajo, el asunto escala a incidente. A la derecha está el mínimo que debe acompañar la alerta: el activo, el origen, la hora verificada, la regla y la evidencia adjunta. Sin eso, el escalón siguiente empieza de cero. Y acompáñenla con una regla firme: nunca escalen por presión de un correo que dice urgente. El atacante también sabe fingir prisa.</aside>
+</section>
+
+<!-- D13 · Prueba y cobertura -->
+<section class="slide" data-fuente="Diagrama propio · concepto: pruebas de detección y matriz de cobertura">
+  <div class="kicker">Prueba</div>
+  <h2>Sin prueba, el monitoreo es una suposición</h2>
+  <p class="sub">Inyecte un evento, siga su rastro y cierre la brecha que encuentre.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 583 440">
+          <defs><marker id="s09p2d13-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <g font-size="13">
+            <rect x="8" y="14" width="567" height="94" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="30" y="44" font-weight="700" fill="#A6192E">1 · Inyectar</text>
+            <text x="30" y="70" font-family="monospace" font-size="12.5" fill="#2A2A2A">logger -p local4.info "prueba-s09"</text>
+            <text x="30" y="94" font-size="12.5" fill="#5F5F5F">evento sintético, marcado y reconocible</text>
+
+            <rect x="8" y="132" width="567" height="94" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="30" y="162" font-weight="700" fill="#A6192E">2 · Verificar llegada</text>
+            <text x="30" y="188" font-family="monospace" font-size="12.5" fill="#2A2A2A">tcpdump -ni eth0 udp port 514</text>
+            <text x="30" y="212" font-size="12.5" fill="#5F5F5F">el datagrama aparece en el colector</text>
+
+            <rect x="8" y="250" width="567" height="94" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="30" y="280" font-weight="700" fill="#A6192E">3 · Verificar parseo e índice</text>
+            <text x="30" y="306" font-family="monospace" font-size="12.5" fill="#2A2A2A">buscar prueba-s09 en el índice</text>
+            <text x="30" y="330" font-size="12.5" fill="#5F5F5F">si no aparece, el patrón falló</text>
+
+            <rect x="8" y="368" width="567" height="64" rx="12" fill="#A6192E"/>
+            <text x="30" y="396" font-weight="700" fill="#D4AF37">4 · Forzar la alerta</text>
+            <text x="30" y="420" font-size="12.5" fill="#fff">regla de prueba activa y notificación recibida</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d13-f)">
+            <line x1="292" y1="108" x2="292" y2="128"/>
+            <line x1="292" y1="226" x2="292" y2="246"/>
+            <line x1="292" y1="344" x2="292" y2="364"/>
+          </g>
+        </svg>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 583 440">
+          <rect x="8" y="14" width="567" height="46" rx="10" fill="#7E1223"/>
+          <text x="292" y="44" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Matriz de cobertura: fuente por tipo de evento</text>
+          <g font-size="12.5" text-anchor="middle" fill="#5F5F5F" font-weight="700">
+            <text x="240" y="90">autenticación</text>
+            <text x="346" y="90">error</text>
+            <text x="448" y="90">cambio</text>
+            <text x="537" y="90">IDS</text>
+          </g>
+          <g font-size="13">
+            <rect x="8" y="102" width="170" height="70" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="24" y="132" font-weight="700" fill="#5F5F5F">OPNsense</text>
+            <text x="24" y="156" font-size="12" fill="#2A2A2A">firewall e IDS</text>
+            <rect x="184" y="102" width="110" height="70" fill="#fff" stroke="#8C8C8C" stroke-dasharray="6 5"/>
+            <rect x="296" y="102" width="100" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="334" y="124" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="398" y="102" width="100" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="436" y="124" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="500" y="102" width="75" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="524" y="124" width="26" height="26" style="color:#2E7D4F"/>
+
+            <rect x="8" y="184" width="170" height="70" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="24" y="214" font-weight="700" fill="#5F5F5F">Servidor Linux</text>
+            <text x="24" y="238" font-size="12" fill="#2A2A2A">aplicación y sistema</text>
+            <rect x="184" y="184" width="110" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="226" y="206" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="296" y="184" width="100" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="334" y="206" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="398" y="184" width="100" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="436" y="206" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="500" y="184" width="75" height="70" fill="#fff" stroke="#8C8C8C" stroke-dasharray="6 5"/>
+
+            <rect x="8" y="266" width="170" height="70" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="24" y="296" font-weight="700" fill="#5F5F5F">Switch y red</text>
+            <text x="24" y="320" font-size="12" fill="#2A2A2A">enlaces y vecinos</text>
+            <rect x="184" y="266" width="110" height="70" fill="#fff" stroke="#8C8C8C" stroke-dasharray="6 5"/>
+            <rect x="296" y="266" width="100" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="334" y="288" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="398" y="266" width="100" height="70" fill="#E8F3EC" stroke="#2E7D4F"/>
+            <use href="#i-ok" x="436" y="288" width="26" height="26" style="color:#2E7D4F"/>
+            <rect x="500" y="266" width="75" height="70" fill="#fff" stroke="#8C8C8C" stroke-dasharray="6 5"/>
+          </g>
+          <rect x="8" y="356" width="567" height="76" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+          <text x="28" y="386" font-size="14" font-weight="700" fill="#8A6D1D">Casilla vacía: brecha conocida</text>
+          <text x="28" y="412" font-size="13" fill="#2A2A2A">Alguien decide si se llena o se acepta por escrito.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Un SIEM silencioso puede ser un SIEM roto, y nadie se entera hasta que hace falta. Por eso se prueba. El proceso tiene cuatro pasos: inyecte un evento de prueba con el comando logger, verifique que el datagrama llega al colector, confirme que el evento quedó parseado e indexado y, por último, fuerce una alerta con una regla de prueba para ver la notificación completa. Si en algún paso se corta, ahí está la brecha. La matriz de la derecha mira otra cosa: la cobertura. Cada fila es una fuente y cada columna un tipo de evento. Las casillas vacías son huecos conocidos, no accidentes: alguien decide si se llenan o se aceptan por escrito. Repitan la prueba cuando cambien de versión cualquier componente de la cadena. La matriz tiene un segundo uso: sirve para planear. Cuando alguien proponga una nueva fuente, la casilla vacía explica mejor el negocio que cualquier presentación. Y si la brecha se acepta, escríbanlo, porque el día que alguien pregunte por qué no había alerta, la respuesta ya estará lista.</aside>
+</section>
+
+<!-- D14 · Síntesis -->
+<section class="slide" data-fuente="Diagrama propio · síntesis de la Parte 2">
+  <div class="kicker">Síntesis</div>
+  <h2>Lo que queda de la Parte 2</h2>
+  <p class="sub">Eventos que entran ordenados, reglas con ventana y métricas que se revisan.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p2d14-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="7" y="8" width="1170" height="44" rx="10" fill="#7E1223"/>
+      <text x="592" y="37" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">La cadena del SIEM que sostiene la Parte 3</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="7" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-engranaje" x="86" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="112" y="176" font-weight="700" fill="#A6192E">Ingesta</text>
+        <text x="112" y="202" fill="#2A2A2A">identificar, parsear</text>
+        <text x="112" y="224" fill="#2A2A2A">y vigilar los fallos</text>
+
+        <rect x="247" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-lista" x="326" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="352" y="176" font-weight="700" fill="#A6192E">Normalización</text>
+        <text x="352" y="202" fill="#2A2A2A">un esquema y una</text>
+        <text x="352" y="224" fill="#2A2A2A">regla para todos</text>
+
+        <rect x="487" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-bd" x="566" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="592" y="176" font-weight="700" fill="#A6192E">Almacenamiento</text>
+        <text x="592" y="202" fill="#2A2A2A">índice por día y</text>
+        <text x="592" y="224" fill="#2A2A2A">retención por capa</text>
+
+        <rect x="727" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-siem" x="806" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="832" y="176" font-weight="700" fill="#A6192E">Correlación</text>
+        <text x="832" y="202" fill="#2A2A2A">condición, ventana</text>
+        <text x="832" y="224" fill="#2A2A2A">y umbral, luego triaje</text>
+
+        <rect x="967" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-reloj" x="1046" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="1072" y="176" font-weight="700" fill="#A6192E">Métricas</text>
+        <text x="1072" y="202" fill="#2A2A2A">tiempo de detección</text>
+        <text x="1072" y="224" fill="#2A2A2A">y de resolución</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p2d14-f)">
+        <line x1="219" y1="160" x2="243" y2="160"/>
+        <line x1="459" y1="160" x2="483" y2="160"/>
+        <line x1="699" y1="160" x2="723" y2="160"/>
+        <line x1="939" y1="160" x2="963" y2="160"/>
+      </g>
+      <rect x="7" y="272" width="1170" height="80" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="306" text-anchor="middle" font-size="17" font-weight="700" fill="#8A6D1D">Lo que no se prueba, se supone.</text>
+      <text x="592" y="334" text-anchor="middle" font-size="14" fill="#2A2A2A">Prueben la cadena completa cada vez que cambien un componente.</text>
+      <rect x="7" y="372" width="1170" height="64" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="400" text-anchor="middle" font-size="15" font-weight="700" fill="#7E1223">Siguiente: detectar en el tráfico con Suricata y Zeek</text>
+      <text x="592" y="424" text-anchor="middle" font-size="13" fill="#2A2A2A">Parte 3: reglas, salida estructurada, DNS, beaconing y afinamiento.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cerramos la parte dos con lo que queda instalado. La ingesta identifica y parsea, y se vigila la proporción de eventos que no se entendieron. La normalización traduce todos los dialectos a un esquema, de modo que una regla sirve para todos los orígenes. El almacenamiento parte el índice por día y apaga la retención por capa, sin reescribir nada. La correlación pide condición, ventana y umbral, y después agrupa, suprime y enriquece. Y las métricas convierten la opinión en número: tiempo de detección y tiempo de resolución, con sus frenos identificados. Recuerden la frase de la diapositiva: lo que no se prueba, se supone. En la parte tres bajamos al tráfico: Suricata, Zeek y cómo detectar comportamientos raros incluso cuando el canal está cifrado. Repasen además el embudo y las métricas: si el volumen de alertas sube sin que suban los incidentes, lo que creció fue el ruido. Con eso cerramos la parte dos. Enseguida entramos al tráfico vivo, donde las mismas ideas se aplican paquete por paquete.</aside>
+</section>

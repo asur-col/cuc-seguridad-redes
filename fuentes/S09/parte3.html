@@ -1,0 +1,786 @@
+<!-- D1 · Mapa de la parte -->
+<section class="slide" data-fuente="Diagrama propio · concepto: detección en tráfico, NIST SP 800-94 (2007)">
+  <div class="kicker">Mapa</div>
+  <h2>Cuatro paradas para detectar en el tráfico</h2>
+  <p class="sub">Suricata y Zeek miran el mismo enlace con dos preguntas distintas.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d1-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="40" width="266" height="176" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-paquete" x="117" y="58" width="48" height="48" style="color:#5F5F5F"/>
+        <text x="141" y="140" font-weight="700" fill="#5F5F5F">El tráfico</text>
+        <text x="141" y="166" fill="#2A2A2A">interfaz en modo</text>
+        <text x="141" y="188" fill="#2A2A2A">promiscuo, sin tocar</text>
+
+        <rect x="308" y="40" width="266" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-escaner" x="417" y="58" width="48" height="48" style="color:#A6192E"/>
+        <text x="441" y="140" font-weight="700" fill="#A6192E">Firma</text>
+        <text x="441" y="166" fill="#2A2A2A">Suricata busca lo</text>
+        <text x="441" y="188" fill="#2A2A2A">conocido y descrito</text>
+
+        <rect x="608" y="40" width="266" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-lupa" x="717" y="58" width="48" height="48" style="color:#A6192E"/>
+        <text x="741" y="140" font-weight="700" fill="#A6192E">Comportamiento</text>
+        <text x="741" y="166" fill="#2A2A2A">Zeek describe lo que</text>
+        <text x="741" y="188" fill="#2A2A2A">ocurre y es raro</text>
+
+        <rect x="908" y="40" width="266" height="176" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-engranaje" x="1017" y="58" width="48" height="48" style="color:#5F5F5F"/>
+        <text x="1041" y="140" font-weight="700" fill="#5F5F5F">Acción</text>
+        <text x="1041" y="166" fill="#2A2A2A">alertar, bloquear</text>
+        <text x="1041" y="188" fill="#2A2A2A">o afinar la regla</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p3d1-f)">
+        <line x1="276" y1="128" x2="304" y2="128"/>
+        <line x1="576" y1="128" x2="604" y2="128"/>
+        <line x1="876" y1="128" x2="904" y2="128"/>
+      </g>
+      <rect x="8" y="256" width="1168" height="88" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="292" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Todo lo que sale de aquí es evidencia para el SIEM</text>
+      <text x="592" y="322" text-anchor="middle" font-size="13.5" fill="#2A2A2A">alertas de Suricata, logs de Zeek y contadores del propio sensor.</text>
+      <rect x="8" y="364" width="1168" height="64" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="392" text-anchor="middle" font-size="14" font-weight="700" fill="#7E1223">Pregunta de la parte: ¿qué hace alguien cuando nadie lo mira?</text>
+      <text x="592" y="416" text-anchor="middle" font-size="13" fill="#2A2A2A">Firma para lo conocido, comportamiento para lo raro, ajuste para el ruido.</text>
+    </svg>
+  </div>
+  <aside class="notes">Arrancamos la parte tres donde quedó el cable: en el tráfico que cruza la red. Verán cuatro paradas. Primera, el tráfico mismo, que se mira desde una interfaz en modo promiscuo sin tocar la comunicación. Segunda, la detección por firma con Suricata, que responde qué software malicioso conocido está aquí. Tercera, la detección por comportamiento con Zeek, que responde otra cosa: qué está pasando que normalmente no pasa. Cuarta, la acción: alertar, bloquear o afinar la regla. Recuerden el hilo de la parte dos: todo lo que sale de aquí se convierte en evidencia, y esa evidencia llega al colector y al índice. Terminaremos con la síntesis y con el puente a la parte cuatro, donde entran las personas, el proceso y la práctica. Recuerden que ninguna parada reemplaza a la anterior: la firma no sustituye a la descripción, ni la descripción sustituye a la política del firewall. Lo que cambia es la pregunta que responde cada una, y esa idea atraviesa toda la parte.</aside>
+</section>
+
+<!-- D2 · Suricata, Zeek, NDR -->
+<section class="slide" data-fuente="Concepto: Suricata (OISF), Zeek, análisis de red (NIST SP 800-94, 2007)">
+  <div class="kicker">Comparación</div>
+  <h2>Tres maneras de mirar el mismo enlace</h2>
+  <p class="sub">Firma, comportamiento y análisis externo: se complementan, no compiten.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 470">
+      <defs><marker id="s09p3d2-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <line x1="74" y1="38" x2="1116" y2="38" stroke="#5F5F5F" stroke-width="4"/>
+      <use href="#i-switch" x="18" y="16" width="44" height="44" style="color:#5F5F5F"/>
+      <text x="40" y="74" text-anchor="middle" font-size="12" fill="#5F5F5F">enlace vigilado</text>
+      <use href="#i-servidor-web" x="1116" y="14" width="48" height="48" style="color:#5F5F5F"/>
+      <use href="#i-tap" x="570" y="16" width="44" height="44" style="color:#8A6D1D"/>
+      <text x="628" y="30" font-size="12.5" font-weight="700" fill="#8A6D1D">copia espejo del tráfico</text>
+      <line x1="592" y1="62" x2="592" y2="78" stroke="#A6192E" stroke-width="2.5"/>
+      <line x1="196" y1="78" x2="988" y2="78" stroke="#A6192E" stroke-width="2.5"/>
+      <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p3d2-f)">
+        <line x1="196" y1="78" x2="196" y2="92"/>
+        <line x1="592" y1="78" x2="592" y2="92"/>
+        <line x1="988" y1="78" x2="988" y2="92"/>
+      </g>
+      <g font-size="13">
+        <rect x="8" y="96" width="376" height="300" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <rect x="8" y="96" width="376" height="52" rx="14" fill="#A6192E"/>
+        <use href="#i-escaner" x="26" y="104" width="36" height="36" style="color:#fff"/>
+        <text x="74" y="129" font-size="17" font-weight="700" fill="#fff">Suricata · firma</text>
+        <text x="28" y="176" font-weight="700" fill="#A6192E">Pregunta: ¿qué busqué?</text>
+        <text x="28" y="204" fill="#2A2A2A">Compara contra reglas escritas</text>
+        <text x="28" y="228" fill="#2A2A2A">por personas y firmas públicas.</text>
+        <text x="28" y="256" fill="#2A2A2A">Trabaja en modo detección o en</text>
+        <text x="28" y="280" fill="#2A2A2A">modo de bloqueo en línea.</text>
+        <text x="28" y="308" fill="#2A2A2A">Escribe eventos estructurados</text>
+        <text x="28" y="332" fill="#2A2A2A">por cada coincidencia.</text>
+        <text x="28" y="368" font-size="12.5" font-weight="700" fill="#5F5F5F">Límite: solo sabe lo que se describió;</text>
+        <text x="28" y="388" font-size="12.5" fill="#5F5F5F">cada firma nueva hay que escribirla.</text>
+
+        <rect x="404" y="96" width="376" height="300" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <rect x="404" y="96" width="376" height="52" rx="14" fill="#A6192E"/>
+        <use href="#i-lupa" x="422" y="104" width="36" height="36" style="color:#fff"/>
+        <text x="470" y="129" font-size="17" font-weight="700" fill="#fff">Zeek · log</text>
+        <text x="424" y="176" font-weight="700" fill="#A6192E">Pregunta: ¿qué pasó?</text>
+        <text x="424" y="204" fill="#2A2A2A">No lleva reglas: describe la</text>
+        <text x="424" y="228" fill="#2A2A2A">conversación protocolo a protocolo.</text>
+        <text x="424" y="256" fill="#2A2A2A">Deja archivos planos con campos</text>
+        <text x="424" y="280" fill="#2A2A2A">fijos por tipo de tráfico.</text>
+        <text x="424" y="308" fill="#2A2A2A">La detección la hace el SIEM o</text>
+        <text x="424" y="332" fill="#2A2A2A">el analista después, no él.</text>
+        <text x="424" y="368" font-size="12.5" font-weight="700" fill="#5F5F5F">Fortaleza: evidencia rica y sin reglas;</text>
+        <text x="424" y="388" font-size="12.5" fill="#5F5F5F">el juicio llega después, con contexto.</text>
+
+        <rect x="800" y="96" width="376" height="300" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <rect x="800" y="96" width="376" height="52" rx="14" fill="#A6192E"/>
+        <use href="#i-sensor" x="818" y="104" width="36" height="36" style="color:#fff"/>
+        <text x="866" y="129" font-size="17" font-weight="700" fill="#fff">Análisis de red</text>
+        <text x="820" y="176" font-weight="700" fill="#A6192E">Pregunta: ¿qué es raro?</text>
+        <text x="820" y="204" fill="#2A2A2A">Aprende lo normal durante un</text>
+        <text x="820" y="228" fill="#2A2A2A">periodo y marca las desviaciones.</text>
+        <text x="820" y="256" fill="#2A2A2A">Compara volumen, horario,</text>
+        <text x="820" y="280" fill="#2A2A2A">destinos y frecuencia.</text>
+        <text x="820" y="308" fill="#2A2A2A">Puede ser producto comprado o</text>
+        <text x="820" y="332" fill="#2A2A2A">proceso armado con código propio.</text>
+        <text x="820" y="368" font-size="12.5" font-weight="700" fill="#5F5F5F">Fortaleza: cubre lo nunca visto;</text>
+        <text x="820" y="388" font-size="12.5" fill="#5F5F5F">exige historia para comparar.</text>
+      </g>
+      <rect x="8" y="410" width="1168" height="56" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="434" text-anchor="middle" font-size="14.5" font-weight="700" fill="#8A6D1D">Ninguno reemplaza al firewall: el firewall aplica política y estos explican lo que la política no contempla.</text>
+      <text x="592" y="456" text-anchor="middle" font-size="13" fill="#2A2A2A">En el laboratorio corren Suricata y Zeek: son de código abierto y caben en VirtualBox.</text>
+    </svg>
+  </div>
+  <aside class="notes">Los tres se parecen porque miran el mismo enlace, pero no hacen la misma pregunta. Suricata compara contra reglas escritas por personas; sabe qué busca y lo dice con un mensaje. Ese conocimiento es su fuerza y también su límite: solo encuentra lo que alguien describió antes. Zeek no lleva reglas; describe la conversación y deja archivos de log con los campos de cada protocolo. La detección después la hace el sistema de monitoreo o el analista. El análisis de red aprende lo normal durante un par de semanas y señala las desviaciones. Ninguno de los tres reemplaza al firewall: el firewall aplica política y estos tres explican lo que esa política no contempla. En el laboratorio usamos Suricata y Zeek porque corren en VirtualBox y son de código abierto. Para elegir entre ellos no sirve la marca sino la pregunta que quieren responder: bloquear algo conocido empieza por la firma; explicar un incidente después exige los hechos. Y si ya tienen historia, el análisis de comportamiento añade lo que nunca se vio antes.</aside>
+</section>
+
+<!-- D3 · Pipeline de Suricata -->
+<section class="slide" data-fuente="Concepto: motor de inspección Suricata, OISF; NIST SP 800-94 (2007), §4.3">
+  <div class="kicker">Proceso</div>
+  <h2>Cómo Suricata procesa un paquete</h2>
+  <p class="sub">Captura, decodifica, inspecciona y escribe: cuatro etapas con su pérdida posible.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d3-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="24" width="266" height="132" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-tap" x="117" y="38" width="44" height="44" style="color:#A6192E"/>
+        <text x="141" y="112" font-weight="700" fill="#A6192E">1 · Captura</text>
+        <text x="141" y="138" fill="#2A2A2A">la interfaz entrega el paquete</text>
+
+        <rect x="308" y="24" width="266" height="132" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-paquete" x="417" y="38" width="44" height="44" style="color:#A6192E"/>
+        <text x="441" y="112" font-weight="700" fill="#A6192E">2 · Decodificar</text>
+        <text x="441" y="138" fill="#2A2A2A">se identifica el protocolo</text>
+
+        <rect x="608" y="24" width="266" height="132" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-escudo" x="717" y="38" width="44" height="44" style="color:#A6192E"/>
+        <text x="741" y="112" font-weight="700" fill="#A6192E">3 · Inspeccionar</text>
+        <text x="741" y="138" fill="#2A2A2A">reglas y estado de sesión</text>
+
+        <rect x="908" y="24" width="266" height="132" rx="14" fill="#A6192E"/>
+        <use href="#i-log" x="1017" y="38" width="44" height="44" style="color:#D4AF37"/>
+        <text x="1041" y="112" font-weight="700" fill="#fff">4 · Escribir</text>
+        <text x="1041" y="138" fill="#fff">alertas y eventos de salida</text>
+
+        <rect x="8" y="216" width="266" height="86" rx="12" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="141" y="248" font-size="12.5" font-weight="700" fill="#5F5F5F">Límite de la tarjeta</text>
+        <text x="141" y="274" font-size="12.5" fill="#2A2A2A">y del modo elegido</text>
+
+        <rect x="308" y="216" width="266" height="86" rx="12" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="441" y="248" font-size="12.5" font-weight="700" fill="#5F5F5F">Paquete mal formado</text>
+        <text x="441" y="274" font-size="12.5" fill="#2A2A2A">queda sin clasificar</text>
+
+        <rect x="608" y="216" width="266" height="86" rx="12" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="741" y="248" font-size="12.5" font-weight="700" fill="#5F5F5F">Memoria y CPU</text>
+        <text x="741" y="274" font-size="12.5" fill="#2A2A2A">siguen el estado de sesión</text>
+
+        <rect x="908" y="216" width="266" height="86" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="1041" y="248" font-size="12.5" font-weight="700" fill="#8A6D1D">Cola saturada</text>
+        <text x="1041" y="274" font-size="12.5" fill="#2A2A2A">eventos descartados</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p3d3-f)">
+        <line x1="276" y1="90" x2="304" y2="90"/>
+        <line x1="576" y1="90" x2="604" y2="90"/>
+        <line x1="876" y1="90" x2="904" y2="90"/>
+      </g>
+      <rect x="8" y="334" width="1168" height="94" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="366" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">El sensor expone contadores de pérdida: revísenlos como revisan el disco</text>
+      <text x="592" y="394" text-anchor="middle" font-size="13.5" fill="#2A2A2A">Si la cola de salida no absorbe a la misma velocidad, los eventos se descartan en silencio.</text>
+      <text x="592" y="418" text-anchor="middle" font-size="13" fill="#5F5F5F">La detección perfecta no existe: existe la medición de lo que se pierde.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cuatro etapas y en cada una se puede perder información. La captura toma el paquete desde la interfaz; ahí ya hay un límite de velocidad que depende de la tarjeta y del modo elegido. La decodificación identifica de qué protocolo se trata para entregarlo a la inspección correcta. La inspección corre las reglas y sigue el estado de las conexiones, que es la parte que más memoria consume. Por último, la salida escribe las alertas y los eventos. El cuello de botella clásico está en la cola de salida: si el destino no absorbe a la misma velocidad, los eventos se descartan y nadie avisa. Por eso el sensor expone contadores de pérdida, y revisarlos es una tarea tan rutinaria como revisar el disco del colector de la parte uno. Nótese que las cuatro etapas se ejecutan por cada paquete que llega, no una vez por segundo. Por eso el dimensionamiento importa: la cantidad de reglas activas y el seguimiento de sesiones definen cuánto tráfico puede absorber el motor antes de perder.</aside>
+</section>
+
+<!-- D4 · Reglas -->
+<section class="slide" data-fuente="Concepto: sintaxis de reglas Suricata y reglas públicas ET Open (OISF)">
+  <div class="kicker">Reglas</div>
+  <h2>Una regla: cabecera, mensaje y clasificación</h2>
+  <p class="sub">La acción decide qué solo registra, qué bloquea y qué cierra la conexión.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d4-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="8" y="16" width="740" height="240" rx="14" fill="#1F1F1F" stroke="#5F5F5F" stroke-width="2"/>
+      <g font-family="monospace" font-size="14" fill="#E8E8E8">
+        <text x="28" y="52" fill="#D4AF37">alert http $HOME_NET any -&gt; $EXTERNAL_NET any (</text>
+        <text x="28" y="86">  msg:"ET MALWARE beacon sospechoso";</text>
+        <text x="28" y="120">  sid:1000001; rev:1;</text>
+        <text x="28" y="154">  classtype:trojan-activity;)</text>
+      </g>
+      <g font-size="12.5" fill="#5F5F5F">
+        <text x="28" y="196">acción + protocolo + dirección de tráfico + puertos</text>
+        <text x="28" y="224">mensaje visible · identificador único · versión · tipo</text>
+      </g>
+      <rect x="776" y="16" width="400" height="76" rx="12" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+      <text x="796" y="46" font-size="14" font-weight="700" fill="#2E7D4F">alert</text>
+      <text x="796" y="72" font-size="13" fill="#2A2A2A">escribe el evento y continúa</text>
+
+      <rect x="776" y="104" width="400" height="76" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="796" y="134" font-size="14" font-weight="700" fill="#8A6D1D">drop</text>
+      <text x="796" y="160" font-size="13" fill="#2A2A2A">descarta el paquete en modo en línea</text>
+
+      <rect x="776" y="192" width="400" height="76" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+      <text x="796" y="222" font-size="14" font-weight="700" fill="#A6192E">reject</text>
+      <text x="796" y="248" font-size="13" fill="#2A2A2A">bloquea y contesta con un cierre</text>
+
+      <rect x="8" y="288" width="1168" height="42" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+      <text x="592" y="315" text-anchor="middle" font-size="15" font-weight="700" fill="#A6192E">Reglas públicas: el camino del conjunto abierto hasta la regla útil</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="28" y="348" width="342" height="66" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="199" y="376" font-weight="700" fill="#8A6D1D">1 · Descargar y revisar</text>
+        <text x="199" y="399" font-size="12.5" fill="#2A2A2A">el conjunto abierto, desde el panel</text>
+        <rect x="430" y="348" width="342" height="66" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="601" y="376" font-weight="700" fill="#8A6D1D">2 · Activar en modo alert</text>
+        <text x="601" y="399" font-size="12.5" fill="#2A2A2A">y observar una semana completa</text>
+        <rect x="832" y="348" width="324" height="66" rx="12" fill="#A6192E"/>
+        <text x="994" y="376" font-weight="700" fill="#D4AF37">3 · Apagar las ruidosas</text>
+        <text x="994" y="399" font-size="12.5" fill="#fff">y documentar el motivo</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p3d4-f)">
+        <line x1="376" y1="381" x2="424" y2="381"/>
+        <line x1="778" y1="381" x2="826" y2="381"/>
+      </g>
+      <text x="592" y="444" text-anchor="middle" font-size="13" fill="#5F5F5F">Un cambio por vuelta: si se mueven varias reglas a la vez, después nadie sabe cuál sirvió.</text>
+    </svg>
+  </div>
+  <aside class="notes">Una regla de Suricata se lee de izquierda a derecha. La cabecera dice la acción, el protocolo y las direcciones implicadas. Dentro del paréntesis aparece el mensaje, que es lo que verá el analista, y el identificador único, que nunca se repite entre reglas. La revisión sirve para versionar: si cambia la lógica, sube el número y queda registro. La clasificación agrupa por tipo de amenaza para poder filtrar después. Ahí está la diferencia entre las acciones: alert escribe el evento y sigue, drop lo descarta cuando el motor está en línea, y reject contesta con un cierre para que ambas partes sepan que hubo intervención. Para empezar, usen alert. Pasar a drop sin probar primero es la forma más rápida de romper un servicio legítimo. Tengan presente que el identificador debe reservarse y documentarse fuera del archivo de reglas, porque no puede repetirse en dos reglas distintas. Y guarden siempre la versión anterior: si una actualización del proveedor rompe la detección, poder volver atrás en un minuto vale mucho.</aside>
+</section>
+
+<!-- D5 · EVE JSON -->
+<section class="slide" data-fuente="Concepto: salida EVE JSON de Suricata, documentación oficial de OISF">
+  <div class="kicker">Salida</div>
+  <h2>EVE: cada evento en una línea JSON</h2>
+  <p class="sub">Un evento por línea permite enviarlo al colector sin escribir un patrón nuevo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d5-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="8" y="16" width="700" height="270" rx="14" fill="#1F1F1F" stroke="#5F5F5F" stroke-width="2"/>
+      <g font-family="monospace" font-size="13" fill="#E8E8E8">
+        <text x="28" y="52">{"timestamp":"2026-10-04T10:15:00",</text>
+        <text x="28" y="80" fill="#D4AF37">"event_type":"alert",</text>
+        <text x="28" y="108">"src_ip":"10.20.30.15","src_port":51234,</text>
+        <text x="28" y="136">"dest_ip":"200.30.12.9","dest_port":443,</text>
+        <text x="28" y="164">"proto":"TCP",</text>
+        <text x="28" y="192" fill="#D4AF37">"alert":{"signature":"ET SCAN puertos",</text>
+        <text x="28" y="220" fill="#D4AF37">"severity":2,"action":"allowed"},</text>
+        <text x="28" y="248">"payload":"... omitido ..."}</text>
+      </g>
+      <g font-size="12.5" fill="#5F5F5F">
+        <text x="28" y="274">una línea = un evento completo, ordenado por hora</text>
+      </g>
+
+      <g font-size="13">
+        <rect x="748" y="16" width="428" height="64" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="772" y="44" font-weight="700" fill="#A6192E">Suricata escribe</text>
+        <text x="772" y="68" font-size="12.5" fill="#2A2A2A">archivo de eventos, una entrada por línea</text>
+
+        <rect x="748" y="100" width="428" height="64" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="772" y="128" font-weight="700" fill="#A6192E">Agente o syslog lo reenvía</text>
+        <text x="772" y="152" font-size="12.5" fill="#2A2A2A">sin romper la estructura de cada línea</text>
+
+        <rect x="748" y="184" width="428" height="64" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="772" y="212" font-weight="700" fill="#A6192E">El colector lo recibe</text>
+        <text x="772" y="236" font-size="12.5" fill="#2A2A2A">el patrón de extracción es casi gratuito</text>
+
+        <rect x="748" y="268" width="428" height="64" rx="12" fill="#A6192E"/>
+        <text x="772" y="296" font-weight="700" fill="#D4AF37">Llega al índice</text>
+        <text x="772" y="320" font-size="12.5" fill="#fff">campos consultables desde el primer minuto</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p3d5-f)">
+        <line x1="962" y1="82" x2="962" y2="96"/>
+        <line x1="962" y1="166" x2="962" y2="180"/>
+        <line x1="962" y1="250" x2="962" y2="264"/>
+      </g>
+      <rect x="8" y="340" width="1168" height="88" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="374" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Si la última línea tiene horas de retraso, el proceso dejó de escribir</text>
+      <text x="592" y="404" text-anchor="middle" font-size="13.5" fill="#2A2A2A">Vigilar la frescura del archivo es la forma más simple de monitorear al sensor.</text>
+    </svg>
+  </div>
+  <aside class="notes">EVE es la salida estructurada de Suricata. Cada evento ocupa una línea completa en formato JSON, así que se puede enviar a cualquier colector sin escribir un patrón de extracción nuevo: ya viene con nombres de campo. Los campos que más se usan son la hora, la dirección de origen y destino, el tipo de evento y, cuando hay alerta, la firma y la severidad. Fíjense en la acción registrada: indica si el motor dejó pasar el paquete o lo bloqueó, y eso cambia por completo la interpretación. Un archivo con una línea por evento también facilita monitorear al propio sensor: si la última línea tiene horas de retraso, el proceso dejó de escribir. En el laboratorio vamos a enviar estas líneas al mismo colector de la parte uno. Otra ventaja de una línea por evento es la limpieza: si una línea queda cortada a mitad de escritura, se descarta solo esa y el resto del archivo sigue siendo legible. Es el mismo criterio de la parte uno con los mensajes sin formato.</aside>
+</section>
+
+<!-- D6 · Logs de Zeek -->
+<section class="slide" data-fuente="Concepto: archivos de log de Zeek, documentación oficial del proyecto">
+  <div class="kicker">Evidencia</div>
+  <h2>Zeek no alerta: describe lo que pasó</h2>
+  <p class="sub">Cinco archivos de log bastan para reconstruir la conversación de una red.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <rect x="8" y="8" width="1168" height="44" rx="10" fill="#7E1223"/>
+      <text x="24" y="37" font-size="14" font-weight="700" fill="#D4AF37">archivo</text>
+      <text x="250" y="37" font-size="14" font-weight="700" fill="#D4AF37">campos principales</text>
+      <text x="740" y="37" font-size="14" font-weight="700" fill="#D4AF37">para qué sirve</text>
+      <g font-size="13">
+        <rect x="8" y="62" width="1168" height="60" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="88" font-family="monospace" font-size="14" font-weight="700" fill="#A6192E">conn.log</text>
+        <text x="24" y="110" font-size="11.5" fill="#5F5F5F">conexiones</text>
+        <text x="250" y="90" font-family="monospace" font-size="12" fill="#2A2A2A">ts, orig_h, resp_h, proto, duration</text>
+        <text x="250" y="112" font-size="12" fill="#5F5F5F">bytes de ida y vuelta, cierre de sesión</text>
+        <text x="740" y="98" fill="#2A2A2A">toda la conversación, base de cada consulta</text>
+
+        <rect x="8" y="130" width="1168" height="60" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="156" font-family="monospace" font-size="14" font-weight="700" fill="#A6192E">dns.log</text>
+        <text x="24" y="178" font-size="11.5" fill="#5F5F5F">dominios</text>
+        <text x="250" y="158" font-family="monospace" font-size="12" fill="#2A2A2A">query, qtype_name, answers, rcode</text>
+        <text x="250" y="180" font-size="12" fill="#5F5F5F">nombre pedido y respuesta recibida</text>
+        <text x="740" y="166" fill="#2A2A2A">aquí primero aparece un túnel de dominios</text>
+
+        <rect x="8" y="198" width="1168" height="60" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="224" font-family="monospace" font-size="14" font-weight="700" fill="#A6192E">http.log</text>
+        <text x="24" y="246" font-size="11.5" fill="#5F5F5F">peticiones web</text>
+        <text x="250" y="226" font-family="monospace" font-size="12" fill="#2A2A2A">method, host, uri, status, user_agent</text>
+        <text x="250" y="248" font-size="12" fill="#5F5F5F">sitio visitado y código de respuesta</text>
+        <text x="740" y="234" fill="#2A2A2A">descarga de archivos y navegación rara</text>
+
+        <rect x="8" y="266" width="1168" height="60" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="292" font-family="monospace" font-size="14" font-weight="700" fill="#A6192E">ssl.log</text>
+        <text x="24" y="314" font-size="11.5" fill="#5F5F5F">capa segura</text>
+        <text x="250" y="294" font-family="monospace" font-size="12" fill="#2A2A2A">server_name, version, ja3, notbefore</text>
+        <text x="250" y="316" font-size="12" fill="#5F5F5F">certificado presentado y huella del cliente</text>
+        <text x="740" y="302" fill="#2A2A2A">sirve aunque el canal esté cifrado</text>
+
+        <rect x="8" y="334" width="1168" height="60" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="24" y="360" font-family="monospace" font-size="14" font-weight="700" fill="#A6192E">notice.log</text>
+        <text x="24" y="382" font-size="11.5" fill="#5F5F5F">avisos propios</text>
+        <text x="250" y="362" font-family="monospace" font-size="12" fill="#2A2A2A">note, msg, src, dst</text>
+        <text x="250" y="384" font-size="12" fill="#5F5F5F">lo que Zeek consideró llamativo solo</text>
+        <text x="740" y="370" fill="#2A2A2A">punto de partida para una regla propia</text>
+      </g>
+      <rect x="8" y="406" width="1168" height="44" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="592" y="434" text-anchor="middle" font-size="14" font-weight="700" fill="#8A6D1D">Zeek deja los hechos; el juicio de si algo es malo lo hace el SIEM con la evidencia junta.</text>
+    </svg>
+  </div>
+  <aside class="notes">Zeek entrega hechos, no juicios. El archivo de conexiones es la base: cada línea es un flujo con sus dos extremos, el protocolo, la duración y los bytes. Con él se responde cuánto habló quién con quién. El de dominios registra cada consulta, incluida la respuesta, y es donde primero se ve un nombre raro. El de peticiones web guarda método, sitio, dirección y código de estado. El de capa segura anota el nombre que pidió el certificado y la versión del cifrado. Y el de avisos recoge las alertas internas de Zeek. Ninguno de estos archivos dice que algo sea malo. Por eso la regla de lectura es simple: primero los hechos y después el juicio, que es lo que hace el sistema de monitoreo con la evidencia reunida. La regla de lectura que les propongo es empezar por conexiones y solo después bajar al detalle del protocolo. Si miran peticiones sueltas pueden perder la sesión que las contiene, y muchas veces el comportamiento extraño está en la sesión, no en el mensaje individual.</aside>
+</section>
+
+<!-- D7 · Matriz severidad × frecuencia -->
+<section class="slide" data-fuente="Diagrama propio · concepto: priorización de alertas, NIST SP 800-61 Rev.3 (2025)">
+  <div class="kicker">Prioridad</div>
+  <h2>Matriz: severidad cruzada con frecuencia</h2>
+  <p class="sub">La prioridad nace de cruzar qué tan grave es con qué tan seguido ocurre.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <text x="20" y="46" font-size="13.5" font-weight="700" fill="#5F5F5F">severidad</text>
+      <text x="200" y="46" font-size="13.5" font-weight="700" fill="#5F5F5F">frecuencia baja</text>
+      <text x="506" y="46" font-size="13.5" font-weight="700" fill="#5F5F5F">frecuencia media</text>
+      <text x="812" y="46" font-size="13.5" font-weight="700" fill="#5F5F5F">frecuencia alta</text>
+      <g font-size="13">
+        <rect x="20" y="66" width="170" height="96" rx="8" fill="#A6192E"/>
+        <text x="105" y="112" text-anchor="middle" font-weight="700" fill="#fff">ALTA</text>
+        <text x="105" y="136" text-anchor="middle" font-size="12" fill="#F9EEF0">activo crítico</text>
+        <rect x="20" y="170" width="170" height="96" rx="8" fill="#D4AF37"/>
+        <text x="105" y="216" text-anchor="middle" font-weight="700" fill="#2A2A2A">MEDIA</text>
+        <text x="105" y="240" text-anchor="middle" font-size="12" fill="#2A2A2A">activo normal</text>
+        <rect x="20" y="274" width="170" height="96" rx="8" fill="#8C8C8C"/>
+        <text x="105" y="320" text-anchor="middle" font-weight="700" fill="#fff">BAJA</text>
+        <text x="105" y="344" text-anchor="middle" font-size="12" fill="#fff">ruido esperado</text>
+
+        <rect x="200" y="66" width="292" height="96" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="346" y="104" text-anchor="middle" font-weight="700" fill="#A6192E">Investigar ya</text>
+        <text x="346" y="132" text-anchor="middle" font-size="12.5" fill="#2A2A2A">un solo evento puede bastar</text>
+
+        <rect x="506" y="66" width="292" height="96" rx="8" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="652" y="104" text-anchor="middle" font-weight="700" fill="#A6192E">Investigar hoy</text>
+        <text x="652" y="132" text-anchor="middle" font-size="12.5" fill="#2A2A2A">entra en la cola de la jornada</text>
+
+        <rect x="812" y="66" width="292" height="96" rx="8" fill="#A6192E"/>
+        <text x="958" y="104" text-anchor="middle" font-weight="700" fill="#D4AF37">Incidente: escalar</text>
+        <text x="958" y="132" text-anchor="middle" font-size="12.5" fill="#fff">impacto y repetición confirmados</text>
+
+        <rect x="200" y="170" width="292" height="96" rx="8" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="346" y="208" text-anchor="middle" font-weight="700" fill="#8A6D1D">Observar</text>
+        <text x="346" y="236" text-anchor="middle" font-size="12.5" fill="#2A2A2A">queda anotado para la revisión</text>
+
+        <rect x="506" y="170" width="292" height="96" rx="8" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="652" y="208" text-anchor="middle" font-weight="700" fill="#8A6D1D">Ajustar el umbral</text>
+        <text x="652" y="236" text-anchor="middle" font-size="12.5" fill="#2A2A2A">la regla se acerca a dispararse</text>
+
+        <rect x="812" y="170" width="292" height="96" rx="8" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="958" y="208" text-anchor="middle" font-weight="700" fill="#8A6D1D">Suprimir o bloquear</text>
+        <text x="958" y="236" text-anchor="middle" font-size="12.5" fill="#2A2A2A">acción según el impacto real</text>
+
+        <rect x="200" y="274" width="292" height="96" rx="8" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="346" y="312" text-anchor="middle" font-weight="700" fill="#5F5F5F">Archivar</text>
+        <text x="346" y="340" text-anchor="middle" font-size="12.5" fill="#2A2A2A">queda el registro, no la acción</text>
+
+        <rect x="506" y="274" width="292" height="96" rx="8" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="652" y="312" text-anchor="middle" font-weight="700" fill="#5F5F5F">Revisar en lote</text>
+        <text x="652" y="340" text-anchor="middle" font-size="12.5" fill="#2A2A2A">una vez por semana basta</text>
+
+        <rect x="812" y="274" width="292" height="96" rx="8" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="958" y="312" text-anchor="middle" font-weight="700" fill="#5F5F5F">Regla mal afinada</text>
+        <text x="958" y="340" text-anchor="middle" font-size="12.5" fill="#2A2A2A">se revisa antes que el evento</text>
+      </g>
+      <rect x="8" y="386" width="1168" height="56" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+      <text x="592" y="412" text-anchor="middle" font-size="14.5" font-weight="700" fill="#A6192E">Ninguna celda dice ignorar: cambian el momento y el responsable.</text>
+      <text x="592" y="434" text-anchor="middle" font-size="13" fill="#5F5F5F">La severidad la pone la regla y el activo; la frecuencia la pone la ventana de correlación.</text>
+    </svg>
+  </div>
+  <aside class="notes">La matriz evita dos errores: tratar todo como urgente y dejar pasar lo grave. En vertical está la severidad, que sale de la regla y del activo afectado. En horizontal está la frecuencia, que sale del conteo dentro de la ventana. La combinación decide la acción. Arriba a la derecha, alta severidad y mucha frecuencia: eso es incidente y se escala de inmediato. Abajo a la izquierda, baja severidad y poca frecuencia: se archiva sin más trámite. La celda más interesante es la de arriba a la izquierda, severidad alta y frecuencia baja, ahí vale la pena mirar aunque sea un solo evento, porque el activo es crítico. Ninguna celda dice ignorar: lo que cambia es cuándo y quién. Para que funcione hay que acordar dos cosas antes de encenderla: quién fija la severidad y quién revisa la frecuencia. Si nadie revisa esas definiciones, la matriz se vuelve decoración y todos usan el criterio de siempre, que es mirar lo último que llegó.</aside>
+</section>
+
+<!-- D8 · Ciclo de falsos positivos -->
+<section class="slide" data-fuente="Diagrama propio · concepto: afinación continua de detección, NIST SP 800-94 (2007)">
+  <div class="kicker">Afinación</div>
+  <h2>El ciclo que convierte ruido en regla útil</h2>
+  <p class="sub">Detectar, clasificar, ajustar y probar: cada vuelta estrecha el embudo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d8-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p3d8-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="24" width="266" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="141" y="62" font-size="16" font-weight="700" fill="#A6192E">1 · Detectar</text>
+        <text x="141" y="98" fill="#2A2A2A">la alerta llega con</text>
+        <text x="141" y="124" fill="#2A2A2A">su evidencia adjunta</text>
+        <text x="141" y="158" font-size="12" fill="#5F5F5F">no se cierra todavía</text>
+
+        <rect x="308" y="24" width="266" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="441" y="62" font-size="16" font-weight="700" fill="#A6192E">2 · Clasificar</text>
+        <text x="441" y="98" fill="#2A2A2A">real, benigno conocido</text>
+        <text x="441" y="124" fill="#2A2A2A">o falso positivo</text>
+        <text x="441" y="158" font-size="12" fill="#5F5F5F">siempre con etiqueta</text>
+
+        <rect x="608" y="24" width="266" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="741" y="62" font-size="16" font-weight="700" fill="#A6192E">3 · Ajustar</text>
+        <text x="741" y="98" fill="#2A2A2A">umbral, ventana o</text>
+        <text x="741" y="124" fill="#2A2A2A">exclusión de origen</text>
+        <text x="741" y="158" font-size="12" fill="#5F5F5F">un cambio por vuelta</text>
+
+        <rect x="908" y="24" width="266" height="164" rx="14" fill="#A6192E"/>
+        <text x="1041" y="62" font-size="16" font-weight="700" fill="#D4AF37">4 · Probar</text>
+        <text x="1041" y="98" fill="#fff">se reinyecta el caso</text>
+        <text x="1041" y="124" fill="#fff">y se confirma el silencio</text>
+        <text x="1041" y="158" font-size="12" fill="#F9EEF0">sin perder la detección buena</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p3d8-f)">
+        <line x1="276" y1="106" x2="304" y2="106"/>
+        <line x1="576" y1="106" x2="604" y2="106"/>
+        <line x1="876" y1="106" x2="904" y2="106"/>
+      </g>
+      <polyline points="1041,188 1041,236 141,236 141,196" fill="none" stroke="#5F5F5F" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#s09p3d8-g)"/>
+      <text x="592" y="260" text-anchor="middle" font-size="13" font-weight="700" fill="#5F5F5F">la vuelta se repite cada semana, no una sola vez</text>
+      <rect x="8" y="288" width="1168" height="140" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="32" y="322" font-size="15" font-weight="700" fill="#8A6D1D">Cada vuelta queda escrita en el caso: qué se cambió, cuándo y por quién</text>
+      <text x="32" y="354" font-size="13.5" fill="#2A2A2A">· Si se cambian varias cosas a la vez, después nadie sabe cuál sirvió.</text>
+      <text x="32" y="384" font-size="13.5" fill="#2A2A2A">· Si se ajusta sin reinyectar el caso, la siguiente semana vuelve el ruido.</text>
+      <text x="32" y="414" font-size="13.5" fill="#2A2A2A">· Si nadie documentó el motivo, alguien revertirá el cambio sin avisar.</text>
+    </svg>
+  </div>
+  <aside class="notes">El ciclo es corto y se repite. Detectar es tener la alerta en pantalla con su evidencia. Clasificar responde una sola pregunta: ¿es real, es benigno conocido o es un falso positivo? Ajustar cambia una cosa a la vez, porque si cambian cinco después no sabrán cuál sirvió. Puede ser el umbral, la ventana, una exclusión de origen o la propia firma. Probar significa inyectar el caso otra vez y confirmar que la alerta ya no se dispara para lo benigno y sigue disparándose para lo malo. Después se documenta en el caso: qué se cambió, cuándo y por quién. Sin ese registro, dentro de dos meses alguien revertirá el ajuste y el ruido volverá. Cierren el concepto con el embudo de la parte dos: él se estrecha justo en este ciclo. Sin clasificar, todas las alertas pesan lo mismo. Sin ajustar, el ruido se acumula. Y sin probar, se cambia a ciegas. Los tres errores se ven en la primera revisión semanal.</aside>
+</section>
+
+<!-- D9 · Línea base -->
+<section class="slide" data-fuente="Diagrama propio · concepto: línea base y detección de anomalías, NIST SP 800-94 (2007)">
+  <div class="kicker">Comportamiento</div>
+  <h2>Anomalía: primero existe la línea base</h2>
+  <p class="sub">Dos semanas de tráfico normal definen lo que después se considera raro.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <rect x="8" y="16" width="744" height="320" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="30" y="48" font-size="13.5" font-weight="700" fill="#5F5F5F">tráfico por hora · banda de lo normal</text>
+      <rect x="40" y="120" width="680" height="120" rx="8" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+      <line x1="40" y1="180" x2="720" y2="180" stroke="#2E7D4F" stroke-width="2.5" stroke-dasharray="9 7"/>
+      <text x="60" y="172" font-size="12.5" font-weight="700" fill="#2E7D4F">línea base</text>
+      <g fill="#5F5F5F">
+        <circle cx="90" cy="170" r="6"/><circle cx="160" cy="196" r="6"/><circle cx="230" cy="164" r="6"/>
+        <circle cx="300" cy="204" r="6"/><circle cx="370" cy="176" r="6"/><circle cx="440" cy="188" r="6"/>
+        <circle cx="510" cy="166" r="6"/><circle cx="580" cy="198" r="6"/><circle cx="650" cy="182" r="6"/>
+      </g>
+      <circle cx="336" cy="76" r="10" fill="#A6192E"/>
+      <line x1="336" y1="86" x2="336" y2="150" stroke="#A6192E" stroke-width="2" stroke-dasharray="5 4"/>
+      <text x="356" y="72" font-size="13" font-weight="700" fill="#A6192E">desviación: 40 veces el volumen normal</text>
+      <text x="40" y="286" font-size="12.5" fill="#5F5F5F">H 00:00</text>
+      <text x="370" y="286" font-size="12.5" fill="#5F5F5F">H 12:00</text>
+      <text x="660" y="286" font-size="12.5" fill="#5F5F5F">H 24:00</text>
+      <text x="40" y="316" font-size="12.5" fill="#2A2A2A">La historia se recoge antes de exigir que el sistema juzgue.</text>
+
+      <g font-size="13">
+        <rect x="790" y="16" width="386" height="72" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="46" font-weight="700" fill="#A6192E">Volumen</text>
+        <text x="812" y="70" font-size="12.5" fill="#2A2A2A">cuánto pasa respecto a lo habitual</text>
+
+        <rect x="790" y="100" width="386" height="72" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="130" font-weight="700" fill="#A6192E">Horario</text>
+        <text x="812" y="154" font-size="12.5" fill="#2A2A2A">en qué franja debería haber nada</text>
+
+        <rect x="790" y="184" width="386" height="72" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="214" font-weight="700" fill="#A6192E">Destino</text>
+        <text x="812" y="238" font-size="12.5" fill="#2A2A2A">a quién habla la organización por vez primera</text>
+
+        <rect x="790" y="268" width="386" height="72" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="298" font-weight="700" fill="#A6192E">Repetición</text>
+        <text x="812" y="322" font-size="12.5" fill="#2A2A2A">con qué regularidad vuelve a ocurrir</text>
+      </g>
+      <rect x="8" y="356" width="1168" height="80" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="388" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Sin línea base no hay anomalía; y la línea base se actualiza, no se congela</text>
+      <text x="592" y="418" text-anchor="middle" font-size="13.5" fill="#2A2A2A">Si la red cambia y la referencia no, todo empieza a parecer raro y la alerta se vuelve rutina.</text>
+    </svg>
+  </div>
+  <aside class="notes">El análisis de comportamiento no adivina: compara. Primero construye la línea base, que es la descripción de lo normal: cuánto tráfico hay, a qué horas, hacia qué destinos y con qué frecuencia. Para eso hace falta historia, y dos semanas es un mínimo razonable. Después marca las desviaciones. Cuatro señales cubren la mayoría de los casos: el volumen que se dispara, el horario en que nadie debería estar activo, un destino nuevo para la organización y una repetición demasiado regular. La trampa clásica es congelar la línea base: si la red cambia y la referencia no, todo empieza a parecer anómalo y la alerta se vuelve rutina otra vez. Una advertencia sobre la muestra: si la línea base se construye durante un mes de vacaciones, quedará mal desde el primer día. Elijan un periodo representativo, anoten los cambios de red y revisen la referencia cada cierto tiempo para ajustarla cuando el trabajo normal cambie.</aside>
+</section>
+
+<!-- D10 · DNS tunneling -->
+<section class="slide" data-fuente="Concepto: túnel sobre consultas de dominio; Zeek dns.log; MITRE ATT&amp;CK T1071.004">
+  <div class="kicker">Caso raro</div>
+  <h2>DNS tunneling: datos escondidos en consultas</h2>
+  <p class="sub">Subdominios largos y aleatorios revelan un canal que no debería existir.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d10-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p3d10-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="30" y="16" width="220" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-pc" x="54" y="24" width="34" height="34" style="color:#A6192E"/>
+        <text x="160" y="49" font-weight="700" fill="#A6192E">Equipo interno</text>
+
+        <rect x="482" y="16" width="220" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-dns" x="506" y="24" width="34" height="34" style="color:#A6192E"/>
+        <text x="616" y="49" font-weight="700" fill="#A6192E">Resolutor</text>
+
+        <rect x="934" y="16" width="220" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-servidor" x="958" y="24" width="34" height="34" style="color:#A6192E"/>
+        <text x="1070" y="49" font-weight="700" fill="#A6192E">Autoritativo</text>
+      </g>
+      <g stroke="#8C8C8C" stroke-width="2" stroke-dasharray="6 6">
+        <line x1="140" y1="70" x2="140" y2="278"/>
+        <line x1="592" y1="70" x2="592" y2="278"/>
+        <line x1="1044" y1="70" x2="1044" y2="278"/>
+      </g>
+      <g font-size="12.5">
+        <line x1="140" y1="110" x2="592" y2="110" stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p3d10-f)"/>
+        <text x="170" y="100" fill="#2A2A2A">TXT 7f3a9c1d2e.malo.example</text>
+        <line x1="592" y1="156" x2="1044" y2="156" stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p3d10-f)"/>
+        <text x="620" y="146" fill="#2A2A2A">reenvío de la misma consulta</text>
+        <line x1="1044" y1="202" x2="592" y2="202" stroke="#5F5F5F" stroke-width="2.5" marker-end="url(#s09p3d10-g)"/>
+        <text x="640" y="192" fill="#2A2A2A">respuesta con el siguiente fragmento</text>
+        <line x1="592" y1="248" x2="140" y2="248" stroke="#5F5F5F" stroke-width="2.5" marker-end="url(#s09p3d10-g)"/>
+        <text x="190" y="238" fill="#2A2A2A">TXT  ZW5jcnlwdG94eQ==</text>
+      </g>
+      <text x="140" y="292" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A6192E">un patrón que se repite minuto a minuto</text>
+      <g font-size="13">
+        <rect x="8" y="316" width="380" height="116" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="348" font-weight="700" fill="#A6192E">Indicador 1</text>
+        <text x="30" y="376" fill="#2A2A2A">subdominio largo y aleatorio</text>
+        <text x="30" y="404" font-size="12.5" fill="#5F5F5F">se ve completo en el log de dominios</text>
+
+        <rect x="402" y="316" width="380" height="116" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="424" y="348" font-weight="700" fill="#A6192E">Indicador 2</text>
+        <text x="424" y="376" fill="#2A2A2A">consultas de texto muy seguidas</text>
+        <text x="424" y="404" font-size="12.5" fill="#5F5F5F">contra el mismo servidor autoritativo</text>
+
+        <rect x="796" y="316" width="380" height="116" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="818" y="348" font-weight="700" fill="#A6192E">Indicador 3</text>
+        <text x="818" y="376" fill="#2A2A2A">volumen fuera del horario</text>
+        <text x="818" y="404" font-size="12.5" fill="#5F5F5F">la organización no consulta nada de noche</text>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">El dominio del sistema de nombres es un servicio que casi nunca se inspecciona, y por eso es un buen canal para esconder información. La técnica es simple: el atacante parte el mensaje en fragmentos y los coloca dentro de subdominios largos, uno por consulta. El resolutor los reenvía, el servidor autoritativo responde y el dato viaja de ida y vuelta dentro de respuestas que parecen normales. Tres indicadores delatan el esquema: subdominios largos y aleatorios, consultas de tipo texto muy frecuentes al mismo destino y un volumen fuera del horario de la organización. En el laboratorio van a buscar exactamente esos tres indicadores en el archivo de dominios de Zeek. Si solo aparece uno, probablemente sea una consulta rara ya documentada. Si aparecen los tres juntos, la conversación merece abrir un caso y mirar también las conexiones de esas horas.</aside>
+</section>
+
+<!-- D11 · Beaconing -->
+<section class="slide" data-fuente="Concepto: comunicación de mando y control; MITRE ATT&amp;CK T1071 · T1572">
+  <div class="kicker">Caso raro</div>
+  <h2>Beaconing: el latido que delata el control</h2>
+  <p class="sub">Intervalos casi fijos hacia el mismo destino, de día y también de noche.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <rect x="8" y="16" width="744" height="316" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="30" y="48" font-size="13.5" font-weight="700" fill="#5F5F5F">sesiones hacia el mismo destino · hora por hora</text>
+      <text x="30" y="96" font-size="13.5" font-weight="700" fill="#5F5F5F">Acceso humano: irregular</text>
+      <line x1="40" y1="140" x2="720" y2="140" stroke="#8C8C8C" stroke-width="3"/>
+      <g fill="#5F5F5F">
+        <circle cx="70" cy="140" r="8"/><circle cx="160" cy="140" r="8"/><circle cx="330" cy="140" r="8"/>
+        <circle cx="380" cy="140" r="8"/><circle cx="560" cy="140" r="8"/><circle cx="700" cy="140" r="8"/>
+      </g>
+      <text x="40" y="172" font-size="12.5" fill="#2A2A2A">los huecos cambian: reunión, almuerzo, fin de semana.</text>
+      <text x="30" y="222" font-size="13.5" font-weight="700" fill="#A6192E">Latido automatizado: casi perfecto</text>
+      <line x1="40" y1="266" x2="720" y2="266" stroke="#A6192E" stroke-width="3"/>
+      <g fill="#A6192E">
+        <circle cx="70" cy="266" r="8"/><circle cx="150" cy="266" r="8"/><circle cx="230" cy="266" r="8"/>
+        <circle cx="310" cy="266" r="8"/><circle cx="390" cy="266" r="8"/><circle cx="470" cy="266" r="8"/>
+        <circle cx="550" cy="266" r="8"/><circle cx="630" cy="266" r="8"/><circle cx="710" cy="266" r="8"/>
+      </g>
+      <g stroke="#8A6D1D" stroke-width="1.5" stroke-dasharray="5 4">
+        <line x1="70" y1="290" x2="70" y2="304"/><line x1="150" y1="290" x2="150" y2="304"/>
+        <line x1="230" y1="290" x2="230" y2="304"/><line x1="310" y1="290" x2="310" y2="304"/>
+        <line x1="390" y1="290" x2="390" y2="304"/><line x1="470" y1="290" x2="470" y2="304"/>
+      </g>
+      <text x="40" y="322" font-size="12.5" fill="#8A6D1D">mismo tamaño de hueco todo el rato, también de madrugada.</text>
+
+      <g font-size="13">
+        <rect x="790" y="16" width="386" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="48" font-weight="700" fill="#A6192E">Intervalo casi fijo</text>
+        <text x="812" y="76" fill="#2A2A2A">la desviación entre consultas</text>
+        <text x="812" y="98" fill="#2A2A2A">es mínima: es un temporizador</text>
+
+        <rect x="790" y="124" width="386" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="156" font-weight="700" fill="#A6192E">Mismo destino</text>
+        <text x="812" y="184" fill="#2A2A2A">una sola dirección y un solo</text>
+        <text x="812" y="206" fill="#2A2A2A">puerto, aunque cambie la hora</text>
+
+        <rect x="790" y="232" width="386" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="812" y="264" font-weight="700" fill="#A6192E">Continuo</text>
+        <text x="812" y="292" fill="#2A2A2A">no descansa en horario laboral</text>
+        <text x="812" y="314" fill="#2A2A2A">ni en fines de semana</text>
+      </g>
+      <rect x="8" y="352" width="1168" height="84" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="384" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">La señal no es una consulta: es la repetición ordenada en el tiempo</text>
+      <text x="592" y="414" text-anchor="middle" font-size="13.5" fill="#2A2A2A">Se detecta ordenando el archivo de conexiones por destino y por hora, sin mirar el contenido.</text>
+    </svg>
+  </div>
+  <aside class="notes">El beaconing es la conversación de un equipo comprometido con su servidor de control. No destaca por el volumen sino por la regularidad. Un humano abre la sesión cuando puede: unos días temprano, otros tarde, y a veces ni siquiera. Un programa automatizado espera el intervalo y vuelve a preguntar, también de madrugada y también en domingo. Por eso las tres características cuentan: el intervalo casi fijo, con desviación mínima; el mismo destino, dirección y puerto; y la continuidad, que no respeta horario. Detectarlo no exige ver el contenido, que además puede estar cifrado. Exige mirar el archivo de conexiones y ordenar los tiempos de las sesiones hacia el mismo destino. Distingan además el latido legítimo del hostil: las aplicaciones de negocio también repiten consultas. La diferencia está en el destino y en el contexto. Si el equipo habla con un servidor desconocido fuera de la organización, la sospecha crece. Anoten la excepción en vez de apagar la detección.</aside>
+</section>
+
+<!-- D12 · Indicador a técnica -->
+<section class="slide" data-fuente="Diagrama propio · mapeo a MITRE ATT&amp;CK Enterprise: T1110, T1071, T1071.004, T1046">
+  <div class="kicker">Vocabulario</div>
+  <h2>Del indicador a la técnica del atacante</h2>
+  <p class="sub">Cada cosa rara que ven corresponde a un paso del marco de tácticas.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p3d12-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="8" y="16" width="440" height="44" rx="10" fill="#7E1223"/>
+      <text x="228" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="#D4AF37">Lo que el sensor ve</text>
+      <rect x="736" y="16" width="440" height="44" rx="10" fill="#7E1223"/>
+      <text x="956" y="45" text-anchor="middle" font-size="14" font-weight="700" fill="#D4AF37">La técnica del marco</text>
+      <g font-size="13">
+        <rect x="8" y="76" width="440" height="76" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="108" font-weight="700" fill="#A6192E">40 fallos del mismo origen</text>
+        <text x="30" y="134" font-size="12.5" fill="#5F5F5F">en la ventana de un minuto</text>
+
+        <rect x="8" y="166" width="440" height="76" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="198" font-weight="700" fill="#A6192E">Subdominios de texto seguidos</text>
+        <text x="30" y="224" font-size="12.5" fill="#5F5F5F">en el archivo de dominios</text>
+
+        <rect x="8" y="256" width="440" height="76" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="288" font-weight="700" fill="#A6192E">Latido cada cierto minuto</text>
+        <text x="30" y="314" font-size="12.5" fill="#5F5F5F">mismo destino, sin importar la hora</text>
+
+        <rect x="8" y="346" width="440" height="76" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="378" font-weight="700" fill="#A6192E">Barrido de mil puertos</text>
+        <text x="30" y="404" font-size="12.5" fill="#5F5F5F">contra un solo equipo, en serie</text>
+
+        <rect x="736" y="76" width="440" height="76" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="758" y="108" font-family="monospace" font-weight="700" fill="#7E1223">T1110</text>
+        <text x="840" y="108" font-weight="700" fill="#5F5F5F">fuerza bruta</text>
+        <text x="758" y="134" font-size="12.5" fill="#2A2A2A">táctica: acceso</text>
+
+        <rect x="736" y="166" width="440" height="76" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="758" y="198" font-family="monospace" font-weight="700" fill="#7E1223">T1071.004</text>
+        <text x="876" y="198" font-weight="700" fill="#5F5F5F">dominios</text>
+        <text x="758" y="224" font-size="12.5" fill="#2A2A2A">táctica: comando y control</text>
+
+        <rect x="736" y="256" width="440" height="76" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="758" y="288" font-family="monospace" font-weight="700" fill="#7E1223">T1071</text>
+        <text x="840" y="288" font-weight="700" fill="#5F5F5F">protocolo de aplicación</text>
+        <text x="758" y="314" font-size="12.5" fill="#2A2A2A">táctica: comando y control</text>
+
+        <rect x="736" y="346" width="440" height="76" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="758" y="378" font-family="monospace" font-weight="700" fill="#7E1223">T1046</text>
+        <text x="840" y="378" font-weight="700" fill="#5F5F5F">sondeo de servicios</text>
+        <text x="758" y="404" font-size="12.5" fill="#2A2A2A">táctica: descubrimiento</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#s09p3d12-f)">
+        <line x1="456" y1="114" x2="728" y2="114"/>
+        <line x1="456" y1="204" x2="728" y2="204"/>
+        <line x1="456" y1="294" x2="728" y2="294"/>
+        <line x1="456" y1="384" x2="728" y2="384"/>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">El vocabulario del marco de tácticas sirve para no discutir nombres. La fuerza bruta contra cuentas tiene código propio y pertenece a la táctica de acceso. El uso del sistema de nombres para comunicarse tiene su variante y pertenece a la de comando y control. El latido regular también vive ahí, porque es la manera de sostener el control remoto. Y el barrido de puertos es descubrimiento, el paso que viene justo antes de elegir objetivo. La regla práctica es esta: cada indicador que alarme debe mapear a una técnica. Si no mapea a ninguna, probablemente sea ruido; si mapea a varias a la vez, probablemente sea incidente. Vuelvan a usar este mapeo al escribir el informe del caso. En vez de decir que hubo tráfico raro, escriban qué técnica se intentó y en qué paso quedó detenida. Esa es la diferencia entre una nota y un informe que otra persona puede retomar.</aside>
+</section>
+
+<!-- D13 · Monitoreo del sensor -->
+<section class="slide" data-fuente="Concepto: operación y verificación de sensores, NIST SP 800-94 (2007), §5">
+  <div class="kicker">Operación</div>
+  <h2>El sensor también falla, y hay que mirarlo</h2>
+  <p class="sub">Interfaz mal puesta, reglas viejas o proceso con retraso: deja de ver.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <rect x="8" y="16" width="640" height="416" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+      <rect x="8" y="16" width="640" height="52" rx="14" fill="#A6192E"/>
+      <text x="328" y="50" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Chequeo semanal del sensor</text>
+      <g font-size="13.5" fill="#2A2A2A">
+        <use href="#i-ok" x="34" y="92" width="30" height="30" style="color:#2E7D4F"/>
+        <text x="80" y="113">Interfaz escuchando en modo promiscuo.</text>
+        <use href="#i-ok" x="34" y="152" width="30" height="30" style="color:#2E7D4F"/>
+        <text x="80" y="173">Reglas descargadas y sin fallos de lectura.</text>
+        <use href="#i-ok" x="34" y="212" width="30" height="30" style="color:#2E7D4F"/>
+        <text x="80" y="233">Fecha de actualización reciente.</text>
+        <use href="#i-ok" x="34" y="272" width="30" height="30" style="color:#2E7D4F"/>
+        <text x="80" y="293">Contadores de pérdida en cero.</text>
+        <use href="#i-ok" x="34" y="332" width="30" height="30" style="color:#2E7D4F"/>
+        <text x="80" y="353">Hora sincronizada con la referencia.</text>
+        <use href="#i-ok" x="34" y="392" width="30" height="30" style="color:#2E7D4F"/>
+        <text x="80" y="413">Última línea del archivo con hora corriente.</text>
+      </g>
+      <g font-size="13">
+        <rect x="684" y="16" width="492" height="128" rx="12" fill="#fff" stroke="#B3261E" stroke-width="2.5"/>
+        <text x="708" y="50" font-weight="700" fill="#B3261E">Interfaz equivocada</text>
+        <text x="708" y="80" fill="#2A2A2A">captura el tráfico de nadie y no</text>
+        <text x="708" y="106" fill="#2A2A2A">levanta ningún error en pantalla.</text>
+        <text x="708" y="132" font-size="12.5" fill="#5F5F5F">el modo más común al montar el laboratorio</text>
+
+        <rect x="684" y="160" width="492" height="128" rx="12" fill="#fff" stroke="#B3261E" stroke-width="2.5"/>
+        <text x="708" y="194" font-weight="700" fill="#B3261E">Reglas sin actualizar</text>
+        <text x="708" y="224" fill="#2A2A2A">solo se buscan amenazas de hace</text>
+        <text x="708" y="250" fill="#2A2A2A">meses, y la detección se queda quieta.</text>
+        <text x="708" y="276" font-size="12.5" fill="#5F5F5F">se comprueba la fecha, no el botón</text>
+
+        <rect x="684" y="304" width="492" height="128" rx="12" fill="#fff" stroke="#B3261E" stroke-width="2.5"/>
+        <text x="708" y="338" font-weight="700" fill="#B3261E">Proceso con retraso</text>
+        <text x="708" y="368" fill="#2A2A2A">las alertas llegan horas después</text>
+        <text x="708" y="394" fill="#2A2A2A">y la respuesta ya no alcanza.</text>
+        <text x="708" y="420" font-size="12.5" fill="#5F5F5F">se mide con la hora de la última línea</text>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">Un sensor ciego es peor que no tener sensor, porque da tranquilidad falsa. El chequeo semanal es corto. Confirme que la interfaz escucha en modo promiscuo y en la red correcta; ese es el error más común al montar el laboratorio. Verifique que las reglas se descargaron sin fallos y que la fecha es reciente. Revise los contadores de pérdida, que deben estar en cero durante el tráfico normal. Y confirme la hora, porque sin sincronía la línea de tiempo del caso no cierra. Los tres modos de falla de la derecha son los que más se repiten: interfaz equivocada, reglas viejas y proceso con retraso. Ninguno levanta una alerta por sí solo. Añadan dos comprobaciones cuando el sensor esté en línea: que la regla de prueba de la parte dos siga llegando al índice y que el archivo de eventos crezca durante la prueba de tráfico. Son la prueba de extremo a extremo de que la cadena sigue viva.</aside>
+</section>
+
+<!-- D14 · Síntesis -->
+<section class="slide" data-fuente="Diagrama propio · síntesis de la Parte 3">
+  <div class="kicker">Síntesis</div>
+  <h2>Lo que queda de la Parte 3</h2>
+  <p class="sub">Firma para lo conocido, comportamiento para lo raro y ajuste continuo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p3d14-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="7" y="8" width="1170" height="44" rx="10" fill="#7E1223"/>
+      <text x="592" y="37" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">Del paquete a la regla afinada</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="7" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-tap" x="86" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="112" y="176" font-weight="700" fill="#A6192E">Captura</text>
+        <text x="112" y="202" fill="#2A2A2A">interfaz correcta</text>
+        <text x="112" y="224" fill="#2A2A2A">y sin pérdida</text>
+
+        <rect x="247" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-escaner" x="326" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="352" y="176" font-weight="700" fill="#A6192E">Firma</text>
+        <text x="352" y="202" fill="#2A2A2A">Suricata con reglas</text>
+        <text x="352" y="224" fill="#2A2A2A">públicas al día</text>
+
+        <rect x="487" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-lupa" x="566" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="592" y="176" font-weight="700" fill="#A6192E">Hechos</text>
+        <text x="592" y="202" fill="#2A2A2A">Zeek describe la</text>
+        <text x="592" y="224" fill="#2A2A2A">conversación</text>
+
+        <rect x="727" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-grafica" x="806" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="832" y="176" font-weight="700" fill="#A6192E">Prioridad</text>
+        <text x="832" y="202" fill="#2A2A2A">severidad por</text>
+        <text x="832" y="224" fill="#2A2A2A">frecuencia</text>
+
+        <rect x="967" y="72" width="210" height="176" rx="14" fill="#A6192E"/>
+        <use href="#i-automatizacion" x="1046" y="88" width="52" height="52" style="color:#D4AF37"/>
+        <text x="1072" y="176" font-weight="700" fill="#fff">Ajuste</text>
+        <text x="1072" y="202" fill="#F9EEF0">ciclo semanal</text>
+        <text x="1072" y="224" fill="#F9EEF0">documentado</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p3d14-f)">
+        <line x1="219" y1="160" x2="243" y2="160"/>
+        <line x1="459" y1="160" x2="483" y2="160"/>
+        <line x1="699" y1="160" x2="723" y2="160"/>
+        <line x1="939" y1="160" x2="963" y2="160"/>
+      </g>
+      <rect x="7" y="272" width="1170" height="80" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="306" text-anchor="middle" font-size="17" font-weight="700" fill="#8A6D1D">Un sensor que no ve no protege: da tranquilidad falsa.</text>
+      <text x="592" y="334" text-anchor="middle" font-size="14" fill="#2A2A2A">Por eso el chequeo semanal es parte de la detección, no un trámite aparte.</text>
+      <rect x="7" y="372" width="1170" height="64" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="400" text-anchor="middle" font-size="15" font-weight="700" fill="#7E1223">Siguiente: proceso, personas y la práctica en OPNsense</text>
+      <text x="592" y="424" text-anchor="middle" font-size="13" fill="#2A2A2A">Parte 4: equipo de respuesta, marco colombiano, caso IFX y los cinco pasos del laboratorio.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cerramos la parte tres con el recorrido completo. La captura toma el paquete desde una interfaz bien puesta. Suricata aplica firma para lo conocido y escribe eventos estructurados. Zeek deja los hechos de la conversación sin juzgar. La matriz convierte severidad y frecuencia en un momento de atención. Y el ciclo de ajuste devuelve la regla al laboratorio cada semana hasta que el ruido baja. Con esto queda lista la evidencia de tráfico: alertas, logs y contadores que van al mismo colector de la parte uno. En la parte cuatro entra el proceso y las personas: quién recibe la alerta, qué se hace en la práctica y cómo queda documentado todo. Antes de cambiar de parte, fíjense en qué momento entra el proceso humano: después de la prioridad y antes del ajuste. Esa es la frontera entre lo que vimos y lo que veremos. En la parte cuatro están la rutina semanal, el equipo de respuesta y la práctica completa.</aside>
+</section>

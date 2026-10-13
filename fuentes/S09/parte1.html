@@ -1,0 +1,894 @@
+<!-- D1 · Mapa de la semana -->
+<section class="slide" data-fuente="Diagrama propio · plan de la semana: docs/analisis-tematico.md §2.4">
+  <div class="kicker">Mapa</div>
+  <h2>De dónde venimos y qué veremos esta semana</h2>
+  <p class="sub">Cuatro bloques: evidencia, SIEM, IDS avanzado y la práctica en OPNsense.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 470">
+      <defs><marker id="s09p1d1-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="4" y="8" width="1176" height="72" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+      <text x="592" y="38" text-anchor="middle" font-size="16" font-weight="700" fill="#7E1223">SEMANA 9 · Monitoreo y logging de red: SIEM, IDS/IPS avanzado</text>
+      <text x="592" y="62" text-anchor="middle" font-size="13" fill="#5F5F5F">De la bitácora suelta a la alerta que un analista puede defender</text>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d1-f)">
+        <line x1="145" y1="86" x2="145" y2="110"/>
+        <line x1="443" y1="86" x2="443" y2="110"/>
+        <line x1="741" y1="86" x2="741" y2="110"/>
+        <line x1="1039" y1="86" x2="1039" y2="110"/>
+      </g>
+      <g font-size="13" text-anchor="middle">
+        <rect x="6" y="116" width="278" height="210" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-log" x="118" y="132" width="54" height="54" style="color:#A6192E"/>
+        <text x="145" y="214" font-size="15" font-weight="700" fill="#A6192E">Parte 1 · Fuentes de evidencia</text>
+        <text x="145" y="242" fill="#2A2A2A">qué registrar · syslog</text>
+        <text x="145" y="264" fill="#2A2A2A">NetFlow · PCAP · NTP</text>
+        <text x="145" y="296" font-size="12" fill="#5F5F5F">salida: política de registro</text>
+
+        <rect x="304" y="116" width="278" height="210" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-siem" x="416" y="132" width="54" height="54" style="color:#A6192E"/>
+        <text x="443" y="214" font-size="15" font-weight="700" fill="#A6192E">Parte 2 · SIEM y correlación</text>
+        <text x="443" y="242" fill="#2A2A2A">ingesta y normalización</text>
+        <text x="443" y="264" fill="#2A2A2A">reglas · alertas · ATT&amp;CK</text>
+        <text x="443" y="296" font-size="12" fill="#5F5F5F">salida: alerta con contexto</text>
+
+        <rect x="602" y="116" width="278" height="210" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-ids" x="714" y="132" width="54" height="54" style="color:#A6192E"/>
+        <text x="741" y="214" font-size="15" font-weight="700" fill="#A6192E">Parte 3 · IDS avanzado y NDR</text>
+        <text x="741" y="242" fill="#2A2A2A">Suricata · Zeek · reglas</text>
+        <text x="741" y="264" fill="#2A2A2A">DNS y beaconing</text>
+        <text x="741" y="296" font-size="12" fill="#5F5F5F">salida: detección afinada</text>
+
+        <rect x="900" y="116" width="278" height="210" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-escudo" x="1012" y="132" width="54" height="54" style="color:#A6192E"/>
+        <text x="1039" y="214" font-size="15" font-weight="700" fill="#A6192E">Parte 4 · SOC, caso y práctica</text>
+        <text x="1039" y="242" fill="#2A2A2A">ColCERT · IFX 2023</text>
+        <text x="1039" y="264" fill="#2A2A2A">flujo de incidente</text>
+        <text x="1039" y="296" font-size="12" fill="#5F5F5F">salida: laboratorio cerrado</text>
+      </g>
+      <rect x="6" y="352" width="1172" height="106" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <use href="#i-terminal" x="40" y="376" width="56" height="56" style="color:#8A6D1D"/>
+      <text x="120" y="398" font-size="15" font-weight="700" fill="#8A6D1D">Hilo conductor de la semana</text>
+      <text x="120" y="424" font-size="14" fill="#2A2A2A">Todo lo que se explica termina en una práctica sobre VirtualBox con OPNsense y Alpine:</text>
+      <text x="120" y="446" font-size="14" fill="#2A2A2A">Suricata generando alertas y syslog llevándolas a un colector dentro de la red del laboratorio.</text>
+    </svg>
+  </div>
+  <aside class="notes">Arrancamos la semana nueve con una pregunta corta: qué queda después de una intrusión. La respuesta es la evidencia, y todo lo demás depende de recogerla bien. Cerramos la semana pasada con Wi-Fi y autenticación, y hoy entramos en monitoreo. Veremos cuatro bloques. En la parte uno, las fuentes de evidencia: qué eventos registrar, cómo viajan por syslog, qué aporta NetFlow y por qué hacen falta capturas de paquetes y relojes sincronizados. En la parte dos, el SIEM, que normaliza, correlaciona y convierte esos eventos en alertas accionables. En la parte tres, detección avanzada con Suricata y Zeek, más las señales que quedan en tráfico cifrado. En la parte cuatro, el caso colombiano, el rol del SOC y la práctica guiada en OPNsense. Verán tres tipos de evidencia: el texto del log, el resumen del flujo y el paquete capturado. Cada parte cierra con una síntesis que llevamos al laboratorio.</aside>
+</section>
+
+<!-- D2 · Comparación con y sin bitácora -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §2.1 · Ley 1273 de 2009">
+  <div class="kicker">Por qué</div>
+  <h2>Sin bitácora, una intrusión no se puede probar</h2>
+  <p class="sub">La misma visita con y sin registro: una deja rastro, la otra no.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 576 440">
+          <defs><marker id="s09p1d2-a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <text x="288" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#2E7D4F">Con bitácora: la secuencia se reconstruye</text>
+          <use href="#i-atacante" x="30" y="44" width="56" height="56" style="color:#A6192E"/>
+          <use href="#i-firewall" x="210" y="44" width="56" height="56" style="color:#A6192E"/>
+          <use href="#i-servidor" x="470" y="44" width="56" height="56" style="color:#2A2A2A"/>
+          <g stroke="#5F5F5F" stroke-width="3">
+            <line x1="86" y1="72" x2="208" y2="72"/>
+            <line x1="266" y1="72" x2="468" y2="72"/>
+          </g>
+          <path d="M276 100 L276 158" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d2-a)"/>
+          <g font-size="13" text-anchor="middle" fill="#2A2A2A">
+            <text x="58" y="122">atacante</text>
+            <text x="238" y="122">OPNsense</text>
+            <text x="498" y="122">servidor interno</text>
+          </g>
+          <g font-family="monospace" font-size="13" fill="#2A2A2A">
+            <rect x="30" y="164" width="516" height="44" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="44" y="192">08:14:02  40 intentos SSH fallidos</text>
+            <rect x="30" y="216" width="516" height="44" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="44" y="244">08:15:11  sesión abierta con respaldo</text>
+            <rect x="30" y="268" width="516" height="44" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="44" y="296">08:16:40  1,2 GB enviados hacia afuera</text>
+          </g>
+          <rect x="30" y="336" width="516" height="82" rx="12" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+          <text x="288" y="368" text-anchor="middle" font-size="14" font-weight="700" fill="#2E7D4F">Hora, origen y acción: los tres hechos</text>
+          <text x="288" y="394" text-anchor="middle" font-size="13" fill="#2A2A2A">con ellos se arma la línea de tiempo del incidente</text>
+        </svg>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 576 440">
+          <defs><marker id="s09p1d2-b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8C8C8C"/></marker></defs>
+          <text x="288" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#B3261E">Sin bitácora: nada que probar</text>
+          <use href="#i-atacante" x="30" y="44" width="56" height="56" style="color:#5F5F5F"/>
+          <use href="#i-firewall" x="210" y="44" width="56" height="56" style="color:#5F5F5F"/>
+          <use href="#i-servidor" x="470" y="44" width="56" height="56" style="color:#5F5F5F"/>
+          <g stroke="#8C8C8C" stroke-width="3">
+            <line x1="86" y1="72" x2="208" y2="72"/>
+            <line x1="266" y1="72" x2="468" y2="72"/>
+          </g>
+          <path d="M276 100 L276 158" stroke="#8C8C8C" stroke-width="3" stroke-dasharray="6 5" marker-end="url(#s09p1d2-b)"/>
+          <g font-size="13" text-anchor="middle" fill="#5F5F5F">
+            <text x="58" y="122">atacante</text>
+            <text x="238" y="122">OPNsense</text>
+            <text x="498" y="122">servidor interno</text>
+          </g>
+          <rect x="30" y="164" width="516" height="148" rx="8" fill="#F4F4F2" stroke="#8C8C8C" stroke-dasharray="7 6"/>
+          <g font-size="14" text-anchor="middle" fill="#5F5F5F">
+            <text x="288" y="206">sin hora registrada</text>
+            <text x="288" y="240">sin origen identificable</text>
+            <text x="288" y="274">sin acción que comparar</text>
+          </g>
+          <text x="288" y="236" font-size="44" font-weight="700" fill="#8C8C8C">?</text>
+          <rect x="30" y="336" width="516" height="82" rx="12" fill="#F9EEF0" stroke="#B3261E" stroke-width="2"/>
+          <text x="288" y="368" text-anchor="middle" font-size="14" font-weight="700" fill="#B3261E">Sin cadena de custodia no hay prueba</text>
+          <text x="288" y="394" text-anchor="middle" font-size="13" fill="#2A2A2A">la denuncia se estanca y la causa sigue ahí</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">¿Por qué esta semana empieza con bitácoras y no con herramientas? Porque sin registro no hay investigación. Comparen las dos columnas. A la izquierda, con bitácora: el firewall anota cada intento fallido, la hora en que se abrió la sesión y el volumen que salió. Con esos tres hechos se arma una línea de tiempo y la evidencia queda completa. A la derecha, sin bitácora: los mismos eventos ocurrieron, pero nadie guardó hora, origen ni acción. El equipo sabe que algo pasó, pero no puede probarlo ni corregir la causa. En una denuncia, la diferencia es la cadena de custodia. En una auditoría, es la diferencia entre una acción correctiva y una disculpa. Por eso lo primero no es comprar un producto, sino decidir qué se registra, con qué formato y durante cuánto tiempo. Un firewall sin registro es como una puerta sin cámara: deja pasar, pero no sirve para investigar. La madurez de una red se mide por su capacidad de reconstruir lo ocurrido.</aside>
+</section>
+
+<!-- D3 · Topología: zonas hacia el colector -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §2.3 · rsyslogd(8)">
+  <div class="kicker">Topología</div>
+  <h2>Cada zona genera eventos que convergen en un colector</h2>
+  <p class="sub">OPNsense, servidores y estaciones envían syslog a un solo punto de la red.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p1d3-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="4" y="6" width="216" height="118" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-firewall" x="90" y="16" width="44" height="44" style="color:#A6192E"/>
+        <text x="112" y="84" font-weight="700" fill="#A6192E">OPNsense</text>
+        <text x="112" y="106" font-size="12" fill="#5F5F5F">firewall, IDS y NAT</text>
+
+        <rect x="244" y="6" width="216" height="118" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-pc" x="330" y="16" width="44" height="44" style="color:#8A6D1D"/>
+        <text x="352" y="84" font-weight="700" fill="#8A6D1D">LAN · VLAN 10</text>
+        <text x="352" y="106" font-size="12" fill="#5F5F5F">estaciones y DHCP</text>
+
+        <rect x="484" y="6" width="216" height="118" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-servidor-web" x="570" y="16" width="44" height="44" style="color:#8A6D1D"/>
+        <text x="592" y="84" font-weight="700" fill="#8A6D1D">DMZ · VLAN 20</text>
+        <text x="592" y="106" font-size="12" fill="#5F5F5F">servidores web</text>
+
+        <rect x="724" y="6" width="216" height="118" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-bd" x="810" y="16" width="44" height="44" style="color:#A6192E"/>
+        <text x="832" y="84" font-weight="700" fill="#A6192E">INTERNA · VLAN 30</text>
+        <text x="832" y="106" font-size="12" fill="#5F5F5F">base de datos y correo</text>
+
+        <rect x="964" y="6" width="216" height="118" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-admin" x="1050" y="16" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="1072" y="84" font-weight="700" fill="#5F5F5F">ADMIN · VLAN 99</text>
+        <text x="1072" y="106" font-size="12" fill="#5F5F5F">sesiones SSH y HTTPS</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3">
+        <line x1="112" y1="124" x2="112" y2="162"/>
+        <line x1="352" y1="124" x2="352" y2="162"/>
+        <line x1="592" y1="124" x2="592" y2="162"/>
+        <line x1="832" y1="124" x2="832" y2="162"/>
+        <line x1="1072" y1="124" x2="1072" y2="162"/>
+        <line x1="112" y1="162" x2="1072" y2="162"/>
+      </g>
+      <line x1="592" y1="162" x2="592" y2="196" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d3-f)"/>
+      <rect x="352" y="200" width="480" height="150" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+      <use href="#i-servidor" x="376" y="216" width="46" height="46" style="color:#A6192E"/>
+      <text x="436" y="244" font-size="15" font-weight="700" fill="#A6192E">COLECTOR · Alpine con rsyslog</text>
+      <g font-size="13" fill="#2A2A2A">
+        <text x="376" y="284">udp o tcp 514, con una cola por origen</text>
+        <text x="376" y="308">si el disco se llena, se pierden los más viejos</text>
+        <text x="376" y="332">un archivo por dispositivo: opnsense.log</text>
+      </g>
+      <line x1="836" y1="275" x2="876" y2="275" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d3-f)"/>
+      <rect x="884" y="204" width="292" height="142" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <use href="#i-lista" x="904" y="220" width="44" height="44" style="color:#8A6D1D"/>
+      <text x="960" y="248" font-size="15" font-weight="700" fill="#8A6D1D">Almacenamiento</text>
+      <g font-size="13" fill="#2A2A2A">
+        <text x="904" y="284">archivos diarios con rotación</text>
+        <text x="904" y="308">retención y búsqueda por día</text>
+        <text x="904" y="332">respaldo fuera de la red local</text>
+      </g>
+      <rect x="8" y="204" width="320" height="142" rx="14" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2" stroke-dasharray="7 6"/>
+      <text x="28" y="236" font-size="14" font-weight="700" fill="#B3261E">Error clásico</text>
+      <g font-size="13" fill="#2A2A2A">
+        <text x="28" y="266">cada equipo guarda sus logs</text>
+        <text x="28" y="290">locales y nadie los revisa</text>
+        <text x="28" y="314">al llenarse, se borran solos</text>
+      </g>
+      <rect x="8" y="372" width="1168" height="66" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="32" y="400" font-size="15" font-weight="700" fill="#8A6D1D">Regla de oro: quien decide en la red, también registra.</text>
+      <text x="32" y="426" font-size="13" fill="#2A2A2A">Y el colector avisa si un origen deja de hablar: un silencio prolongado también es un evento.</text>
+    </svg>
+  </div>
+  <aside class="notes">Este es el mapa de la red del laboratorio, la misma topología de zonas que venimos usando. Arriba, las cinco fuentes: OPNsense, que ve todo el tráfico que cruza; la red de usuarios; la DMZ con los servidores publicados; la zona interna con la base de datos; y la zona de administración, donde entran las sesiones de administración. Cada una genera eventos distintos, pero todos viajan por el mismo canal y llegan a un solo colector, que en el laboratorio es una máquina Alpine con rsyslog escuchando en el puerto 514. A la izquierda, el error clásico: dejar que cada equipo guarde sus archivos locales y no revisarlos; el disco se llena y la evidencia desaparece. A la derecha, el destino correcto: archivos rotados, retención definida y respaldo fuera de la red. Y una idea que retomaremos después: que un origen deje de hablar también merece una alerta. Todo lo que siga en la semana entra por este mismo conducto.</aside>
+</section>
+
+<!-- D4 · Anatomía de la trama syslog -->
+<section class="slide" data-fuente="IETF RFC 5424 (2009), §6 · RFC 5425 (2009) TLS · RFC 5426 (2009) UDP">
+  <div class="kicker">Formato</div>
+  <h2>Una trama syslog: la prioridad viaja delante del texto</h2>
+  <p class="sub">Anatomía del formato 5424: prioridad, hora con huso, host y mensaje.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 400">
+      <defs><marker id="s09p1d4-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8C8C8C"/></marker></defs>
+      <g font-size="11" font-weight="700" fill="#5F5F5F" text-anchor="middle">
+        <text x="44" y="46">PRI</text>
+        <text x="100" y="46">VERSIÓN</text>
+        <text x="240" y="46">TIMESTAMP</text>
+        <text x="431" y="46">HOSTNAME</text>
+        <text x="562" y="46">APP-NAME</text>
+        <text x="663" y="46">PROCID</text>
+        <text x="754" y="46">MSGID</text>
+        <text x="895" y="46">STRUCTURED-DATA</text>
+        <text x="1076" y="46">MENSAJE</text>
+      </g>
+      <g font-family="monospace" font-size="12">
+        <rect x="10" y="56" width="68" height="60" fill="#A6192E" stroke="#7E1223"/>
+        <text x="44" y="92" text-anchor="middle" fill="#fff" font-weight="700">&lt;165&gt;</text>
+        <rect x="78" y="56" width="44" height="60" fill="#7E1223"/>
+        <text x="100" y="92" text-anchor="middle" fill="#fff" font-weight="700">1</text>
+        <rect x="122" y="56" width="236" height="60" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="240" y="92" text-anchor="middle" fill="#2A2A2A">2026-10-04T08:14:02-05:00</text>
+        <rect x="358" y="56" width="146" height="60" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="431" y="92" text-anchor="middle" fill="#2A2A2A">opnsense-lab</text>
+        <rect x="504" y="56" width="116" height="60" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="562" y="92" text-anchor="middle" fill="#2A2A2A">suricata</text>
+        <rect x="620" y="56" width="86" height="60" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="663" y="92" text-anchor="middle" fill="#2A2A2A">1234</text>
+        <rect x="706" y="56" width="96" height="60" fill="#F4F4F2" stroke="#8C8C8C"/>
+        <text x="754" y="92" text-anchor="middle" fill="#2A2A2A">IDSDROP</text>
+        <rect x="802" y="56" width="186" height="60" fill="#FBF6E7" stroke="#D4AF37"/>
+        <text x="895" y="92" text-anchor="middle" fill="#8A6D1D">[Origin ip="10.10.10.55"]</text>
+        <rect x="988" y="56" width="176" height="60" fill="#F9EEF0" stroke="#A6192E"/>
+        <text x="1076" y="92" text-anchor="middle" fill="#A6192E">escaneo bloqueado</text>
+      </g>
+      <g stroke="#8C8C8C" stroke-width="2.5" marker-end="url(#s09p1d4-f)">
+        <line x1="44" y1="118" x2="44" y2="150"/>
+        <line x1="480" y1="118" x2="480" y2="150"/>
+        <line x1="895" y1="118" x2="895" y2="150"/>
+      </g>
+      <g font-size="13">
+        <rect x="10" y="154" width="366" height="96" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="28" y="184" font-weight="700" fill="#A6192E">Prioridad = facility por 8 + nivel</text>
+        <text x="28" y="210" fill="#2A2A2A">165 = 20 por 8 más 5: local4.aviso</text>
+        <text x="28" y="234" fill="#5F5F5F">el nivel decide quién recibe la alerta</text>
+
+        <rect x="396" y="154" width="366" height="96" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="414" y="184" font-weight="700" fill="#5F5F5F">La hora trae su huso</text>
+        <text x="414" y="210" fill="#2A2A2A">-05:00 es la hora del emisor</text>
+        <text x="414" y="234" fill="#5F5F5F">el receptor la convierte a su zona</text>
+
+        <rect x="782" y="154" width="382" height="96" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="800" y="184" font-weight="700" fill="#8A6D1D">Dato estructurado, clave y valor</text>
+        <text x="800" y="210" fill="#2A2A2A">si no hay datos, se escribe un guion</text>
+        <text x="800" y="234" fill="#5F5F5F">ahí caben la IP de origen y la regla</text>
+      </g>
+      <rect x="10" y="266" width="1154" height="66" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="30" y="294" font-size="14" fill="#2A2A2A">El mensaje final es texto libre; para correlacionar, lo útil está en los campos que vienen antes.</text>
+      <text x="30" y="318" font-size="13" fill="#5F5F5F">Versión 1: RFC 5424, marzo de 2009. Transporte por TLS en RFC 5425 y por UDP en RFC 5426.</text>
+      <text x="10" y="372" font-size="13" fill="#A6192E" font-weight="700">Si el hostname no corresponde al equipo real, la trama es válida pero la atribución falla.</text>
+    </svg>
+  </div>
+  <aside class="notes">Ahora abramos el formato. Una trama syslog tiene ocho campos antes del texto, y todos importan. Primero la prioridad, que en el ejemplo vale ciento sesenta y cinco. Ese número significa que el emisor pertenece a la facility local cuatro y que el nivel es aviso. Se calcula multiplicando el facility por ocho y sumando el nivel. Después viene la versión, que es uno. Luego la hora con el huso del emisor, con su desplazamiento respecto a UTC, de modo que el receptor la convierte a su propia zona. Siguen el nombre del host, la aplicación, el identificador de proceso y el identificador de mensaje. Después va el dato estructurado, con claves y valores, y por último el mensaje libre. La RFC 5424 de marzo de dos mil nueve definió este formato, y esa prioridad es la que usaremos para filtrar en el colector. El ejemplo muestra una alerta de detección de intrusos con la IP de origen en el dato estructurado, que es justo el campo que correlacionaremos después.</aside>
+</section>
+<!-- D5 · Escala de severidad -->
+<section class="slide" data-fuente="IETF RFC 5424 (2009), §6.2.1–6.2.6 · niveles de syslog de BSD">
+  <div class="kicker">Niveles</div>
+  <h2>Ocho severidades: de la emergencia a la depuración</h2>
+  <p class="sub">La prioridad combina facility y nivel, y decide a quién despierta.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 400">
+      <text x="11" y="34" font-size="14" font-weight="700" fill="#7E1223">Nivel de severidad, del 0 al 7</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="11" y="50" width="140" height="116" rx="10" fill="#A6192E"/>
+        <text x="81" y="92" font-size="34" font-weight="700" fill="#fff">0</text>
+        <text x="81" y="118" font-weight="700" fill="#fff">emergencia</text>
+        <text x="81" y="140" font-size="11" fill="#fff">el sensor dejó de</text>
+        <text x="81" y="156" font-size="11" fill="#fff">reportar</text>
+
+        <rect x="157" y="50" width="140" height="116" rx="10" fill="#A6192E"/>
+        <text x="227" y="92" font-size="34" font-weight="700" fill="#fff">1</text>
+        <text x="227" y="118" font-weight="700" fill="#fff">alerta</text>
+        <text x="227" y="140" font-size="11" fill="#fff">enlace crítico</text>
+        <text x="227" y="156" font-size="11" fill="#fff">caído</text>
+
+        <rect x="303" y="50" width="140" height="116" rx="10" fill="#A6192E"/>
+        <text x="373" y="92" font-size="34" font-weight="700" fill="#fff">2</text>
+        <text x="373" y="118" font-weight="700" fill="#fff">crítica</text>
+        <text x="373" y="140" font-size="11" fill="#fff">ola de accesos</text>
+        <text x="373" y="156" font-size="11" fill="#fff">fallidos</text>
+
+        <rect x="449" y="50" width="140" height="116" rx="10" fill="#A6192E"/>
+        <text x="519" y="92" font-size="34" font-weight="700" fill="#fff">3</text>
+        <text x="519" y="118" font-weight="700" fill="#fff">error</text>
+        <text x="519" y="140" font-size="11" fill="#fff">el servicio no</text>
+        <text x="519" y="156" font-size="11" fill="#fff">responde</text>
+
+        <rect x="595" y="50" width="140" height="116" rx="10" fill="#D4AF37"/>
+        <text x="665" y="92" font-size="34" font-weight="700" fill="#2A2A2A">4</text>
+        <text x="665" y="118" font-weight="700" fill="#2A2A2A">aviso</text>
+        <text x="665" y="140" font-size="11" fill="#2A2A2A">regla IDS</text>
+        <text x="665" y="156" font-size="11" fill="#2A2A2A">revisada</text>
+
+        <rect x="741" y="50" width="140" height="116" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="811" y="92" font-size="34" font-weight="700" fill="#5F5F5F">5</text>
+        <text x="811" y="118" font-weight="700" fill="#5F5F5F">notificación</text>
+        <text x="811" y="140" font-size="11" fill="#5F5F5F">usuario nuevo</text>
+        <text x="811" y="156" font-size="11" fill="#5F5F5F">creado</text>
+
+        <rect x="887" y="50" width="140" height="116" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <text x="957" y="92" font-size="34" font-weight="700" fill="#5F5F5F">6</text>
+        <text x="957" y="118" font-weight="700" fill="#5F5F5F">información</text>
+        <text x="957" y="140" font-size="11" fill="#5F5F5F">sesión abierta</text>
+        <text x="957" y="156" font-size="11" fill="#5F5F5F">con éxito</text>
+
+        <rect x="1033" y="50" width="140" height="116" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2" stroke-dasharray="6 5"/>
+        <text x="1103" y="92" font-size="34" font-weight="700" fill="#5F5F5F">7</text>
+        <text x="1103" y="118" font-weight="700" fill="#5F5F5F">depuración</text>
+        <text x="1103" y="140" font-size="11" fill="#5F5F5F">paquete</text>
+        <text x="1103" y="156" font-size="11" fill="#5F5F5F">examinado</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3">
+        <line x1="11" y1="192" x2="589" y2="192"/>
+        <line x1="11" y1="192" x2="11" y2="204"/>
+        <line x1="589" y1="192" x2="589" y2="204"/>
+      </g>
+      <g stroke="#8A6D1D" stroke-width="3">
+        <line x1="595" y1="192" x2="881" y2="192"/>
+        <line x1="595" y1="192" x2="595" y2="204"/>
+        <line x1="881" y1="192" x2="881" y2="204"/>
+      </g>
+      <g stroke="#5F5F5F" stroke-width="3">
+        <line x1="887" y1="192" x2="1173" y2="192"/>
+        <line x1="887" y1="192" x2="887" y2="204"/>
+        <line x1="1173" y1="192" x2="1173" y2="204"/>
+      </g>
+      <g font-size="13" text-anchor="middle" font-weight="700">
+        <text x="300" y="228" fill="#A6192E">Acción inmediata: alertar al turno</text>
+        <text x="738" y="228" fill="#8A6D1D">Revisar en horario hábil</text>
+        <text x="1030" y="228" fill="#5F5F5F">Solo afinar reglas</text>
+      </g>
+      <rect x="11" y="252" width="1162" height="76" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="34" y="282" font-size="15" font-weight="700" fill="#8A6D1D">El facility dice quién habla; el nivel dice qué tan grave es.</text>
+      <text x="34" y="310" font-size="13" fill="#2A2A2A">En el colector se filtra por los dos: &lt;165&gt; entra en la cola de avisos, &lt;128&gt; en la de emergencias.</text>
+      <text x="11" y="372" font-size="13" fill="#5F5F5F">Los ocho niveles vienen de BSD syslog; la RFC 5424 los conserva sin cambiar el orden.</text>
+    </svg>
+  </div>
+  <aside class="notes">Los mismos campos de antes producen un número del cero al siete que ordena la gravedad. El nivel cero es una emergencia: algo dejó de funcionar y no hay margen. El uno es una alerta, el dos es crítico, el tres es un error de aplicación. Juntos forman el grupo que despierta a alguien. El cuatro es un aviso, el cinco una notificación y el seis información de rutina. El siete, la depuración, sirve para afinar reglas y después se apaga. Recuerden la cuenta de la diapositiva anterior: facility por ocho más nivel. Así un mismo colector puede separar en colas distintas lo que exige reacción inmediata de lo que se revisa en horario hábil. En el laboratorio arrancaremos con información y solo bajaremos a depuración cuando depuremos una regla. Tengan presente que el nivel no dice quién reporta, sino qué tan grave es. Dos fuentes distintas pueden emitir el mismo nivel y entrar en la misma cola de atención.</aside>
+</section>
+
+<!-- D6 · UDP, TCP y TLS -->
+<section class="slide" data-fuente="IETF RFC 5425 (2009) TLS · RFC 5426 (2009) UDP · RFC 6587 (2012) TCP">
+  <div class="kicker">Transporte</div>
+  <h2>Tres caminos del emisor al colector: UDP, TCP y TLS</h2>
+  <p class="sub">Mismo mensaje, distinta garantía de entrega, cifrado y confirmación.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 382 310">
+          <defs><marker id="s09p1d6a-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <text x="191" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#A6192E">UDP · puerto 514</text>
+          <use href="#i-firewall" x="14" y="44" width="56" height="56" style="color:#A6192E"/>
+          <use href="#i-servidor" x="312" y="44" width="56" height="56" style="color:#2A2A2A"/>
+          <line x1="74" y1="72" x2="304" y2="72" stroke="#A6192E" stroke-width="3" stroke-dasharray="9 7"/>
+          <path d="M191 72 L191 108" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d6a-f)"/>
+          <text x="191" y="130" text-anchor="middle" font-size="13" fill="#5F5F5F">un datagrama por evento, sin acuse</text>
+          <g font-size="13">
+            <rect x="10" y="150" width="362" height="50" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="26" y="172" fill="#2A2A2A">Mejor esfuerzo: si la cola del destino</text>
+            <text x="26" y="192" fill="#2A2A2A">está llena, el mensaje se pierde.</text>
+            <rect x="10" y="212" width="362" height="50" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="26" y="234" fill="#2A2A2A">Soporta picos grandes sin frenar</text>
+            <text x="26" y="254" fill="#2A2A2A">al emisor.</text>
+          </g>
+          <rect x="10" y="274" width="362" height="30" rx="8" fill="#F9EEF0" stroke="#A6192E"/>
+          <text x="191" y="294" text-anchor="middle" font-size="13" font-weight="700" fill="#A6192E">Sirve: volumen alto, pérdida tolerable</text>
+        </svg>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 382 310">
+          <defs><marker id="s09p1d6b-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+          <text x="191" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#8A6D1D">TCP · 514 o 601</text>
+          <use href="#i-firewall" x="14" y="44" width="56" height="56" style="color:#8A6D1D"/>
+          <use href="#i-servidor" x="312" y="44" width="56" height="56" style="color:#2A2A2A"/>
+          <line x1="74" y1="72" x2="304" y2="72" stroke="#8A6D1D" stroke-width="4"/>
+          <path d="M191 72 L191 108" stroke="#8A6D1D" stroke-width="3" marker-end="url(#s09p1d6b-f)"/>
+          <text x="191" y="130" text-anchor="middle" font-size="13" fill="#5F5F5F">conexión persistente con acuse</text>
+          <g font-size="13">
+            <rect x="10" y="150" width="362" height="50" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="26" y="172" fill="#2A2A2A">El emisor reenvía lo que no fue</text>
+            <text x="26" y="192" fill="#2A2A2A">confirmado; nada se pierde en silencio.</text>
+            <rect x="10" y="212" width="362" height="50" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="26" y="234" fill="#2A2A2A">Si el colector cae, la cola crece en</text>
+            <text x="26" y="254" fill="#2A2A2A">el emisor y puede bloquearlo.</text>
+          </g>
+          <rect x="10" y="274" width="362" height="30" rx="8" fill="#FBF6E7" stroke="#D4AF37"/>
+          <text x="191" y="294" text-anchor="middle" font-size="13" font-weight="700" fill="#8A6D1D">Sirve: evidencia que no puede perderse</text>
+        </svg>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 382 310">
+          <defs><marker id="s09p1d6c-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#2E7D4F"/></marker></defs>
+          <text x="191" y="24" text-anchor="middle" font-size="16" font-weight="700" fill="#2E7D4F">TLS · puerto 6514</text>
+          <use href="#i-firewall" x="14" y="44" width="56" height="56" style="color:#2E7D4F"/>
+          <use href="#i-servidor" x="312" y="44" width="56" height="56" style="color:#2A2A2A"/>
+          <line x1="74" y1="72" x2="304" y2="72" stroke="#2E7D4F" stroke-width="4"/>
+          <use href="#i-candado" x="169" y="50" width="44" height="44" style="color:#2E7D4F"/>
+          <path d="M191 96 L191 112" stroke="#2E7D4F" stroke-width="3" marker-end="url(#s09p1d6c-f)"/>
+          <text x="191" y="132" text-anchor="middle" font-size="13" fill="#5F5F5F">TCP además, con certificado X.509</text>
+          <g font-size="13">
+            <rect x="10" y="150" width="362" height="50" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="26" y="172" fill="#2A2A2A">Cifra el contenido en la red: nadie</text>
+            <text x="26" y="192" fill="#2A2A2A">lee ni altera las bitácoras en tránsito.</text>
+            <rect x="10" y="212" width="362" height="50" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="26" y="234" fill="#2A2A2A">Exige confiar en la autoridad de</text>
+            <text x="26" y="254" fill="#2A2A2A">certificados de ambos lados.</text>
+          </g>
+          <rect x="10" y="274" width="362" height="30" rx="8" fill="#E8F3EC" stroke="#2E7D4F"/>
+          <text x="191" y="294" text-anchor="middle" font-size="13" font-weight="700" fill="#2E7D4F">Sirve: tráfico que cruza redes ajenas</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Una vez formato el mensaje, falta el viaje. Por UDP, el emisor lanza un datagrama y sigue: si la cola del colector está llena, el evento desaparece sin que nadie se entere. Por TCP hay conexión persistente y confirmación, así que lo que no fue aceptado se reenvía; el riesgo cambia, porque si el colector se cae, la cola crece dentro del firewall. Y sobre TCP aparece TLS, con el puerto seiscientos catorce y un certificado de servidor: las bitácoras viajan cifradas y nadie las lee ni las altera en la red intermedia. ¿Cuándo usar cada uno? UDP cuando el volumen es alto y una pérdida puntual no cambia la investigación. TCP cuando el registro es evidencia. TLS cuando el mensaje cruza una red que no controlamos. En el laboratorio empezaremos por UDP y después endureceremos con TLS. Noten que el formato del mensaje no cambia con el transporte; lo que cambia es la confianza en que llegue completo y solo a manos del colector.</aside>
+</section>
+
+<!-- D7 · NetFlow / IPFIX -->
+<section class="slide" data-fuente="IETF RFC 3954 (2004) NetFlow v9 · RFC 7011 (2013) IPFIX">
+  <div class="kicker">Flujos</div>
+  <h2>NetFlow resume la conversación en un registro por flujo</h2>
+  <p class="sub">Cinco tupla más octetos: quién habló con quién, cuánto y cuándo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p1d7-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g stroke="#5F5F5F" stroke-width="3">
+        <line x1="94" y1="52" x2="222" y2="52"/>
+        <line x1="294" y1="52" x2="412" y2="52"/>
+        <line x1="484" y1="52" x2="602" y2="52"/>
+      </g>
+      <g font-size="13" text-anchor="middle" fill="#2A2A2A">
+        <use href="#i-internet" x="34" y="20" width="60" height="60" style="color:#5F5F5F"/>
+        <text x="64" y="102">Internet</text>
+        <use href="#i-firewall" x="234" y="20" width="60" height="60" style="color:#A6192E"/>
+        <text x="264" y="102">OPNsense</text>
+        <text x="264" y="122" font-size="12" fill="#A6192E">exporta flujos</text>
+        <use href="#i-switch" x="424" y="20" width="60" height="60" style="color:#2A2A2A"/>
+        <text x="454" y="102">Switch de distribución</text>
+        <use href="#i-servidor-web" x="614" y="20" width="60" height="60" style="color:#2A2A2A"/>
+        <text x="644" y="102">Servidores DMZ</text>
+      </g>
+      <path d="M264 128 L264 176" stroke="#A6192E" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#s09p1d7-f)"/>
+      <text x="280" y="160" font-size="12" fill="#A6192E">cada cierto tiempo</text>
+      <rect x="40" y="184" width="470" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+      <use href="#i-paquete" x="60" y="200" width="46" height="46" style="color:#A6192E"/>
+      <text x="120" y="230" font-size="15" font-weight="700" fill="#A6192E">Registro de flujo · 8 campos</text>
+      <g font-size="13" fill="#2A2A2A">
+        <text x="60" y="268">1  IP de origen</text>
+        <text x="60" y="294">2  IP de destino</text>
+        <text x="60" y="320">3  puerto de origen</text>
+        <text x="60" y="346">4  puerto de destino</text>
+        <text x="300" y="268">5  protocolo</text>
+        <text x="300" y="294">6  octetos enviados</text>
+        <text x="300" y="320">7  paquetes contados</text>
+        <text x="300" y="346">8  inicio y fin del flujo</text>
+      </g>
+      <line x1="514" y1="272" x2="574" y2="272" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d7-f)"/>
+      <text x="544" y="256" text-anchor="middle" font-size="12" fill="#A6192E">UDP 2055</text>
+      <rect x="584" y="184" width="560" height="176" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <use href="#i-grafica" x="604" y="200" width="46" height="46" style="color:#8A6D1D"/>
+      <text x="664" y="230" font-size="15" font-weight="700" fill="#8A6D1D">Colector de flujos</text>
+      <g font-size="13" fill="#2A2A2A">
+        <text x="604" y="268">Retención corta: minutos u horas de conversaciones.</text>
+        <text x="604" y="294">No guarda el contenido, guarda contadores y sentidos.</text>
+        <text x="604" y="320">Responde rápido: ¿con quién habló este host esta noche?</text>
+        <text x="604" y="346">Volumen anómalo, escaneos y destinos raros a simple vista.</text>
+      </g>
+      <rect x="40" y="380" width="1104" height="64" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="64" y="408" font-size="14" font-weight="700" fill="#7E1223">El log dice qué pasó; el flujo dice cuánto y con quién.</text>
+      <text x="64" y="432" font-size="13" fill="#2A2A2A">NetFlow v9, RFC 3954 de 2004; IPFIX, el estándar que lo sustituye, RFC 7011 de 2013.</text>
+    </svg>
+  </div>
+  <aside class="notes">Los registros de texto cuentan acciones concretas, pero no la conversación completa. Para eso están los flujos. Cuando el firewall ve pasar paquetes, arma un registro por cada conversación, o por cada flujo, con la IP de origen, la de destino, los dos puertos y el protocolo. A eso se le llama la quíntupla. Le añade cuántos octetos y paquetes circularon, y la hora de inicio y de fin. Ese registro se exporta, normalmente por UDP en el puerto dos mil cincuenta y cinco, a un colector que lo guarda poco tiempo. La gran diferencia con el log es la escala: el flujo resume millones de paquetes en una línea, y por eso permite preguntar en segundos qué host habló con qué destino de madrugada. NetFlow noveno se define en la RFC 3954 y su sucesor, IPFIX, en la RFC 7011. Por eso miramos los flujos cuando queremos volumen, y los logs cuando queremos detalle.</aside>
+</section>
+
+<!-- D8 · Captura de paquetes -->
+<section class="slide" data-fuente="Diagrama propio · concepto: tcpdump(1) · capture filters de Wireshark">
+  <div class="kicker">PCAP</div>
+  <h2>La captura de paquetes guarda el payload tal cual cayó</h2>
+  <p class="sub">Tap, filtro y longitud de corte: la prueba que ningún log reemplaza.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 420">
+      <defs><marker id="s09p1d8-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="14" text-anchor="middle">
+        <rect x="7" y="30" width="210" height="164" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-tap" x="86" y="46" width="52" height="52" style="color:#5F5F5F"/>
+        <text x="112" y="130" font-weight="700" fill="#5F5F5F">1 · Tap o espejo</text>
+        <text x="112" y="156" font-size="13" fill="#2A2A2A">copia del tráfico</text>
+        <text x="112" y="176" font-size="13" fill="#2A2A2A">sin tocar la red</text>
+
+        <rect x="247" y="30" width="210" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-terminal" x="326" y="46" width="52" height="52" style="color:#A6192E"/>
+        <text x="352" y="130" font-weight="700" fill="#A6192E">2 · Capturador</text>
+        <text x="352" y="156" font-size="13" fill="#2A2A2A">tcpdump o dump</text>
+        <text x="352" y="176" font-size="13" fill="#2A2A2A">de la consola</text>
+
+        <rect x="487" y="30" width="210" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-lupa" x="566" y="46" width="52" height="52" style="color:#A6192E"/>
+        <text x="592" y="130" font-weight="700" fill="#A6192E">3 · Filtro BPF</text>
+        <text x="592" y="156" font-size="13" fill="#2A2A2A">host y puerto de</text>
+        <text x="592" y="176" font-size="13" fill="#2A2A2A">interés únicamente</text>
+
+        <rect x="727" y="30" width="210" height="164" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <use href="#i-lista" x="806" y="46" width="52" height="52" style="color:#8A6D1D"/>
+        <text x="832" y="130" font-weight="700" fill="#8A6D1D">4 · Longitud de corte</text>
+        <text x="832" y="156" font-size="13" fill="#2A2A2A">hasta 96 bytes si</text>
+        <text x="832" y="176" font-size="13" fill="#2A2A2A">solo quiere cabeceras</text>
+
+        <rect x="967" y="30" width="210" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-documento" x="1046" y="46" width="52" height="52" style="color:#A6192E"/>
+        <text x="1072" y="130" font-weight="700" fill="#A6192E">5 · Archivo .pcap</text>
+        <text x="1072" y="156" font-size="13" fill="#2A2A2A">evidencia para</text>
+        <text x="1072" y="176" font-size="13" fill="#2A2A2A">abrir y reproducir</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d8-f)">
+        <line x1="219" y1="112" x2="243" y2="112"/>
+        <line x1="459" y1="112" x2="483" y2="112"/>
+        <line x1="699" y1="112" x2="723" y2="112"/>
+        <line x1="939" y1="112" x2="963" y2="112"/>
+      </g>
+      <rect x="7" y="224" width="1170" height="86" rx="12" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+      <text x="30" y="256" font-size="15" font-weight="700" fill="#7E1223">Qué se elige en cada paso, y qué se arriesga</text>
+      <text x="30" y="286" font-size="13" fill="#2A2A2A">Sin filtro, el disco se llena en minutos. Con corte muy corto, se pierde la carga útil. Con espejo mal configurado, faltan tramas.</text>
+      <rect x="7" y="330" width="1170" height="74" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="30" y="360" font-size="15" font-weight="700" fill="#8A6D1D">Única fuente que conserva el payload exacto</text>
+      <text x="30" y="386" font-size="13" fill="#2A2A2A">Los diccionarios de flujo y los logs describen; el .pcap demuestra byte a byte lo que circuló.</text>
+    </svg>
+  </div>
+  <aside class="notes">Flujos y bitácoras describen la red, pero a veces hay que demostrar el byte exacto. Ahí entra la captura de paquetes. Primero se toma una copia del tráfico, con un puerto espejo o un equipo de gancho en línea, sin modificar la red. Segundo, un capturador como tcpdump escribe esa copia a disco. Tercero, un filtro limita la captura a la host y los puertos que interesan, porque sin filtro el disco se llena en minutos. Cuarto, se decide la longitud de corte: hasta noventa y seis bytes alcanzan para las cabeceras, y guardar todo solo cuando hace falta la carga útil. Quinto queda el archivo con extensión pcap, que se abre en un analizador y se reproduce como si el tráfico volviera a pasar. Los diccionarios de flujo describen y los logs resumen; el pcap es lo que demuestra. Guarden una captura corta del incidente junto con el log: es la pieza que ningún analista discute.</aside>
+</section>
+<!-- D9 · Sincronización de relojes -->
+<section class="slide" data-fuente="IETF RFC 5905 (2010) NTPv4 · Diagrama propio">
+  <div class="kicker">Tiempo</div>
+  <h2>Sin relojes sincronizados, la correlación se rompe</h2>
+  <p class="sub">NTP alinea a todos los dispositivos antes de que alguien investigue.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <text x="60" y="30" font-size="15" font-weight="700" fill="#A6192E">SIN NTP: tres relojes, tres verdades</text>
+      <line x1="60" y1="120" x2="1124" y2="120" stroke="#8C8C8C" stroke-width="3"/>
+      <g font-size="13" text-anchor="middle">
+        <circle cx="250" cy="120" r="13" fill="#A6192E"/>
+        <line x1="250" y1="106" x2="250" y2="86" stroke="#A6192E" stroke-width="2"/>
+        <text x="250" y="74" font-weight="700" fill="#A6192E">07:58:12</text>
+        <text x="250" y="150" fill="#2A2A2A">escaneo · reloj atrasado 16 min</text>
+        <circle cx="620" cy="120" r="13" fill="#A6192E"/>
+        <line x1="620" y1="106" x2="620" y2="86" stroke="#A6192E" stroke-width="2"/>
+        <text x="620" y="74" font-weight="700" fill="#A6192E">08:14:02</text>
+        <text x="620" y="150" fill="#2A2A2A">fuerza bruta · hora correcta</text>
+        <circle cx="980" cy="120" r="13" fill="#A6192E"/>
+        <line x1="980" y1="106" x2="980" y2="86" stroke="#A6192E" stroke-width="2"/>
+        <text x="980" y="74" font-weight="700" fill="#A6192E">08:11:40</text>
+        <text x="980" y="150" fill="#2A2A2A">sesión abierta · reloj adelantado</text>
+      </g>
+      <rect x="60" y="172" width="1064" height="46" rx="10" fill="#F9EEF0" stroke="#B3261E" stroke-width="2"/>
+      <text x="600" y="202" text-anchor="middle" font-size="14" fill="#B3261E" font-weight="700">Ordenadas por hora, la sesión parece anterior al ataque: la evidencia se contradice</text>
+      <text x="60" y="258" font-size="15" font-weight="700" fill="#2E7D4F">CON NTP: la misma referencia para todos</text>
+      <line x1="60" y1="330" x2="1124" y2="330" stroke="#2E7D4F" stroke-width="3"/>
+      <g font-size="13" text-anchor="middle">
+        <circle cx="250" cy="330" r="13" fill="#2E7D4F"/>
+        <line x1="250" y1="316" x2="250" y2="296" stroke="#2E7D4F" stroke-width="2"/>
+        <text x="250" y="284" font-weight="700" fill="#2E7D4F">08:14:02</text>
+        <text x="250" y="360" fill="#2A2A2A">escaneo · hora del servidor NTP</text>
+        <circle cx="620" cy="330" r="13" fill="#2E7D4F"/>
+        <line x1="620" y1="316" x2="620" y2="296" stroke="#2E7D4F" stroke-width="2"/>
+        <text x="620" y="284" font-weight="700" fill="#2E7D4F">08:15:11</text>
+        <text x="620" y="360" fill="#2A2A2A">fuerza bruta · mismo origen</text>
+        <circle cx="980" cy="330" r="13" fill="#2E7D4F"/>
+        <line x1="980" y1="316" x2="980" y2="296" stroke="#2E7D4F" stroke-width="2"/>
+        <text x="980" y="284" font-weight="700" fill="#2E7D4F">08:16:40</text>
+        <text x="980" y="360" fill="#2A2A2A">sesión abierta · misma referencia</text>
+      </g>
+      <rect x="60" y="382" width="1064" height="52" rx="10" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+      <text x="600" y="414" text-anchor="middle" font-size="14" fill="#2E7D4F" font-weight="700">Antes de abrir la bitácora: verificar NTP en OPNsense, en el colector y en los servidores</text>
+    </svg>
+  </div>
+  <aside class="notes">Todo lo que vimos depende de una condición invisible: que los relojes coincidan. Arriba está la línea de tiempo sin NTP. El escaneo ocurrió primero, pero su firewall lo registró dieciséis minutos atrasado. La sesión abierta aparece con una hora anterior a la del ataque. Quien ordene los eventos por hora recibe una secuencia imposible y la evidencia pierde valor frente a una auditoría. Abajo, la misma historia con NTP: los tres equipos toman la hora del mismo servidor de referencia y los eventos quedan en orden, con la distancia real entre uno y otro. En el laboratorio verificamos la sincronización antes de investigar, en OPNsense, en el colector y en los servidores. El estándar es la RFC 5905 de dos mil diez, y para el laboratorio basta un servidor NTP público de confianza. La sincronización también es lo que permite comparar la bitácora de dos equipos distintos. Diez minutos de configuración evitan semanas de discusión sobre qué pasó primero.</aside>
+</section>
+
+<!-- D10 · Entrega del evento y cola -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §2.3 · rsyslogd(8)">
+  <div class="kicker">Entrega</div>
+  <h2>Tres formas de entregar el evento, una sola cola detrás</h2>
+  <p class="sub">Agente, envío syslog o consulta por API: todo converge antes de guardar.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 470">
+      <defs><marker id="s09p1d10-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="22" y="14" width="360" height="150" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-engranaje" x="178" y="28" width="48" height="48" style="color:#A6192E"/>
+        <text x="202" y="104" font-weight="700" fill="#A6192E">Agente instalado</text>
+        <text x="202" y="128" fill="#2A2A2A">rsyslog o syslog-ng en cada equipo</text>
+        <text x="202" y="150" fill="#5F5F5F">filtra y reenvía los archivos locales</text>
+
+        <rect x="412" y="14" width="360" height="150" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-log" x="568" y="28" width="48" height="48" style="color:#A6192E"/>
+        <text x="592" y="104" font-weight="700" fill="#A6192E">Envío directo syslog</text>
+        <text x="592" y="128" fill="#2A2A2A">el emisor habla al puerto 514</text>
+        <text x="592" y="150" fill="#5F5F5F">es lo que configura OPNsense</text>
+
+        <rect x="802" y="14" width="360" height="150" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-api" x="958" y="28" width="48" height="48" style="color:#A6192E"/>
+        <text x="982" y="104" font-weight="700" fill="#A6192E">Consulta por API</text>
+        <text x="982" y="128" fill="#2A2A2A">el origen no empuja: hay que ir</text>
+        <text x="982" y="150" fill="#5F5F5F">típico de servicios en la nube</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d10-f)">
+        <line x1="202" y1="170" x2="202" y2="214"/>
+        <line x1="592" y1="170" x2="592" y2="214"/>
+        <line x1="982" y1="170" x2="982" y2="214"/>
+      </g>
+      <rect x="22" y="220" width="1140" height="92" rx="16" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <use href="#i-automatizacion" x="52" y="242" width="48" height="48" style="color:#8A6D1D"/>
+      <text x="120" y="258" font-size="16" font-weight="700" fill="#8A6D1D">COLA DE MENSAJES</text>
+      <text x="120" y="288" font-size="14" fill="#2A2A2A">Amortigua los picos: si el destino tarda, esperan. Si se llena, se descartan primero los más viejos.</text>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d10-f)">
+        <line x1="300" y1="316" x2="300" y2="360"/>
+        <line x1="884" y1="316" x2="884" y2="360"/>
+      </g>
+      <g font-size="13" text-anchor="middle">
+        <rect x="22" y="366" width="540" height="88" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-siem" x="46" y="386" width="46" height="46" style="color:#A6192E"/>
+        <text x="110" y="402" font-weight="700" fill="#A6192E">Índice de búsqueda</text>
+        <text x="110" y="428" fill="#2A2A2A">consultas en segundos, retención corta</text>
+
+        <rect x="622" y="366" width="540" height="88" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-documento" x="646" y="386" width="46" height="46" style="color:#A6192E"/>
+        <text x="710" y="402" font-weight="700" fill="#A6192E">Archivo diario rotado</text>
+        <text x="710" y="428" fill="#2A2A2A">respaldo barato, evidencia a largo plazo</text>
+      </g>
+    </svg>
+  </div>
+  <aside class="notes">El evento ya está escrito, pero falta entregarlo. Hay tres caminos. El primero es el agente instalado: un programa en cada equipo, como rsyslog o syslog-ng, que lee los archivos locales y los reenvía; da más control y permite filtrar antes de salir. El segundo es el envío directo: el propio emisor habla con el colector por el puerto quinientos catorce, que es justamente lo que configura OPNsense desde su menú de registro remoto. El tercero es la consulta por API, cuando el origen vive en un servicio que nadie empuja y hay que ir a buscarlo por cuenta propia. Los tres caminos caen en la misma cola. La cola es lo que evita perder eventos cuando el destino se congestiona: sostiene el pico y, si se llena, descarta primero lo más viejo. Después el evento se guarda en el índice y en el archivo rotado. En el laboratorio usaremos el envío directo, porque es el que OPNsense configura en un solo formulario.</aside>
+</section>
+
+<!-- D11 · Escalera de retención -->
+<section class="slide" data-fuente="Diagrama propio · concepto: NIST SP 800-92 (2006), §4.1 retención">
+  <div class="kicker">Retención</div>
+  <h2>La retención se diseña: caliente, frío, archivo y legal</h2>
+  <p class="sub">Cuatro niveles con distinta velocidad de búsqueda y distinto costo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 430">
+      <defs><marker id="s09p1d11-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+      <g font-size="13">
+        <rect x="22" y="20" width="270" height="180" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-lupa" x="42" y="36" width="44" height="44" style="color:#A6192E"/>
+        <text x="100" y="66" font-size="15" font-weight="700" fill="#A6192E">Caliente · 0 a 30 días</text>
+        <text x="42" y="112" fill="#2A2A2A">índice con búsqueda</text>
+        <text x="42" y="136" fill="#2A2A2A">instantánea</text>
+        <text x="42" y="168" fill="#5F5F5F">el más caro por gigabyte</text>
+
+        <rect x="312" y="70" width="270" height="160" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+        <use href="#i-lista" x="332" y="86" width="44" height="44" style="color:#8A6D1D"/>
+        <text x="390" y="116" font-size="15" font-weight="700" fill="#8A6D1D">Frío · 1 a 6 meses</text>
+        <text x="332" y="162" fill="#2A2A2A">archivos comprimidos</text>
+        <text x="332" y="186" fill="#2A2A2A">búsqueda en minutos</text>
+        <text x="332" y="214" fill="#5F5F5F">rotación diaria</text>
+
+        <rect x="602" y="120" width="270" height="140" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2.5"/>
+        <use href="#i-respaldo" x="622" y="136" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="680" y="166" font-size="15" font-weight="700" fill="#5F5F5F">Archivo · 6 a 24 meses</text>
+        <text x="622" y="212" fill="#2A2A2A">objetos o cinta</text>
+        <text x="622" y="236" fill="#5F5F5F">se recupera bajo solicitud</text>
+
+        <rect x="892" y="170" width="270" height="120" rx="14" fill="#F4F4F2" stroke="#7E1223" stroke-width="2.5" stroke-dasharray="7 6"/>
+        <use href="#i-candado" x="912" y="186" width="44" height="44" style="color:#7E1223"/>
+        <text x="970" y="216" font-size="15" font-weight="700" fill="#7E1223">Respaldo legal</text>
+        <text x="912" y="252" fill="#2A2A2A">cifrado e inmutable</text>
+        <text x="912" y="276" fill="#5F5F5F">probado antes de necesitarlo</text>
+      </g>
+      <g stroke="#8A6D1D" stroke-width="3" fill="none" marker-end="url(#s09p1d11-f)">
+        <path d="M296 130 L306 130"/>
+        <path d="M586 160 L596 160"/>
+        <path d="M876 200 L886 200"/>
+      </g>
+      <g font-size="13" text-anchor="middle" fill="#5F5F5F">
+        <text x="157" y="330" font-weight="700" fill="#A6192E">buscar</text>
+        <text x="447" y="330" font-weight="700" fill="#8A6D1D">revisar</text>
+        <text x="737" y="330" font-weight="700" fill="#5F5F5F">solicitar</text>
+        <text x="1027" y="330" font-weight="700" fill="#7E1223">restaurar</text>
+      </g>
+      <rect x="22" y="354" width="1140" height="60" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="46" y="380" font-size="15" font-weight="700" fill="#8A6D1D">La retención se decide antes del incidente, no después.</text>
+      <text x="46" y="404" font-size="13" fill="#2A2A2A">En el laboratorio: rotación diaria y treinta días de consulta en el colector.</text>
+    </svg>
+  </div>
+  <aside class="notes">Guardar todo para siempre no es una política, es un accidente. La escalera muestra cuatro niveles. El primero es el almacenamiento caliente, de cero a treinta días, con índice y búsqueda instantánea, y es el más caro por gigabyte. Después viene el nivel frío, de uno a seis meses, con archivos comprimidos que se consultan en minutos. El tercero es el archivo, donde la evidencia vieja espera en objetos o en cinta y se recupera bajo solicitud. Y el cuarto es el respaldo cifrado e inmutable, que existe para el ransomware y para las auditorías. En el laboratorio usamos rotación diaria con treinta días de retención. La regla es decidir la política antes de que ocurra el incidente, porque después de ocurrido todo documento parece imprescindible y no hay espacio para guardarlo. Y prueben el respaldo antes de necesitarlo: un archivo que nunca se restauró no es un respaldo, es una esperanza.</aside>
+</section>
+<!-- D12 · Privacidad -->
+<section class="slide" data-fuente="Congreso de Colombia, Ley 1581 de 2012, artículos 4, 9 y 15 · Anexo decreto 1377 de 2013">
+  <div class="kicker">Privacidad</div>
+  <h2>Registrar sin violar la Ley 1581 de 2012</h2>
+  <p class="sub">Antes de guardar, pregunte si el dato es personal y para qué lo necesita.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p1d12-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="14" text-anchor="middle">
+        <rect x="60" y="16" width="420" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="270" y="50" font-weight="700" fill="#A6192E">¿El registro incluye datos personales?</text>
+
+        <rect x="60" y="118" width="420" height="56" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+        <text x="270" y="152" font-weight="700" fill="#8A6D1D">Sí: minimizar y enmascarar al escribir</text>
+
+        <rect x="560" y="118" width="420" height="56" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2.5"/>
+        <text x="770" y="152" font-weight="700" fill="#5F5F5F">No: guardar según la política de retención</text>
+
+        <rect x="60" y="216" width="420" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="270" y="250" font-weight="700" fill="#A6192E">¿Es imprescindible para la finalidad?</text>
+
+        <rect x="60" y="318" width="200" height="64" rx="10" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2.5"/>
+        <text x="160" y="346" font-size="13" font-weight="700" fill="#2E7D4F">Sí: registrar con</text>
+        <text x="160" y="368" font-size="13" font-weight="700" fill="#2E7D4F">finalidad declarada</text>
+
+        <rect x="280" y="318" width="200" height="64" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="380" y="346" font-size="13" font-weight="700" fill="#A6192E">No: descartar</text>
+        <text x="380" y="368" font-size="13" font-weight="700" fill="#A6192E">el campo</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="2.5" fill="none" marker-end="url(#s09p1d12-f)">
+        <path d="M270 74 L270 112"/>
+        <path d="M480 44 L520 44 L520 112"/>
+        <path d="M270 176 L270 210"/>
+        <path d="M160 274 L160 312"/>
+        <path d="M380 274 L380 312"/>
+      </g>
+      <g font-size="13" fill="#5F5F5F" font-weight="700">
+        <text x="282" y="98">sí</text>
+        <text x="492" y="100">no</text>
+        <text x="172" y="300">sí</text>
+        <text x="392" y="300">no</text>
+      </g>
+      <rect x="560" y="216" width="604" height="166" rx="14" fill="#F9EEF0" stroke="#7E1223" stroke-width="2.5"/>
+      <use href="#i-ley" x="584" y="236" width="46" height="46" style="color:#7E1223"/>
+      <text x="646" y="266" font-size="15" font-weight="700" fill="#7E1223">Nunca en claro en una bitácora de red</text>
+      <g font-size="14" fill="#2A2A2A">
+        <text x="584" y="304">· Contraseñas, claves de acceso y tokens de sesión.</text>
+        <text x="584" y="332">· Números de tarjeta y datos de pago.</text>
+        <text x="584" y="360">· Contenido de correos o mensajes privados.</text>
+      </g>
+      <rect x="60" y="402" width="1104" height="40" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="612" y="428" text-anchor="middle" font-size="14" font-weight="700" fill="#8A6D1D">Nuestro oficio registra equipos, puertos y acciones; el dato personal se trata aparte.</text>
+    </svg>
+  </div>
+  <aside class="notes">Podemos registrar mucho y aun así estar cometiendo una infracción. La Ley 1581 de dos mil doce regula el tratamiento de datos personales en Colombia, y una bitácora de red puede contenerlos sin querer: la dirección de un cliente, el usuario que inició sesión, el correo en la cabecera. El árbol de la izquierda da el orden de decisión. Primero pregunte si el registro incluye datos personales. Si la respuesta es no, guárdelo según la política de retención. Si es sí, minimice y enmascare el campo antes de escribirlo. Después pregunte si es imprescindible para la finalidad declarada; si no lo es, descarte el campo. A la derecha está la lista que nunca va en claro: contraseñas, tokens, números de tarjeta y contenido de mensajes. Nuestro oficio registra equipos y puertos; los datos personales se tratan con cuidado. Noten que minimizar no es borrar: es guardar el dato que hace falta, sin el que sobra, y explicar para qué.</aside>
+</section>
+
+<!-- D13 · Diagnóstico de la bitácora -->
+<section class="slide" data-fuente="tcpdump(1) · df(1) · date(1) · Diagrama propio">
+  <div class="kicker">Diagnóstico</div>
+  <h2>Cuando no llegan eventos, el diagnóstico es lineal</h2>
+  <p class="sub">Generación, envío, recepción, disco y hora: un orden que no falla.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># 1 · ¿llegan datagramas al puerto 514?</span>
+<span class="k">tcpdump</span> -ni eth0 udp port 514 -c 5
+
+<span class="c"># 2 · ¿el colector escribe su archivo?</span>
+<span class="k">tail</span> -f /var/log/opnsense.log
+
+<span class="c"># 3 · ¿queda espacio en el disco?</span>
+<span class="k">df</span> -h /var/log
+
+<span class="c"># 4 · ¿coincide la hora con el emisor?</span>
+<span class="k">date</span> -u
+<span class="c"># con chrony: chronyc tracking</span></pre>
+        <div class="note"><b>Orden:</b> cada paso asume que el anterior ya fue verificado; no empiece por el final.</div>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 566 420">
+          <defs><marker id="s09p1d13-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <g font-size="13">
+            <rect x="20" y="10" width="330" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="185" y="42" text-anchor="middle" font-weight="700" fill="#A6192E">¿El origen genera eventos?</text>
+            <rect x="370" y="10" width="185" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="462" y="32" text-anchor="middle" font-size="11.5" fill="#2A2A2A">habilitar el registro</text>
+            <text x="462" y="50" text-anchor="middle" font-size="11.5" fill="#2A2A2A">en el equipo origen</text>
+
+            <rect x="20" y="86" width="330" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="185" y="118" text-anchor="middle" font-weight="700" fill="#A6192E">¿Está activo el envío remoto?</text>
+            <rect x="370" y="86" width="185" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="462" y="108" text-anchor="middle" font-size="11.5" fill="#2A2A2A">activar destino syslog</text>
+            <text x="462" y="126" text-anchor="middle" font-size="11.5" fill="#2A2A2A">en OPNsense</text>
+
+            <rect x="20" y="162" width="330" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="185" y="194" text-anchor="middle" font-weight="700" fill="#A6192E">¿Llegan datagramas al 514?</text>
+            <rect x="370" y="162" width="185" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="462" y="184" text-anchor="middle" font-size="11.5" fill="#2A2A2A">revisar ruta y firewall</text>
+            <text x="462" y="202" text-anchor="middle" font-size="11.5" fill="#2A2A2a">hacia el colector</text>
+
+            <rect x="20" y="238" width="330" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="185" y="270" text-anchor="middle" font-weight="700" fill="#A6192E">¿El colector escribe en disco?</text>
+            <rect x="370" y="238" width="185" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="462" y="260" text-anchor="middle" font-size="11.5" fill="#2A2A2A">df -h: espacio lleno</text>
+            <text x="462" y="278" text-anchor="middle" font-size="11.5" fill="#2A2A2A">o permisos mal puestos</text>
+
+            <rect x="20" y="314" width="330" height="52" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="185" y="346" text-anchor="middle" font-weight="700" fill="#A6192E">¿Las horas coinciden?</text>
+            <rect x="370" y="314" width="185" height="52" rx="8" fill="#F4F4F2" stroke="#8C8C8C"/>
+            <text x="462" y="336" text-anchor="middle" font-size="11.5" fill="#2A2A2A">corregir NTP antes</text>
+            <text x="462" y="354" text-anchor="middle" font-size="11.5" fill="#2A2A2a">de sacar conclusiones</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="2.5">
+            <line x1="350" y1="36" x2="366" y2="36"/>
+            <line x1="350" y1="112" x2="366" y2="112"/>
+            <line x1="350" y1="188" x2="366" y2="188"/>
+            <line x1="350" y1="264" x2="366" y2="264"/>
+            <line x1="350" y1="340" x2="366" y2="340"/>
+          </g>
+          <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d13-f)">
+            <line x1="185" y1="64" x2="185" y2="82"/>
+            <line x1="185" y1="140" x2="185" y2="158"/>
+            <line x1="185" y1="216" x2="185" y2="234"/>
+            <line x1="185" y1="292" x2="185" y2="310"/>
+          </g>
+          <rect x="20" y="384" width="535" height="30" rx="8" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+          <text x="287" y="404" text-anchor="middle" font-size="13" font-weight="700" fill="#2E7D4F">Cinco veces sí: la cadena de evidencia está completa</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Cuando la bitácora llega vacía, el diagnóstico sigue un orden que casi nunca falla. A la izquierda, los cuatro comandos del laboratorio. Primero tcpdump en el puerto quinientos catorce, para ver si el datagrama siquiera llega. Segundo, tail sobre el archivo del colector, para confirmar que lo recibe y lo escribe. Tercero, df, porque el disco lleno es la causa más común de pérdida silenciosa. Y cuarto, date, para descartar que el problema sea la hora. A la derecha, el árbol de decisión: cada pregunta tiene su salida y su arreglo, y la última rama recuerda que una hora mal puesta arruina la investigación. Empiece siempre por la fuente: si el equipo no genera eventos, nada de lo demás importa. Solo con cinco respuestas afirmativas puede decir que la cadena de evidencia está completa. Anoten la secuencia, porque en el laboratorio la usarán cada vez que falte un mensaje. El problema casi nunca está en la herramienta: está en la configuración que faltó.</aside>
+</section>
+
+<!-- D14 · Síntesis -->
+<section class="slide" data-fuente="Diagrama propio · síntesis de la Parte 1">
+  <div class="kicker">Síntesis</div>
+  <h2>Lo que queda de la Parte 1</h2>
+  <p class="sub">Evidencia que llega, a tiempo, completa y con permiso para existir.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 450">
+      <defs><marker id="s09p1d14-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="7" y="8" width="1170" height="44" rx="10" fill="#7E1223"/>
+      <text x="592" y="37" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">La cadena de evidencia que sostiene la Parte 2</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="7" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-lista" x="86" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="112" y="176" font-weight="700" fill="#A6192E">Qué registrar</text>
+        <text x="112" y="202" fill="#2A2A2A">solo lo que responde</text>
+        <text x="112" y="224" fill="#2A2A2A">una pregunta útil</text>
+
+        <rect x="247" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-log" x="326" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="352" y="176" font-weight="700" fill="#A6192E">Cómo viaja</text>
+        <text x="352" y="202" fill="#2A2A2A">trama syslog con</text>
+        <text x="352" y="224" fill="#2A2A2A">prioridad y huso</text>
+
+        <rect x="487" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-reloj" x="566" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="592" y="176" font-weight="700" fill="#A6192E">Cuándo</text>
+        <text x="592" y="202" fill="#2A2A2A">hora verificada</text>
+        <text x="592" y="224" fill="#2A2A2A">con NTP siempre</text>
+
+        <rect x="727" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-respaldo" x="806" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="832" y="176" font-weight="700" fill="#A6192E">Dónde vive</text>
+        <text x="832" y="202" fill="#2A2A2A">cola, índice y</text>
+        <text x="832" y="224" fill="#2A2A2A">archivo rotado</text>
+
+        <rect x="967" y="72" width="210" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-ley" x="1046" y="88" width="52" height="52" style="color:#A6192E"/>
+        <text x="1072" y="176" font-weight="700" fill="#A6192E">Con qué permiso</text>
+        <text x="1072" y="202" fill="#2A2A2A">dato personal</text>
+        <text x="1072" y="224" fill="#2A2A2A">minimizado</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p1d14-f)">
+        <line x1="219" y1="160" x2="243" y2="160"/>
+        <line x1="459" y1="160" x2="483" y2="160"/>
+        <line x1="699" y1="160" x2="723" y2="160"/>
+        <line x1="939" y1="160" x2="963" y2="160"/>
+      </g>
+      <rect x="7" y="272" width="1170" height="80" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="306" text-anchor="middle" font-size="17" font-weight="700" fill="#8A6D1D">Si un eslabón falla, la alerta posterior no se sostiene.</text>
+      <text x="592" y="334" text-anchor="middle" font-size="14" fill="#2A2A2A">Registros incompletos, horas falsas o discos llenos convierten un incidente en una disculpa.</text>
+      <rect x="7" y="372" width="1170" height="64" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="400" text-anchor="middle" font-size="15" font-weight="700" fill="#7E1223">Siguiente: el SIEM que recibe todo esto</text>
+      <text x="592" y="424" text-anchor="middle" font-size="13" fill="#2A2A2A">Parte 2: ingesta, normalización, correlación y alertas con ATT&amp;CK.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cerramos la parte uno con la cadena que sostiene todo lo demás. Primero, qué registrar: solo lo que responde una pregunta de investigación. Segundo, cómo viaja: una trama syslog con prioridad y con el huso del emisor, por UDP, TCP o TLS según el riesgo. Tercero, cuándo: la hora verificada con NTP antes de cualquier investigación. Cuarto, dónde vive: una cola que amortigua, un índice para buscar y un archivo rotado con retención decidida de antemano. Y quinto, con qué permiso: la Ley 1581 marca el límite cuando aparecen datos personales. Si un eslabón falla, la alerta posterior no se sostiene. En la parte dos vemos quién recibe todo esto, cómo lo normaliza y cómo convierte miles de eventos en una sola alerta que un analista pueda defender. Antes de pasar, repitan en su laboratorio los cuatro comandos de diagnóstico y confirmen que el colector recibe el mensaje de prueba. Si hoy no llega, mañana tampoco llegará la alerta.</aside>
+</section>

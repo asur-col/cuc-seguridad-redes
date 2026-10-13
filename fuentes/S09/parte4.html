@@ -1,0 +1,861 @@
+<!-- D1 · Mapa de la parte -->
+<section class="slide" data-fuente="Diagrama propio · plan de la parte: docs/analisis-tematico.md §2.4">
+  <div class="kicker">Mapa</div>
+  <h2>De la alerta a la práctica guiada</h2>
+  <p class="sub">Equipo, marco colombiano, caso real y los pasos para montarlo.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p4d1-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="40" width="266" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-grupo" x="117" y="58" width="48" height="48" style="color:#A6192E"/>
+        <text x="141" y="140" font-weight="700" fill="#A6192E">El equipo</text>
+        <text x="141" y="166" fill="#2A2A2A">quién vigila y quién</text>
+        <text x="141" y="188" fill="#2A2A2A">responde al incidente</text>
+
+        <rect x="308" y="40" width="266" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-ley" x="417" y="58" width="48" height="48" style="color:#A6192E"/>
+        <text x="441" y="140" font-weight="700" fill="#A6192E">El marco</text>
+        <text x="441" y="166" fill="#2A2A2A">ColCERT, CONPES</text>
+        <text x="441" y="188" fill="#2A2A2A">y las leyes vigentes</text>
+
+        <rect x="608" y="40" width="266" height="176" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-alerta" x="717" y="58" width="48" height="48" style="color:#A6192E"/>
+        <text x="741" y="140" font-weight="700" fill="#A6192E">El caso</text>
+        <text x="741" y="166" fill="#2A2A2A">septiembre de dos mil</text>
+        <text x="741" y="188" fill="#2A2A2A">veintitrés: un tercero</text>
+
+        <rect x="908" y="40" width="266" height="176" rx="14" fill="#A6192E"/>
+        <use href="#i-terminal" x="1017" y="58" width="48" height="48" style="color:#D4AF37"/>
+        <text x="1041" y="140" font-weight="700" fill="#fff">La práctica</text>
+        <text x="1041" y="166" fill="#F9EEF0">Suricata y syslog en</text>
+        <text x="1041" y="188" fill="#F9EEF0">OPNsense y Alpine</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d1-f)">
+        <line x1="276" y1="128" x2="304" y2="128"/>
+        <line x1="576" y1="128" x2="604" y2="128"/>
+        <line x1="876" y1="128" x2="904" y2="128"/>
+      </g>
+      <rect x="8" y="256" width="1168" height="88" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="292" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">La parte cuatro siempre cierra con la práctica sobre la topología del laboratorio</text>
+      <text x="592" y="322" text-anchor="middle" font-size="13.5" fill="#2A2A2A">cinco pasos, cada uno con su verificación; nada que instalar fuera de VirtualBox.</text>
+      <rect x="8" y="364" width="1168" height="64" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="392" text-anchor="middle" font-size="14" font-weight="700" fill="#7E1223">Y después: las fuentes consultadas y el puente a la semana 10</text>
+      <text x="592" y="416" text-anchor="middle" font-size="13" fill="#2A2A2A">Del monitoreo pasamos a la gestión de vulnerabilidades y al parcheo.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cerramos la semana con cuatro paradas. Primera, el equipo: quién vigila de forma continua y quién responde cuando algo se confirma, porque la vigilancia y la respuesta son oficios distintos. Segunda, el proceso: el ciclo de respuesta con sus fases y el papel de las personas en cada una. Tercera, el marco colombiano: el equipo nacional de emergencias, la política pública y las leyes que respaldan el registro. Y cuarta, el caso real de septiembre de dos mil veintitrés, donde el problema empezó dentro de un proveedor del que dependían cientos de organizaciones, con una lección que sigue vigente. Después viene la práctica: van a encender Suricata en OPNsense, van a enviar sus alertas a un colector con rsyslog y van a verificar cada paso con un comando. Terminamos con las fuentes consultadas y con el puente hacia la semana diez, que cambia la pregunta: de detectar a prevenir.</aside>
+</section>
+
+<!-- D2 · SOC y CSIRT -->
+<section class="slide" data-fuente="Concepto: operación de centros de monitoreo y respuesta; NIST SP 800-61 Rev.3 (2025)">
+  <div class="kicker">Equipo</div>
+  <h2>SOC y CSIRT: quién vigila y quién responde</h2>
+  <p class="sub">Atención continua de un lado; respuesta coordinada del otro.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p4d2-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p4d2-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+      <rect x="8" y="16" width="552" height="44" rx="10" fill="#7E1223"/>
+      <text x="284" y="45" text-anchor="middle" font-size="15" font-weight="700" fill="#D4AF37">Centro de operaciones · vigila sin parar</text>
+      <g font-size="13">
+        <rect x="8" y="72" width="552" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="104" font-weight="700" fill="#A6192E">Nivel 1 · triaje</text>
+        <text x="30" y="130" fill="#2A2A2A">abre la alerta, aplica las cuatro preguntas</text>
+        <text x="30" y="154" fill="#2A2A2A">y cierra lo que es benigno conocido</text>
+
+        <rect x="8" y="180" width="552" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="212" font-weight="700" fill="#A6192E">Nivel 2 · investigación</text>
+        <text x="30" y="238" fill="#2A2A2A">correlaciona eventos, arma la cronología</text>
+        <text x="30" y="262" fill="#2A2A2A">y decide si escala a incidente</text>
+
+        <rect x="8" y="288" width="552" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="320" font-weight="700" fill="#A6192E">Nivel 3 · caza</text>
+        <text x="30" y="346" fill="#2A2A2A">busca señales que nadie alertó</text>
+        <text x="30" y="370" fill="#2A2A2A">y escribe las reglas nuevas</text>
+
+        <rect x="624" y="16" width="552" height="44" rx="10" fill="#7E1223"/>
+        <text x="900" y="45" text-anchor="middle" font-size="15" font-weight="700" fill="#D4AF37">Equipo de respuesta · actúa por caso</text>
+
+        <rect x="624" y="72" width="552" height="96" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="646" y="104" font-weight="700" fill="#5F5F5F">Coordinación</text>
+        <text x="646" y="130" fill="#2A2A2A">se nombra responsable, alcance y horario</text>
+        <text x="646" y="154" fill="#2A2A2A">antes de tocar el entorno</text>
+
+        <rect x="624" y="180" width="552" height="96" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="646" y="212" font-weight="700" fill="#5F5F5F">Contención y erradicación</text>
+        <text x="646" y="238" fill="#2A2A2A">se aísla, se retira el acceso y</text>
+        <text x="646" y="262" fill="#2A2A2A">se recupera desde respaldo</text>
+
+        <rect x="624" y="288" width="552" height="96" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="646" y="320" font-weight="700" fill="#5F5F5F">Comunicación y lecciones</text>
+        <text x="646" y="346" fill="#2A2A2A">se reporta a quien corresponda</text>
+        <text x="646" y="370" fill="#2A2A2A">y la causa vuelve como regla</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d2-f)">
+        <line x1="420" y1="404" x2="790" y2="404"/>
+      </g>
+      <text x="605" y="394" text-anchor="middle" font-size="13" font-weight="700" fill="#A6192E">escala cuando el impacto se confirma</text>
+      <g stroke="#5F5F5F" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#s09p4d2-g)">
+        <line x1="790" y1="434" x2="420" y2="434"/>
+      </g>
+      <text x="605" y="452" text-anchor="middle" font-size="13" font-weight="700" fill="#5F5F5F">reglas aprendidas vuelven al sensor</text>
+    </svg>
+  </div>
+  <aside class="notes">Los dos nombres se confunden, pero las tareas son distintas. El centro de operaciones trabaja sobre el turno: recibe alertas de forma continua, hace triaje y escala lo que se confirma. Sus tres niveles son conocidos: el primero clasifica con las cuatro preguntas de la parte dos, el segundo investiga y arma la cronología, y el tercero caza señales que nadie alertó, escribiendo las reglas nuevas. El equipo de respuesta, en cambio, se activa por caso y con alcance definido: nombra un responsable, contiene el alcance sin borrar evidencia, erradica el acceso, recupera el servicio y comunica lo que pasó. La flecha de ida es la escala: solo cruza cuando el impacto está confirmado. Y la de vuelta es lo que más se olvida: la lección aprendida regresa como regla nueva al sensor. Sin esa vuelta, el mismo incidente vuelve a pasar con otro nombre. Pregunten en su empresa quién cumple cada rol, aunque sea la misma persona con dos sombreros.</aside>
+</section>
+
+<!-- D3 · Ciclo de respuesta -->
+<section class="slide" data-fuente="NIST SP 800-61 Rev.3 (2025): Incident Response Recommendations and Considerations for Cybersecurity Risk Management">
+  <div class="kicker">Proceso</div>
+  <h2>El ciclo de respuesta, paso por paso</h2>
+  <p class="sub">Preparación primero; después detección, contención, erradicación y recuperación.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p4d3-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p4d3-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="8" y="24" width="206" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-escudo" x="85" y="40" width="50" height="50" style="color:#A6192E"/>
+        <text x="111" y="122" font-weight="700" fill="#A6192E">Preparación</text>
+        <text x="111" y="148" font-size="12.5" fill="#2A2A2A">roles, contacto y</text>
+        <text x="111" y="170" font-size="12.5" fill="#2A2A2A">herramientas listas</text>
+
+        <rect x="249" y="24" width="206" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-lupa" x="326" y="40" width="50" height="50" style="color:#A6192E"/>
+        <text x="352" y="122" font-weight="700" fill="#A6192E">Detección</text>
+        <text x="352" y="148" font-size="12.5" fill="#2A2A2A">la alerta se confirma</text>
+        <text x="352" y="170" font-size="12.5" fill="#2A2A2A">con evidencia junta</text>
+
+        <rect x="490" y="24" width="206" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-bloqueo" x="567" y="40" width="50" height="50" style="color:#A6192E"/>
+        <text x="593" y="122" font-weight="700" fill="#A6192E">Contención</text>
+        <text x="593" y="148" font-size="12.5" fill="#2A2A2A">se aísla el alcance</text>
+        <text x="593" y="170" font-size="12.5" fill="#2A2A2a">sin borrar evidencia</text>
+
+        <rect x="731" y="24" width="206" height="164" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-malware" x="808" y="40" width="50" height="50" style="color:#A6192E"/>
+        <text x="834" y="122" font-weight="700" fill="#A6192E">Erradicación</text>
+        <text x="834" y="148" font-size="12.5" fill="#2A2A2A">se retira el acceso</text>
+        <text x="834" y="170" font-size="12.5" fill="#2A2A2A">y se cierra la vía</text>
+
+        <rect x="972" y="24" width="206" height="164" rx="14" fill="#A6192E"/>
+        <use href="#i-respaldo" x="1049" y="40" width="50" height="50" style="color:#D4AF37"/>
+        <text x="1075" y="122" font-weight="700" fill="#fff">Recuperación</text>
+        <text x="1075" y="148" font-size="12.5" fill="#F9EEF0">se vuelve al servicio</text>
+        <text x="1075" y="170" font-size="12.5" fill="#F9EEF0">y se vigila el cambio</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d3-f)">
+        <line x1="216" y1="106" x2="245" y2="106"/>
+        <line x1="457" y1="106" x2="486" y2="106"/>
+        <line x1="698" y1="106" x2="727" y2="106"/>
+        <line x1="939" y1="106" x2="968" y2="106"/>
+      </g>
+      <rect x="8" y="240" width="1170" height="86" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="592" y="274" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Lecciones aprendidas: lo que se entendió vuelve a la preparación</text>
+      <text x="592" y="304" text-anchor="middle" font-size="13.5" fill="#2A2A2A">Cada caso deja una regla nueva, una corrección de procedimiento o una brecha documentada.</text>
+      <polyline points="1140,326 1170,326 1170,401 592,401 592,360 586,360" fill="none" stroke="#5F5F5F" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#s09p4d3-g)"/>
+      <rect x="8" y="404" width="1170" height="44" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="432" text-anchor="middle" font-size="13.5" font-weight="700" fill="#7E1223">El monitoreo que montamos en esta semana es la mitad de la detección; la otra mitad es el proceso.</text>
+    </svg>
+  </div>
+  <aside class="notes">El estándar de referencia describe la respuesta en cinco fases y una vuelta de cierre. Todo empieza por la preparación: sin contactos acordados y sin herramientas listas, la primera hora se pierde buscando a alguien que responda. La detección confirma la alerta con la evidencia reunida en las partes anteriores: bitácoras, flujos y capturas. La contención aísla el alcance sin borrar la evidencia, porque el análisis posterior y hasta la causa legal dependen de ella. La erradicación retira el acceso del atacante y cierra la vía que usó para entrar. La recuperación devuelve el servicio y vigila el cambio, porque a veces el atacante intenta volver por la misma puerta. Y después vienen las lecciones, que no son un informe bonito: son una regla nueva, un procedimiento corregido o una brecha documentada que vuelve a la preparación. El ciclo completo se apoya en el monitoreo que montamos esta semana: sin detección oportuna, las demás fases empiezan tarde.</aside>
+</section>
+
+<!-- D4 · Marco colombiano -->
+<section class="slide" data-fuente="DNP, CONPES 3995 (2020) · Ley 1273 de 2009 · Ley 1581 de 2012 · función CSIRT: IETF RFC 2350 (1998)">
+  <div class="kicker">Colombia</div>
+  <h2>Colombia: el marco y el circuito del reporte</h2>
+  <p class="sub">Política nacional, equipo que responde y leyes que respaldan la bitácora.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p4d4-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <rect x="8" y="16" width="470" height="44" rx="10" fill="#7E1223"/>
+      <use href="#i-escudo" x="26" y="24" width="32" height="32" style="color:#D4AF37"/>
+      <text x="72" y="44" font-size="15" font-weight="700" fill="#D4AF37">El circuito del reporte</text>
+      <g font-size="13">
+        <rect x="28" y="80" width="430" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="46" y="104" font-weight="700" fill="#A6192E">1 · La entidad reporta el incidente</text>
+        <text x="46" y="126" fill="#2A2A2A">con lo que vio y a qué hora lo vio</text>
+        <rect x="28" y="154" width="430" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="46" y="178" font-weight="700" fill="#A6192E">2 · Se clasifica la severidad</text>
+        <text x="46" y="200" fill="#2A2A2A">y se decide qué respuesta hace falta</text>
+        <rect x="28" y="228" width="430" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="46" y="252" font-weight="700" fill="#A6192E">3 · Se orienta la contención</text>
+        <text x="46" y="274" fill="#2A2A2A">con guías técnicas para la entidad</text>
+        <rect x="28" y="302" width="430" height="56" rx="10" fill="#A6192E"/>
+        <text x="46" y="326" font-weight="700" fill="#D4AF37">4 · Se difunde la alerta</text>
+        <text x="46" y="348" font-size="12.5" fill="#fff">para que otros corrijan el mismo hueco</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d4-f)">
+        <line x1="243" y1="136" x2="243" y2="152"/>
+        <line x1="243" y1="210" x2="243" y2="226"/>
+        <line x1="243" y1="284" x2="243" y2="300"/>
+      </g>
+      <rect x="28" y="376" width="430" height="48" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+      <text x="48" y="397" font-size="13.5" font-weight="700" fill="#8A6D1D">Reportar temprano acorta la recuperación</text>
+      <text x="48" y="416" font-size="12.5" fill="#2A2A2A">de quien reporta y de los demás. Función estándar de un CSIRT nacional.</text>
+      <g font-size="13">
+        <rect x="506" y="16" width="670" height="118" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-ley" x="528" y="44" width="44" height="44" style="color:#A6192E"/>
+        <text x="592" y="52" font-weight="700" fill="#A6192E">Política nacional</text>
+        <text x="592" y="80" fill="#2A2A2A">El CONPES 3995 de 2020, del DNP, puso</text>
+        <text x="592" y="106" fill="#2A2A2A">metas y responsables a la seguridad digital.</text>
+
+        <rect x="506" y="154" width="670" height="118" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-escudo-alerta" x="528" y="182" width="44" height="44" style="color:#A6192E"/>
+        <text x="592" y="190" font-weight="700" fill="#A6192E">Respuesta del Estado</text>
+        <text x="592" y="218" fill="#2A2A2A">El ColCERT, del MinTIC, recibe, clasifica</text>
+        <text x="592" y="244" fill="#2A2A2A">y orienta los reportes de incidentes.</text>
+
+        <rect x="506" y="292" width="670" height="118" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-documento" x="528" y="320" width="44" height="44" style="color:#A6192E"/>
+        <text x="592" y="328" font-weight="700" fill="#A6192E">Obligaciones</text>
+        <text x="592" y="356" fill="#2A2A2A">Ley 1273 de 2009: delitos informáticos.</text>
+        <text x="592" y="382" fill="#2A2A2A">Ley 1581 de 2012: datos personales en bitácoras.</text>
+      </g>
+      <text x="592" y="446" text-anchor="middle" font-size="13.5" font-weight="700" fill="#7E1223">Registrar bien no es costumbre: es la base técnica y jurídica de la respuesta.</text>
+    </svg>
+  </div>
+  <aside class="notes">El país no arranca de cero en esta materia. La política nacional de seguridad digital, del consejo nacional de política económica, existe desde dos mil veinte y le puso metas y responsables a algo que antes dependía de la buena voluntad de cada entidad. La respuesta del Estado la encabeza el equipo nacional de emergencias cibernéticas del ministerio de tecnologías. Sigan el circuito de la izquierda. Una entidad reporta lo que vio y a qué hora lo vio. El equipo nacional clasifica la severidad del caso y decide qué respuesta hace falta. Después orienta la contención con guías técnicas, y por último difunde alertas para que otras organizaciones corrijan el mismo hueco antes de que las toque. Ese circuito se alimenta de la evidencia que ustedes aprendieron a recoger esta semana. Y las dos leyes de la derecha respaldan el trabajo: una define los delitos informáticos y la otra protege los datos personales, incluidos los que aparecen dentro de una bitácora.</aside>
+</section>
+
+<!-- D5 · Caso IFX -->
+<section class="slide" data-fuente="EFE y prensa nacional (12–19 sep 2023) · Noticias RCN (18-sep-2023) · Rama Judicial: suspensión de términos 14–20 sep 2023">
+  <div class="kicker">Caso</div>
+  <h2>IFX Networks, septiembre de 2023</h2>
+  <p class="sub">Un proveedor en la nube, cientos de entidades afectadas y una respuesta nacional.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <rect x="8" y="16" width="1168" height="44" rx="10" fill="#7E1223"/>
+      <text x="592" y="45" text-anchor="middle" font-size="15" font-weight="700" fill="#D4AF37">Cronología pública del incidente</text>
+      <line x1="70" y1="160" x2="1140" y2="160" stroke="#A6192E" stroke-width="4"/>
+      <g font-size="12.5">
+        <circle cx="180" cy="160" r="12" fill="#A6192E"/>
+        <text x="180" y="106" text-anchor="middle" font-weight="700" fill="#A6192E">12 sep</text>
+        <text x="180" y="136" text-anchor="middle" fill="#2A2A2A">ataque con cifrado en</text>
+        <text x="180" y="196" text-anchor="middle" fill="#5F5F5F">el proveedor de nube</text>
+
+        <circle cx="470" cy="160" r="12" fill="#A6192E"/>
+        <text x="470" y="106" text-anchor="middle" font-weight="700" fill="#A6192E">13–15 sep</text>
+        <text x="470" y="136" text-anchor="middle" fill="#2A2A2A">762 compañías afectadas:</text>
+        <text x="470" y="196" text-anchor="middle" fill="#5F5F5F">la cifra de la semana, varios países</text>
+
+        <circle cx="760" cy="160" r="12" fill="#A6192E"/>
+        <text x="760" y="106" text-anchor="middle" font-weight="700" fill="#A6192E">14–20 sep</text>
+        <text x="760" y="136" text-anchor="middle" fill="#2A2A2A">la Rama Judicial suspende</text>
+        <text x="760" y="196" text-anchor="middle" fill="#5F5F5F">términos en todo el país</text>
+
+        <circle cx="1050" cy="160" r="12" fill="#A6192E"/>
+        <text x="1050" y="106" text-anchor="middle" font-weight="700" fill="#A6192E">18 sep</text>
+        <text x="1050" y="136" text-anchor="middle" fill="#2A2A2A">la Fiscalía señala a</text>
+        <text x="1050" y="196" text-anchor="middle" fill="#5F5F5F">RansomHouse como presunto autor</text>
+      </g>
+      <g font-size="13">
+        <rect x="8" y="244" width="380" height="150" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="30" y="278" font-weight="700" fill="#A6192E">Lección 1 · dependencia</text>
+        <text x="30" y="308" fill="#2A2A2A">El incidente empezó en el proveedor</text>
+        <text x="30" y="334" fill="#2A2A2A">y sus clientes no tenían visibilidad</text>
+        <text x="30" y="360" fill="#2A2A2A">propia del servicio que usaban.</text>
+
+        <rect x="402" y="244" width="380" height="150" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="424" y="278" font-weight="700" fill="#A6192E">Lección 2 · continuidad</text>
+        <text x="424" y="308" fill="#2A2A2A">Sin respaldo probado y sin plan,</text>
+        <text x="424" y="334" fill="#2A2A2A">la recuperación dependió del</text>
+        <text x="424" y="360" fill="#2A2A2A">tiempo del tercero.</text>
+
+        <rect x="796" y="244" width="380" height="150" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="818" y="278" font-weight="700" fill="#A6192E">Lección 3 · registro</text>
+        <text x="818" y="308" fill="#2A2A2A">Las fechas que vimos arriba</text>
+        <text x="818" y="334" fill="#2A2A2A">existen porque alguien guardó</text>
+        <text x="818" y="360" fill="#2A2A2A">bitácoras y las publicó.</text>
+      </g>
+      <text x="592" y="432" text-anchor="middle" font-size="13" font-weight="700" fill="#7E1223">También se monitorea al tercero del que dependemos: pregunténle qué registro conserva.</text>
+    </svg>
+  </div>
+  <aside class="notes">Este es el incidente que ordenó la conversación en Colombia. El doce de septiembre de dos mil veintitrés empezó a conocerse un ataque con cifrado contra un proveedor de servicios en la nube que atendía a cientos de organizaciones. En los primeros días, la cifra que circuló en la prensa fue de setecientas sesenta y dos compañías afectadas en varios países de la región. Entre el catorce y el veinte de septiembre, la Rama Judicial suspendió términos procesales en todo el país. Y el dieciocho de septiembre, la Fiscalía señaló al grupo RansomHouse como presunto responsable. Las tres lecciones importan más que las fechas. Primera: la dependencia, porque el problema nació dentro del proveedor y los clientes no tenían visibilidad propia del servicio que usaban. Segunda: la continuidad, porque sin respaldo probado la recuperación dependió del tiempo del tercero. Y tercera: el registro, porque esta cronología existe únicamente porque alguien guardó bitácoras y las hizo públicas.</aside>
+</section>
+
+<!-- D6 · Plano de control en la nube -->
+<section class="slide" data-fuente="Diagrama propio · concepto: registro de auditoría de la API de control · NIST SP 800-92 (2006), §3.2">
+  <div class="kicker">Nube</div>
+  <h2>La nube se vigila en la bitácora de la API</h2>
+  <p class="sub">Cada llamada de administración queda registrada: identidad, hora, origen y acción.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p4d6-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+      <use href="#i-admin" x="24" y="28" width="56" height="56" style="color:#A6192E"/>
+      <text x="52" y="106" text-anchor="middle" font-size="12.5" fill="#5F5F5F">administración</text>
+      <line x1="88" y1="56" x2="222" y2="56" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d6-f)"/>
+      <text x="155" y="44" text-anchor="middle" font-size="12" fill="#5F5F5F">HTTPS 443</text>
+      <rect x="232" y="16" width="310" height="82" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+      <use href="#i-nube" x="252" y="32" width="48" height="48" style="color:#A6192E"/>
+      <text x="318" y="52" font-size="15" font-weight="700" fill="#A6192E">Plano de control</text>
+      <text x="318" y="78" font-size="13" fill="#2A2A2A">crear, cambiar y borrar recursos</text>
+      <line x1="548" y1="56" x2="682" y2="56" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d6-f)"/>
+      <text x="615" y="44" text-anchor="middle" font-size="12" fill="#5F5F5F">queda anotada</text>
+      <rect x="692" y="16" width="250" height="82" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <use href="#i-log" x="710" y="32" width="44" height="44" style="color:#8A6D1D"/>
+      <text x="770" y="52" font-size="15" font-weight="700" fill="#8A6D1D">Bitácora de API</text>
+      <text x="770" y="78" font-size="12.5" fill="#2A2A2A">hora, identidad, origen, acción</text>
+      <line x1="950" y1="56" x2="1020" y2="56" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d6-f)"/>
+      <rect x="1028" y="16" width="146" height="82" rx="14" fill="#A6192E"/>
+      <use href="#i-siem" x="1080" y="30" width="42" height="42" style="color:#D4AF37"/>
+      <text x="1101" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#fff">Su colector</text>
+      <text x="24" y="146" font-size="15" font-weight="700" fill="#7E1223">Las preguntas que esta bitácora responde</text>
+      <g font-size="13.5">
+        <rect x="24" y="160" width="360" height="66" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <use href="#i-lupa" x="42" y="178" width="30" height="30" style="color:#5F5F5F"/>
+        <text x="88" y="188" fill="#2A2A2A">¿Quién creó o borró esa regla</text>
+        <text x="88" y="210" fill="#2A2A2A">de acceso del firewall en la nube?</text>
+        <rect x="412" y="160" width="360" height="66" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <use href="#i-lupa" x="430" y="178" width="30" height="30" style="color:#5F5F5F"/>
+        <text x="476" y="188" fill="#2A2A2A">¿Desde qué dirección IP se administró</text>
+        <text x="476" y="210" fill="#2A2A2A">el servicio y a qué hora exacta?</text>
+        <rect x="800" y="160" width="360" height="66" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+        <use href="#i-lupa" x="818" y="178" width="30" height="30" style="color:#5F5F5F"/>
+        <text x="864" y="188" fill="#2A2A2A">¿Qué permiso cambió justo antes</text>
+        <text x="864" y="210" fill="#2A2A2A">de que apareciera el incidente?</text>
+      </g>
+      <rect x="24" y="252" width="1136" height="98" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+      <text x="48" y="282" font-size="14.5" font-weight="700" fill="#A6192E">El mismo concepto en cualquier proveedor</text>
+      <text x="48" y="310" font-size="13" fill="#2A2A2A">Ejemplos de bitácora de plano de control: CloudTrail de Amazon Web Services, Activity Log de</text>
+      <text x="48" y="334" font-size="13" fill="#2A2A2A">Azure y Cloud Audit Logs de Google. El concepto es el registro de auditoría; el nombre es lo de menos.</text>
+      <rect x="24" y="372" width="1136" height="76" rx="12" fill="#7E1223"/>
+      <text x="592" y="402" text-anchor="middle" font-size="15" font-weight="700" fill="#D4AF37">La nube no externaliza la responsabilidad: la bitácora de la API es su evidencia.</text>
+      <text x="592" y="428" text-anchor="middle" font-size="13" fill="#fff">Pregunte siempre cuánto retiene el proveedor y cómo se exporta hacia el colector de ustedes.</text>
+    </svg>
+  </div>
+  <aside class="notes">Los servicios en la nube se administran por código: cada regla, cada máquina y cada permiso se crea o se cambia con una llamada a la interfaz de programación. Ese plano de control deja su propia bitácora, y es la evidencia más valiosa cuando algo cambia sin explicación. Sigan el recorrido de arriba. La persona administra por la consola o por línea de comandos; la llamada viaja cifrada al proveedor, y el proveedor anota quién llamó, desde qué dirección, a qué hora, qué acción pidió y qué resultado obtuvo. Esa bitácora se puede exportar al mismo colector de la parte uno, con la misma normalización y las mismas reglas. Las preguntas de abajo son las que salvan una investigación: quién creó esa regla, desde dónde se administró y qué cambió justo antes del incidente. Y la línea final es la que más se olvida: la nube no externaliza la responsabilidad.</aside>
+</section>
+
+<!-- D7 · Wazuh opcional -->
+<section class="slide" data-fuente="Concepto: arquitectura gestor-agente · Wazuh (wazuh.com) y Elastic (elastic.co), citados como ejemplo">
+  <div class="kicker">Crecer</div>
+  <h2>Del colector simple al SIEM libre: una opción de crecimiento</h2>
+  <p class="sub">La misma arquitectura de siempre, con agente, motor de reglas y panel de consulta.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 470">
+      <defs><marker id="s09p4d7-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p4d7-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+      <g font-size="13">
+        <rect x="24" y="24" width="250" height="80" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-firewall" x="42" y="40" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="102" y="58" font-weight="700" fill="#5F5F5F">OPNsense</text>
+        <text x="102" y="82" fill="#2A2A2A">syslog del firewall y del IDS</text>
+        <rect x="24" y="124" width="250" height="80" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-servidor" x="42" y="140" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="102" y="158" font-weight="700" fill="#5F5F5F">Hosts y Alpine</text>
+        <text x="102" y="182" fill="#2A2A2A">agente instalado en cada equipo</text>
+        <rect x="24" y="224" width="250" height="80" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <use href="#i-nube" x="42" y="240" width="44" height="44" style="color:#5F5F5F"/>
+        <text x="102" y="258" font-weight="700" fill="#5F5F5F">Servicios en nube</text>
+        <text x="102" y="282" fill="#2A2A2A">bitácora de la API (D6)</text>
+
+        <rect x="400" y="74" width="300" height="180" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-siem" x="516" y="88" width="56" height="56" style="color:#A6192E"/>
+        <text x="552" y="168" text-anchor="middle" font-size="16" font-weight="700" fill="#A6192E">Gestor de eventos</text>
+        <text x="552" y="196" text-anchor="middle" fill="#2A2A2A">decodifica, normaliza y</text>
+        <text x="552" y="220" text-anchor="middle" fill="#2A2A2A">aplica las reglas de correlación</text>
+
+        <rect x="782" y="74" width="180" height="180" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+        <use href="#i-bd" x="848" y="94" width="48" height="48" style="color:#8A6D1D"/>
+        <text x="872" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#8A6D1D">Indexador</text>
+        <text x="872" y="196" text-anchor="middle" font-size="12.5" fill="#2A2A2A">búsqueda en segundos</text>
+        <rect x="1024" y="74" width="150" height="180" rx="14" fill="#A6192E"/>
+        <use href="#i-grafica" x="1076" y="94" width="48" height="48" style="color:#D4AF37"/>
+        <text x="1099" y="170" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Panel</text>
+        <text x="1099" y="196" text-anchor="middle" font-size="12.5" fill="#F9EEF0">consultas e informes</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="2.5" fill="none" marker-end="url(#s09p4d7-f)">
+        <path d="M278 64 L396 120"/>
+        <path d="M278 164 L396 164"/>
+        <path d="M278 264 L396 210"/>
+        <line x1="704" y1="164" x2="776" y2="164"/>
+      </g>
+      <line x1="966" y1="164" x2="1018" y2="164" stroke="#8A6D1D" stroke-width="2.5" marker-end="url(#s09p4d7-g)"/>
+      <text x="24" y="340" font-size="15" font-weight="700" fill="#7E1223">Qué añade sobre el colector con rsyslog</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="24" y="356" width="360" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="204" y="380" font-weight="700" fill="#A6192E">Índice de búsqueda</text>
+        <text x="204" y="400" fill="#2A2A2A">consultas en segundos sobre millones de eventos</text>
+        <rect x="412" y="356" width="360" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="592" y="380" font-weight="700" fill="#A6192E">Reglas listas</text>
+        <text x="592" y="400" fill="#2A2A2A">decodificadores y correlaciones mantenidas por la comunidad</text>
+        <rect x="800" y="356" width="360" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="980" y="380" font-weight="700" fill="#A6192E">Paneles e informes</text>
+        <text x="980" y="400" fill="#2A2A2A">visualización sin escribir código</text>
+      </g>
+      <rect x="24" y="432" width="1136" height="30" rx="8" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+      <text x="592" y="452" text-anchor="middle" font-size="13" fill="#2A2A2A">¿Cuándo hace falta? Volumen alto, correlación entre host y red, informes periódicos. En el laboratorio es opcional.</text>
+    </svg>
+  </div>
+  <aside class="notes">El colector con rsyslog que van a montar es perfecto para aprender la cadena, pero en producción el volumen crece y la correlación se vuelve crítica. Ahí entra la plataforma de gestión de eventos. Wazuh es un ejemplo libre, sin costo de licencia, y Elastic cumple el mismo papel; los nombramos juntos porque el concepto no es de marca. Miren la arquitectura: los agentes en los hosts, el syslog del firewall y la bitácora de la nube llegan a un gestor que decodifica, normaliza y aplica reglas; de ahí pasan a un índice para buscar en segundos y a un panel para consultar con comodidad. Todo lo de la parte dos aplica igual: ingesta, esquema común, correlación con ventana y umbral. La decisión es de recursos, porque la plataforma pide memoria y disco aparte. Por eso en el laboratorio es opcional: el objetivo de esta semana es entender la cadena, no administrar un producto.</aside>
+</section>
+
+<!-- D8 · Práctica: panorama -->
+<section class="slide" data-fuente="Diagrama propio · práctica sobre la plataforma del curso: VirtualBox + OPNsense + Alpine (Lab 1)">
+  <div class="kicker">Práctica</div>
+  <h2>La práctica: un sensor y un colector en su laboratorio</h2>
+  <p class="sub">Sobre la topología del laboratorio: Suricata en OPNsense y rsyslog en Alpine.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 340">
+      <defs><marker id="s09p4d8-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p4d8-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#8A6D1D"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="24" y="20" width="280" height="150" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="164" y="46" font-weight="700" fill="#8A6D1D">VLAN 10 · USUARIOS</text>
+        <use href="#i-atacante" x="76" y="66" width="52" height="52" style="color:#A6192E"/>
+        <use href="#i-pc" x="188" y="66" width="52" height="52" style="color:#2A2A2A"/>
+        <text x="164" y="142" fill="#2A2A2A">la Alpine «atacante» hace las pruebas</text>
+        <text x="164" y="160" font-size="12" fill="#5F5F5F">10.10.10.0/24</text>
+
+        <rect x="380" y="40" width="260" height="110" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <use href="#i-firewall" x="424" y="52" width="52" height="52" style="color:#A6192E"/>
+        <text x="500" y="76" font-weight="700" fill="#A6192E">OPNsense</text>
+        <text x="500" y="100" font-size="12.5" fill="#2A2A2A">firewall · NAT · Suricata</text>
+        <rect x="404" y="164" width="212" height="34" rx="8" fill="#A6192E"/>
+        <text x="510" y="186" fill="#fff" font-weight="700">Suricata IDS escucha en LAN</text>
+
+        <rect x="760" y="20" width="240" height="150" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="880" y="46" font-weight="700" fill="#8A6D1D">VLAN 20 · DMZ</text>
+        <use href="#i-servidor-web" x="854" y="66" width="52" height="52" style="color:#2A2A2A"/>
+        <text x="880" y="142" fill="#2A2A2A">servidor web 10.10.20.10</text>
+        <text x="880" y="160" font-size="12" fill="#5F5F5F">objetivo del escaneo</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d8-f)">
+        <line x1="308" y1="95" x2="374" y2="95"/>
+        <line x1="644" y1="95" x2="754" y2="95"/>
+      </g>
+      <text x="341" y="82" text-anchor="middle" font-size="12" fill="#A6192E">nmap</text>
+      <text x="700" y="82" text-anchor="middle" font-size="12" fill="#A6192E">tráfico</text>
+      <path d="M510 202 C 620 222, 720 222, 876 222" stroke="#8A6D1D" stroke-width="3" fill="none" stroke-dasharray="8 6" marker-end="url(#s09p4d8-g)"/>
+      <text x="720" y="196" text-anchor="middle" font-size="12.5" font-weight="700" fill="#8A6D1D">syslog 514/UDP · EVE JSON</text>
+      <g font-size="13" text-anchor="middle">
+        <rect x="880" y="200" width="284" height="120" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="1022" y="228" font-weight="700" fill="#5F5F5F">VLAN 99 · ADMIN</text>
+        <use href="#i-servidor" x="962" y="244" width="48" height="48" style="color:#5F5F5F"/>
+        <text x="1046" y="262" fill="#2A2A2A">colector Alpine</text>
+        <text x="1046" y="284" fill="#2A2A2A">rsyslog · puerto 514</text>
+        <text x="1046" y="304" font-size="12" fill="#5F5F5F">archivo por cada origen</text>
+      </g>
+      <g font-size="13" text-anchor="middle">
+        <rect x="24" y="236" width="150" height="60" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="99" y="260" font-weight="700" fill="#A6192E">1 · Encender el IDS</text>
+        <text x="99" y="282" font-size="12" fill="#2A2A2A">en OPNsense</text>
+        <rect x="202" y="236" width="150" height="60" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="277" y="260" font-weight="700" fill="#A6192E">2 · Probar con nmap</text>
+        <text x="277" y="282" font-size="12" fill="#2A2A2A">y ver la alerta</text>
+        <rect x="380" y="236" width="150" height="60" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="455" y="260" font-weight="700" fill="#A6192E">3 · Enviar al colector</text>
+        <text x="455" y="282" font-size="12" fill="#2A2A2A">syslog remoto</text>
+        <rect x="558" y="236" width="150" height="60" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <text x="633" y="260" font-weight="700" fill="#A6192E">4 · Consultar y avisar</text>
+        <text x="633" y="282" font-size="12" fill="#2A2A2A">grep y umbral</text>
+        <rect x="736" y="236" width="124" height="60" rx="10" fill="#A6192E"/>
+        <text x="798" y="260" font-weight="700" fill="#D4AF37">5 · Bloquear</text>
+        <text x="798" y="282" font-size="12" fill="#fff">de IDS a IPS</text>
+      </g>
+      <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d8-f)">
+        <line x1="176" y1="266" x2="198" y2="266"/>
+        <line x1="354" y1="266" x2="376" y2="266"/>
+        <line x1="532" y1="266" x2="554" y2="266"/>
+        <line x1="710" y1="266" x2="732" y2="266"/>
+      </g>
+    </svg>
+    <div class="lab-box"><b>Todo corre en VirtualBox:</b> OPNsense, las Alpine del laboratorio y nada más. Cada paso tiene una verificación con un comando o con una pantalla antes de avanzar al siguiente.</div>
+  </div>
+  <aside class="notes">Llegó el momento de juntar todo. Esta es la topología del laboratorio, la misma de las semanas anteriores. A la izquierda, la red de usuarios, y dentro de ella la máquina Alpine que hará de atacante en las pruebas. En el centro, OPNsense, que además de firewall y NAT lleva el sensor Suricata escuchando en la interfaz de la red de usuarios. A la derecha, la DMZ con el servidor web, que será el objetivo del escaneo. Y abajo, en la zona de administración, la segunda Alpine: el colector con rsyslog que recibirá las alertas por syslog. Los cinco pasos van en orden. Primero encender el sensor como sistema de detección. Segundo, probarlo con un escaneo controlado. Tercero, enviar las alertas al colector remoto. Cuarto, consultarlas y convertir un umbral en un aviso. Y quinto, pasar de detección a prevención: bloquear el paquete. Cada paso se verifica antes de avanzar. Si algo no sale, regresen a la secuencia de diagnóstico de la parte uno: generación, envío, recepción, disco y hora.</aside>
+</section>
+
+<!-- D9 · Práctica paso 1 -->
+<section class="slide" data-fuente="OPNsense, manual «Intrusion Prevention System» (docs.opnsense.org, consultado 4-oct-2026)">
+  <div class="kicker">Paso 1</div>
+  <h2>Paso 1 · Encender Suricata como IDS en OPNsense</h2>
+  <p class="sub">Habilitar el servicio, descargar las reglas abiertas y verificar que escucha.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># 1 · en OPNsense, interfaz web</span>
+Services → Intrusion Detection → General
+  Enable Suricata: sí
+  Interfaces: <span class="v">LAN</span>
+  Capture mode: <span class="v">PCAP live move (IDS)</span>
+  Promiscuous mode: sí
+<span class="c"># 2 · reglas del conjunto abierto</span>
+Services → Intrusion Detection → Download
+  ET Open: marcar → descargar e instalar
+<span class="c"># 3 · verificación del paso</span>
+Services → Intrusion Detection → Alerts
+  el servicio corre, sin errores en el log</pre>
+        <div class="note"><b>Modo IDS:</b> el sensor observa una copia del tráfico; todavía no bloquea nada.</div>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 400">
+          <defs><marker id="s09p4d9-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <g text-anchor="middle" font-size="13">
+            <rect x="16" y="16" width="180" height="96" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+            <use href="#i-atacante" x="82" y="28" width="48" height="48" style="color:#A6192E"/>
+            <text x="106" y="98" fill="#2A2A2A">VLAN 10</text>
+            <rect x="216" y="16" width="240" height="96" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <use href="#i-firewall" x="302" y="28" width="48" height="48" style="color:#A6192E"/>
+            <text x="336" y="66" font-weight="700" fill="#A6192E">OPNsense</text>
+            <text x="336" y="92" font-size="12" fill="#2A2A2A">Suricata IDS en LAN</text>
+            <rect x="476" y="16" width="72" height="96" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+            <use href="#i-servidor-web" x="492" y="38" width="40" height="40" style="color:#2A2A2A"/>
+            <text x="512" y="98" font-size="12" fill="#2A2A2A">DMZ</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d9-f)">
+            <line x1="198" y1="64" x2="212" y2="64"/>
+            <line x1="458" y1="64" x2="472" y2="64"/>
+          </g>
+          <path d="M336 116 L336 152" stroke="#8A6D1D" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#s09p4d9-f)"/>
+          <text x="352" y="142" font-size="12.5" fill="#8A6D1D">mira una copia; el paquete sigue su camino</text>
+          <rect x="16" y="176" width="532" height="104" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+          <use href="#i-lupa" x="36" y="196" width="36" height="36" style="color:#5F5F5F"/>
+          <text x="92" y="212" font-size="14" font-weight="700" fill="#7E1223">¿Por qué LAN y no WAN?</text>
+          <text x="92" y="240" font-size="13" fill="#2A2A2A">En la WAN, el NAT ya reescribió las direcciones:</text>
+          <text x="92" y="264" font-size="13" fill="#2A2A2A">la alerta no diría qué equipo interno generó el tráfico.</text>
+          <rect x="16" y="304" width="532" height="72" rx="12" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+          <use href="#i-ok" x="36" y="322" width="36" height="36" style="color:#2E7D4F"/>
+          <text x="92" y="328" font-size="13.5" font-weight="700" fill="#2E7D4F">Punto de control</text>
+          <text x="92" y="352" font-size="13" fill="#2A2A2A">servicio corriendo, reglas instaladas y fecha reciente.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Primer paso: encender el sensor. En la interfaz de OPNsense, vayan a servicios, detección de intrusos, pestaña general. Actívenlo, elijan la interfaz de la red de usuarios y dejen el modo de captura en modo IDS, que es el que solo observa. Marquen también el modo promiscuo para ver todo el tráfico del segmento. Después, en la pestaña de descarga, marquen el conjunto abierto de reglas, descárguenlo e instálenlo. La verificación del paso es doble: que el servicio aparezca corriendo y que las reglas queden instaladas con fecha reciente. La pregunta de la derecha se repite en todos los laboratorios: por qué vigilar la interfaz interna y no la externa. Porque en la WAN, la traducción de direcciones ya reescribió los orígenes, y la alerta diría que el atacante es el propio firewall. En el modo IDS el sensor mira una copia del tráfico, así que un error suyo no corta la red. Por ahí empezamos: bloquear llega en el paso cinco.</aside>
+</section>
+
+<!-- D10 · Práctica paso 2 -->
+<section class="slide" data-fuente="nmap(1) · firmas de sondeo del conjunto ET Open (Proofpoint) · OPNsense (docs.opnsense.org, 2026)">
+  <div class="kicker">Paso 2</div>
+  <h2>Paso 2 · Un escaneo de prueba y la primera alerta</h2>
+  <p class="sub">Generar tráfico de sondeo controlado y verlo llegar al panel de alertas.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># desde la Alpine «atacante» · VLAN 10</span>
+<span class="k">apk</span> add nmap
+<span class="k">nmap</span> -sV -p 22,80,443 10.10.20.10
+<span class="c"># a los segundos, en OPNsense:</span>
+Services → Intrusion Detection → Alerts
+<span class="c">#   buscar la familia de sondeo (SCAN)</span>
+<span class="c">#   origen: la IP de la Alpine atacante</span>
+<span class="c">#   hora: la misma del escaneo</span></pre>
+        <div class="note"><b>Solo contra su laboratorio:</b> el sondeo se hace dentro de la red propia, con permiso, hacia un equipo propio.</div>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 400">
+          <defs><marker id="s09p4d10-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <g text-anchor="middle" font-size="13">
+            <use href="#i-atacante" x="20" y="40" width="52" height="52" style="color:#A6192E"/>
+            <text x="46" y="112" fill="#2A2A2A">Alpine atacante</text>
+            <text x="46" y="132" font-size="12" fill="#5F5F5F">10.10.10.50</text>
+            <rect x="200" y="24" width="200" height="90" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <use href="#i-firewall" x="276" y="34" width="48" height="48" style="color:#A6192E"/>
+            <text x="300" y="98" font-weight="700" fill="#A6192E">OPNsense</text>
+            <use href="#i-servidor-web" x="490" y="40" width="48" height="48" style="color:#2A2A2A"/>
+            <text x="514" y="112" fill="#2A2A2A">DMZ</text>
+            <text x="514" y="132" font-size="12" fill="#5F5F5F">10.10.20.10</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d10-f)">
+            <line x1="82" y1="66" x2="196" y2="66"/>
+            <line x1="404" y1="66" x2="486" y2="66"/>
+          </g>
+          <text x="139" y="54" text-anchor="middle" font-size="12" fill="#A6192E">nmap -sV</text>
+          <rect x="150" y="150" width="300" height="96" rx="12" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+          <use href="#i-alerta" x="170" y="170" width="40" height="40" style="color:#8A6D1D"/>
+          <text x="230" y="182" font-size="13.5" font-weight="700" fill="#8A6D1D">firma de sondeo (SCAN)</text>
+          <text x="230" y="208" font-size="12.5" fill="#2A2A2A">origen 10.10.10.50 → destino 10.10.20.10</text>
+          <text x="230" y="230" font-size="12.5" fill="#5F5F5F">aparece en Alerts en segundos</text>
+          <path d="M300 118 L300 146" stroke="#8A6D1D" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#s09p4d10-f)"/>
+          <rect x="20" y="272" width="520" height="52" rx="10" fill="#F4F4F2" stroke="#8C8C8C" stroke-width="2"/>
+          <use href="#i-reloj" x="38" y="282" width="32" height="32" style="color:#5F5F5F"/>
+          <text x="90" y="294" font-size="13" font-weight="700" fill="#5F5F5F">La hora de la alerta y la del escaneo coinciden</text>
+          <text x="90" y="314" font-size="12" fill="#2A2A2A">porque NTP quedó sincronizado en la Parte 1</text>
+          <rect x="20" y="340" width="520" height="52" rx="10" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+          <use href="#i-ok" x="38" y="350" width="32" height="32" style="color:#2E7D4F"/>
+          <text x="90" y="362" font-size="13" font-weight="700" fill="#2E7D4F">La alerta ya es evidencia:</text>
+          <text x="90" y="382" font-size="12.5" fill="#2A2A2A">firma, código, origen, destino y hora, listos para correlacionar.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Un sensor que nunca alerta puede estar perfecto o estar roto, y no hay forma de distinguirlos sin probarlo. Segundo paso: generen tráfico de sondeo desde la máquina atacante de la red de usuarios. Instalen nmap con el gestor de paquetes de Alpine y escaneen los puertos veintidós, ochenta y cuatrocientos cuarenta y tres del servidor de la DMZ. Es un escaneo controlado, dentro de su propio laboratorio y contra su propio servidor. A los segundos, en la pestaña de alertas de OPNsense deben aparecer las firmas de la familia de sondeo. Miren tres cosas: el origen, que es la dirección de la Alpine atacante; el destino, que es el servidor de la DMZ; y la hora, que debe coincidir con la del escaneo, porque los relojes quedaron sincronizados en la parte uno. Esa alerta ya es evidencia completa: tiene firma, código, origen, destino y hora. Es exactamente el tipo de evento que viajará al colector en el siguiente paso.</aside>
+</section>
+
+<!-- D11 · Práctica paso 3 -->
+<section class="slide" data-fuente="rsyslog: módulo imudp, plantillas y rulesets (rsyslog.com) · OPNsense: EVE syslog + Logging → Targets (2026)">
+  <div class="kicker">Paso 3</div>
+  <h2>Paso 3 · Un colector remoto con rsyslog en Alpine</h2>
+  <p class="sub">El sensor escribe; el colector recibe y guarda un archivo por cada origen.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># colector Alpine · VLAN 99</span>
+<span class="k">apk</span> add rsyslog
+<span class="k">mkdir</span> -p /var/log/hosts
+<span class="c"># /etc/rsyslog.conf — agregar:</span>
+module(load=<span class="v">"imudp"</span>)
+input(type=<span class="v">"imudp"</span> port=<span class="v">"514"</span> ruleset=<span class="v">"remoto"</span>)
+template(name=<span class="v">"porhost"</span> type=<span class="v">"string"</span>
+  string=<span class="v">"/var/log/hosts/%HOSTNAME%.log"</span>)
+ruleset(name=<span class="v">"remoto"</span>){
+  action(type=<span class="v">"omfile"</span> template=<span class="v">"porhost"</span>)
+  stop
+}
+<span class="k">rc-update</span> add rsyslog boot
+<span class="k">rc-service</span> rsyslog start
+<span class="c"># ¿escucha en el 514?</span>
+<span class="k">netstat</span> -lun | grep 514</pre>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 400">
+          <defs><marker id="s09p4d11-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <rect x="16" y="10" width="532" height="110" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+          <text x="36" y="36" font-size="14" font-weight="700" fill="#A6192E">En OPNsense — dos ajustes</text>
+          <text x="36" y="64" font-size="13" fill="#2A2A2A">1 · IDS → General: activar la salida EVE por syslog.</text>
+          <text x="36" y="90" font-size="13" fill="#2A2A2A">2 · System → Settings → Logging → Targets: destino</text>
+          <text x="36" y="110" font-size="12.5" fill="#5F5F5F">nuevo: IP del colector, puerto 514, UDP, aplicación suricata.</text>
+          <g text-anchor="middle" font-size="13">
+            <rect x="16" y="156" width="150" height="72" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+            <use href="#i-log" x="70" y="164" width="34" height="34" style="color:#5F5F5F"/>
+            <text x="91" y="218" font-size="12.5" fill="#2A2A2A">eventos EVE del sensor</text>
+            <rect x="216" y="156" width="140" height="72" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+            <use href="#i-cable" x="270" y="164" width="34" height="34" style="color:#8A6D1D"/>
+            <text x="286" y="218" font-size="12.5" fill="#2A2A2A">514/UDP</text>
+            <rect x="406" y="156" width="142" height="72" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+            <use href="#i-engranaje" x="460" y="164" width="34" height="34" style="color:#5F5F5F"/>
+            <text x="477" y="218" font-size="12.5" fill="#2A2A2A">rsyslog</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d11-f)">
+            <line x1="170" y1="192" x2="212" y2="192"/>
+            <line x1="360" y1="192" x2="402" y2="192"/>
+          </g>
+          <path d="M477 232 L477 262" stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d11-f)"/>
+          <rect x="16" y="268" width="532" height="50" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+          <use href="#i-lista" x="34" y="278" width="30" height="30" style="color:#A6192E"/>
+          <text x="82" y="290" font-size="12.5" font-family="monospace" fill="#2A2A2A">/var/log/hosts/opnsense-lab.log</text>
+          <text x="82" y="308" font-size="11.5" fill="#5F5F5F">un archivo por cada origen que reporta</text>
+          <rect x="16" y="334" width="532" height="56" rx="10" fill="#E8F3EC" stroke="#2E7D4F" stroke-width="2"/>
+          <use href="#i-ok" x="34" y="346" width="32" height="32" style="color:#2E7D4F"/>
+          <text x="84" y="356" font-size="12.5" font-weight="700" fill="#2E7D4F">Verificar en este orden:</text>
+          <text x="84" y="376" font-size="12" font-family="monospace" fill="#2A2A2A">tcpdump -ni eth0 udp port 514 · luego: tail -f</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Tercer paso: que las alertas viajen solas a un colector remoto. En la Alpine de la zona de administración instalen rsyslog, creen la carpeta de destino y agreguen cinco líneas a la configuración. Se carga el módulo que escucha en el puerto quinientos catorce por UDP, se define la plantilla que guarda un archivo por cada equipo que reporta, y el ruleset remoto escribe y corta: el stop evita que los eventos de otros se mezclen con la bitácora local del colector. Del lado de OPNsense van dos ajustes: activar la salida de eventos en formato EVE hacia syslog, y crear el destino remoto en la sección de registro, apuntando a la dirección del colector. La verificación sigue el orden de diagnóstico de la parte uno: primero confirmar que el datagrama llega, con tcpdump en el puerto quinientos catorce, y después que el archivo crece, con tail. Con esto, la evidencia del sensor ya vive en una máquina distinta de la que la produce.</aside>
+</section>
+
+<!-- D12 · Práctica paso 4 -->
+<section class="slide" data-fuente="Diagrama propio · caso de uso del laboratorio: consultas grep(1)/uniq(1) sobre registros EVE JSON">
+  <div class="kicker">Paso 4</div>
+  <h2>Paso 4 · Consultar el colector y disparar el aviso</h2>
+  <p class="sub">Contar por firma, comparar con un umbral y convertir el umbral en aviso.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># ¿llegan alertas del IDS?</span>
+<span class="k">grep</span> '"event_type":"alert"' /var/log/hosts/opnsense*.log | tail -3
+<span class="c"># ¿cuántas por firma?</span>
+<span class="k">grep</span> -o '"signature":"[^"]*"' /var/log/hosts/opnsense*.log \
+  | sort | uniq -c | sort -rn | head
+<span class="c"># umbral del laboratorio (regla nuestra):</span>
+<span class="c">#   más de 20 sondeos en una hora desde la</span>
+<span class="c">#   misma IP de origen → aviso al correo del grupo</span></pre>
+        <div class="note"><b>Correlación de bolsillo:</b> condición, ventana y umbral, los tres ingredientes de la Parte 2, escritos en consola.</div>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 410">
+          <defs><marker id="s09p4d12-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker></defs>
+          <g font-size="13" text-anchor="middle">
+            <rect x="60" y="10" width="440" height="56" rx="10" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+            <use href="#i-lista" x="80" y="24" width="28" height="28" style="color:#5F5F5F"/>
+            <text x="292" y="44" fill="#2A2A2A">archivo del host, una alerta por línea</text>
+            <rect x="60" y="88" width="440" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+            <use href="#i-lupa" x="80" y="102" width="28" height="28" style="color:#A6192E"/>
+            <text x="292" y="122" fill="#2A2A2A">consultar: filtrar las alertas con grep</text>
+            <rect x="60" y="166" width="440" height="56" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+            <use href="#i-grafica" x="80" y="180" width="28" height="28" style="color:#A6192E"/>
+            <text x="292" y="200" fill="#2A2A2A">contar: cuántas veces aparece cada firma</text>
+            <rect x="60" y="244" width="440" height="56" rx="10" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+            <use href="#i-reloj" x="80" y="258" width="28" height="28" style="color:#8A6D1D"/>
+            <text x="292" y="278" fill="#2A2A2A">ventana y umbral: 20 sondeos en una hora</text>
+            <rect x="60" y="322" width="440" height="56" rx="10" fill="#A6192E"/>
+            <use href="#i-alerta" x="80" y="336" width="28" height="28" style="color:#D4AF37"/>
+            <text x="292" y="356" fill="#fff" font-weight="700">aviso al correo del grupo, con la evidencia adjunta</text>
+          </g>
+          <g stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d12-f)">
+            <line x1="280" y1="66" x2="280" y2="84"/>
+            <line x1="280" y1="144" x2="280" y2="162"/>
+            <line x1="280" y1="222" x2="280" y2="240"/>
+            <line x1="280" y1="300" x2="280" y2="318"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Cuarto paso: preguntarle a la evidencia. La primera consulta confirma que las alertas están llegando: se filtra el tipo de evento y se miran las últimas líneas. La segunda es la que convierte el archivo en información: se extrae el nombre de cada firma y se cuenta cuántas veces apareció, ordenado de mayor a menor. Con eso en la mano, la regla del laboratorio es nuestra decisión de diseño: si un mismo origen acumula más de veinte sondeos dentro de una hora, se envía un aviso al correo del grupo con la evidencia adjunta. Es una correlación de bolsillo: condición, ventana y umbral, los mismos tres ingredientes de la parte dos, pero escritos en consola. El número del umbral no es sagrado; afínenlo contra su propio tráfico. Lo importante es el hábito: cada alerta debe poder responder cuántas veces pasó, desde dónde y en qué ventana. En producción esta lógica vive en el SIEM; en el laboratorio la escribimos a mano justamente para entender qué hace el SIEM por dentro.</aside>
+</section>
+
+<!-- D13 · Práctica paso 5 -->
+<section class="slide" data-fuente="OPNsense, manual «Intrusion Prevention System» (docs.opnsense.org, 2026): modos Netmap, Policies y tunables">
+  <div class="kicker">Paso 5</div>
+  <h2>Paso 5 · De IDS a IPS: descartar el paquete en el camino</h2>
+  <p class="sub">Cambiar el modo de captura, pedir la acción de descarte y verificar el bloqueo.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+<pre class="con"><span class="c"># 1 · cambiar el modo de captura</span>
+Services → Intrusion Detection → General
+  Capture mode: <span class="v">Netmap (IPS)</span>
+<span class="c"># 2 · reglas que descartan</span>
+Services → Intrusion Detection → Policies
+  política nueva → acción: <span class="v">Drop</span>
+  (solo el conjunto de sondeo ET Open)
+<span class="c"># 3 · consejos del fabricante</span>
+  Interfaces → Settings: sin offloading de hardware
+  System → Tunables: dev.netmap.admode=2
+<span class="c">#   (si VirtualBox no entrega paquetes al sensor)</span>
+<span class="c"># 4 · verificar</span>
+  repetir el nmap: el escaneo se corta
+  en Alerts, la acción aparece como drop</pre>
+      </div>
+      <div class="col">
+        <svg class="dgm" viewBox="0 0 560 410">
+          <defs><marker id="s09p4d13-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+          <g text-anchor="middle" font-size="13">
+            <rect x="16" y="12" width="528" height="150" rx="12" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+            <text x="280" y="36" font-weight="700" fill="#5F5F5F">Hasta aquí: IDS · el paquete llega</text>
+            <use href="#i-atacante" x="40" y="60" width="44" height="44" style="color:#A6192E"/>
+            <use href="#i-ids" x="216" y="60" width="48" height="48" style="color:#8A6D1D"/>
+            <use href="#i-servidor-web" x="440" y="60" width="48" height="48" style="color:#2A2A2A"/>
+            <line x1="92" y1="84" x2="210" y2="84" stroke="#5F5F5F" stroke-width="2.5" marker-end="url(#s09p4d13-f)"/>
+            <line x1="272" y1="84" x2="434" y2="84" stroke="#5F5F5F" stroke-width="2.5" marker-end="url(#s09p4d13-f)"/>
+            <text x="280" y="140" fill="#2A2A2A" font-size="12.5">observa una copia, alerta, y el tráfico sigue</text>
+
+            <rect x="16" y="186" width="528" height="150" rx="12" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+            <text x="280" y="210" font-weight="700" fill="#A6192E">Ahora: IPS · el paquete no llega</text>
+            <use href="#i-atacante" x="40" y="234" width="44" height="44" style="color:#A6192E"/>
+            <use href="#i-ips" x="216" y="234" width="48" height="48" style="color:#A6192E"/>
+            <use href="#i-servidor-web" x="440" y="234" width="48" height="48" style="color:#8C8C8C"/>
+            <line x1="92" y1="258" x2="210" y2="258" stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d13-f)"/>
+            <line x1="272" y1="258" x2="386" y2="258" stroke="#A6192E" stroke-width="2.5" marker-end="url(#s09p4d13-f)"/>
+            <use href="#i-bloqueo" x="392" y="242" width="34" height="34" style="color:#A6192E"/>
+            <line x1="434" y1="258" x2="428" y2="258" stroke="#A6192E" stroke-width="2.5" stroke-dasharray="4 4"/>
+            <text x="280" y="314" fill="#2A2A2A" font-size="12.5">en línea: descarta antes de entregar al servidor</text>
+          </g>
+          <rect x="16" y="352" width="528" height="46" rx="10" fill="#F9EEF0" stroke="#B3261E" stroke-width="2"/>
+          <text x="36" y="372" font-size="13" font-weight="700" fill="#B3261E">Primero una semana en alert:</text>
+          <text x="300" y="372" font-size="12.5" fill="#2A2A2A">un falso positivo en modo drop</text>
+          <text x="300" y="390" font-size="12.5" fill="#2A2A2A">corta tráfico legítimo.</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Quinto paso: cerrar el círculo pasando de detección a prevención. Primero cambien el modo de captura al modo de prevención con el controlador de red. Segundo, las reglas siguen siendo la misma lista: lo que cambia es la acción, y se define con una política que marca descartar para el conjunto de sondeo. Tercero, dos consejos del fabricante que en VirtualBox importan: quitar el descargo de hardware en las interfaces y, si el sensor no recibe paquetes, ajustar el parámetro del controlador en los ajustes del sistema. Cuarto, la verificación: repitan el escaneo. La diferencia es la de arriba: antes el paquete llegaba al servidor y solo quedaba la alerta; ahora el sensor lo descarta a mitad de camino y el escaneo se corta. La advertencia final es la de siempre: una semana entera en modo alerta antes de activar el descarte, porque un falso positivo en modo de bloqueo corta tráfico legítimo y convierte al defensor en el incidente.</aside>
+</section>
+
+<!-- D14 · Referencias -->
+<section class="slide" data-fuente="Fuentes de la semana · normas, RFC, proyectos de código abierto, marco colombiano y prensa del caso IFX (2023)">
+  <div class="kicker">Fuentes</div>
+  <h2>Referencias y lecturas de la semana</h2>
+  <p class="sub">Normas y RFC primero; los manuales de las herramientas, a mano durante el laboratorio.</p>
+  <div class="s-body">
+    <div class="cols">
+      <div class="col">
+        <ul class="refs">
+          <li>IETF. (2009). <i>The Syslog Protocol</i> (RFC 5424); <i>TLS Transport Mapping for Syslog</i> (RFC 5425); <i>Transmission over UDP</i> (RFC 5426).</li>
+          <li>IETF. (2012). <i>Transmission of syslog Messages over TCP</i> (RFC 6587).</li>
+          <li>IETF. (2004). <i>Cisco Systems NetFlow Version 9</i> (RFC 3954); (2013). <i>IPFIX</i> (RFC 7011); (2010). <i>NTP v4</i> (RFC 5905); (1998). <i>Expectations for CSIRT</i> (RFC 2350).</li>
+          <li>Kent, K. y Souppaya, M. (2006). <i>Guide to Computer Security Log Management</i> (NIST SP 800-92).</li>
+          <li>Scarfone, K. y Grance, T. (2007). <i>Guide to Intrusion Detection and Prevention Systems</i> (NIST SP 800-94).</li>
+          <li>NIST. (2025). <i>Incident Response Recommendations and Considerations for Cybersecurity Risk Management</i> (SP 800-61 Rev. 3).</li>
+          <li>MITRE. (2026). <i>ATT&CK Enterprise</i>: técnicas T1078, T1110, T1046, T1071, T1572, T1041. Consultado en octubre de 2026.</li>
+        </ul>
+      </div>
+      <div class="col">
+        <ul class="refs">
+          <li>Open Information Security Foundation. (2026). <i>Suricata User Guide</i> (suricata.io).</li>
+          <li>The Zeek Project. (2026). <i>Zeek Documentation</i> (zeek.org).</li>
+          <li>Deciso B. V. (2026). <i>OPNsense User Manual: Intrusion Prevention System; Log Files</i> (docs.opnsense.org).</li>
+          <li>rsyslog. (2026). <i>rsyslog Documentation: imudp, templates, rulesets</i> (rsyslog.com).</li>
+          <li>Departamento Nacional de Planeación. (2020). <i>Documento CONPES 3995: Política Nacional de Seguridad Digital</i>.</li>
+          <li>Congreso de Colombia. (2009). <i>Ley 1273 de 2009</i>; (2012). <i>Ley 1581 de 2012</i>.</li>
+          <li>EFE, El Tiempo y Noticias RCN. (12–19 de septiembre de 2023). Cobertura del incidente de IFX Networks.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note"><b>Para el laboratorio:</b> los manuales de OPNsense, Suricata, Zeek y rsyslog son la referencia de consulta; abranlos en pantalla mientras ejecutan los cinco pasos.</div>
+  </div>
+  <aside class="notes">Antes de cerrar, las fuentes. A la izquierda, las normas y los documentos de petición de comentarios que sostienen la parte técnica: el formato y el transporte de syslog, los flujos, el protocolo de relojes, la función de un equipo nacional de respuesta, y las tres guías del instituto de estándares sobre gestión de bitácoras, sistemas de detección y respuesta a incidentes. El marco de tácticas del atacante se cita con sus códigos, para que los usen en los informes. A la derecha, las herramientas y el marco colombiano: los manuales de Suricata, Zeek, OPNsense y rsyslog, que son la referencia directa durante el laboratorio; la política nacional de seguridad digital; las dos leyes; y la cobertura del caso de septiembre de dos mil veintitrés. Nuestra recomendación de estudio: abran los manuales en pantalla mientras corren los cinco pasos, porque leer la opción correcta en el manual vale más que memorizarla. Todo lo demás de la semana se apoya únicamente en estas fuentes.</aside>
+</section>
+
+<!-- D15 · Qué sigue -->
+<section class="slide" data-fuente="Diagrama propio · calendario oficial del curso · contenidos: docs/analisis-tematico.md §2.4">
+  <div class="kicker">Qué sigue</div>
+  <h2>De detectar a prevenir: qué viene ahora</h2>
+  <p class="sub">La semana diez cambia la pregunta: de qué pasó a qué está expuesto.</p>
+  <div class="s-body">
+    <svg class="dgm" viewBox="0 0 1184 460">
+      <defs><marker id="s09p4d15-f" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#A6192E"/></marker>
+      <marker id="s09p4d15-g" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6z" fill="#5F5F5F"/></marker></defs>
+      <rect x="8" y="12" width="470" height="44" rx="10" fill="#7E1223"/>
+      <text x="243" y="40" text-anchor="middle" font-size="15" font-weight="700" fill="#D4AF37">Lo que se llevan de la semana 9</text>
+      <g font-size="13">
+        <rect x="8" y="76" width="470" height="70" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-log" x="28" y="94" width="34" height="34" style="color:#A6192E"/>
+        <text x="82" y="104" font-weight="700" fill="#A6192E">Evidencia</text>
+        <text x="82" y="128" fill="#2A2A2A">llega completa, a tiempo y con permiso para existir</text>
+        <rect x="8" y="158" width="470" height="70" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-siem" x="28" y="176" width="34" height="34" style="color:#A6192E"/>
+        <text x="82" y="186" font-weight="700" fill="#A6192E">SIEM</text>
+        <text x="82" y="210" fill="#2A2A2A">normaliza, correlaciona con ventana y umbral, prioriza</text>
+        <rect x="8" y="240" width="470" height="70" rx="10" fill="#F9EEF0" stroke="#A6192E" stroke-width="2"/>
+        <use href="#i-escaner" x="28" y="258" width="34" height="34" style="color:#A6192E"/>
+        <text x="82" y="268" font-weight="700" fill="#A6192E">Sensor</text>
+        <text x="82" y="292" fill="#2A2A2A">firma y comportamiento, probado, medido y afinado</text>
+        <rect x="8" y="322" width="470" height="70" rx="10" fill="#A6192E"/>
+        <use href="#i-terminal" x="28" y="340" width="34" height="34" style="color:#D4AF37"/>
+        <text x="82" y="350" font-weight="700" fill="#D4AF37">Práctica</text>
+        <text x="82" y="374" fill="#fff">de IDS a IPS, con colector remoto y aviso por umbral</text>
+      </g>
+      <line x1="486" y1="230" x2="536" y2="230" stroke="#A6192E" stroke-width="3" marker-end="url(#s09p4d15-f)"/>
+      <g font-size="13" text-anchor="middle">
+        <rect x="548" y="76" width="200" height="150" rx="14" fill="#F4F4F2" stroke="#5F5F5F" stroke-width="2"/>
+        <text x="648" y="106" font-weight="700" fill="#5F5F5F">Semana 9 · hoy</text>
+        <text x="648" y="134" fill="#2A2A2A">monitoreo, evidencia</text>
+        <text x="648" y="156" fill="#2A2A2A">y detección</text>
+        <text x="648" y="196" font-size="12" fill="#5F5F5F">la red cuenta lo que pasa</text>
+
+        <rect x="788" y="76" width="200" height="150" rx="14" fill="#F9EEF0" stroke="#A6192E" stroke-width="2.5"/>
+        <text x="888" y="106" font-weight="700" fill="#A6192E">Semana 10 · 12 oct</text>
+        <text x="888" y="134" fill="#2A2A2A">hardening y gestión</text>
+        <text x="888" y="156" fill="#2A2A2A">de vulnerabilidades</text>
+        <text x="888" y="196" font-size="12" fill="#5F5F5F">descubrir · priorizar · parchear</text>
+
+        <rect x="1028" y="76" width="148" height="150" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2"/>
+        <text x="1102" y="106" font-weight="700" fill="#8A6D1D">Semana 11</text>
+        <text x="1102" y="134" fill="#2A2A2A">repaso de la</text>
+        <text x="1102" y="156" fill="#2A2A2A">Unidad 2</text>
+        <text x="1102" y="196" font-size="12" fill="#5F5F5F">ejercicios integradores</text>
+      </g>
+      <g stroke="#5F5F5F" stroke-width="2.5" marker-end="url(#s09p4d15-g)">
+        <line x1="752" y1="151" x2="784" y2="151"/>
+        <line x1="992" y1="151" x2="1024" y2="151"/>
+      </g>
+      <rect x="548" y="256" width="628" height="136" rx="14" fill="#FBF6E7" stroke="#D4AF37" stroke-width="2.5"/>
+      <text x="568" y="288" font-size="15" font-weight="700" fill="#8A6D1D">En la semana 10 la pregunta cambia</text>
+      <g font-size="13.5" fill="#2A2A2A">
+        <text x="568" y="316">· De «¿qué pasó y cómo lo sé?» a «¿qué está expuesto y hasta cuándo?».</text>
+        <text x="568" y="342">· Escaneo propio de hosts y servicios, priorización con severidad y explotación conocida.</text>
+        <text x="568" y="368">· El mismo laboratorio: las Alpine y la DMZ que ya tienen montadas.</text>
+      </g>
+      <rect x="8" y="416" width="1168" height="38" rx="10" fill="#7E1223"/>
+      <text x="592" y="441" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Monitorear cuenta por dónde entra el agua; la semana que viene es para tapar la gotera.</text>
+    </svg>
+  </div>
+  <aside class="notes">Cerramos con el mapa completo. Se llevan cuatro cosas de esta semana. La evidencia: los registros que llegan completos, a tiempo y con permiso para existir. El sistema de gestión de eventos: normaliza, correlaciona con ventana y umbral, y convierte miles de líneas en una alerta defendible. El sensor: firma para lo conocido, comportamiento para lo raro, probado y afinado. Y la práctica completa: el sensor en el firewall, el colector remoto, el aviso por umbral y el salto a prevención. La semana que viene la pregunta cambia de qué pasó a qué está expuesto. Gestión de vulnerabilidades: descubrir los equipos y servicios, priorizar con severidad y con explotación conocida, y parchear verificando. Correr sobre el mismo laboratorio, así que no desarmen nada. La idea para llevarse es la de la línea final: monitorear cuenta por dónde entra el agua; prevenir es tapar la gotera. Nos vemos en la semana diez, con nmap y con la lista de pendientes de la red de ustedes.</aside>
+</section>
