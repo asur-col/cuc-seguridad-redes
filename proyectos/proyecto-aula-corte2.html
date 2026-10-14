@@ -185,7 +185,7 @@
   <ul>
     <li>Los criterios <b>1 a 4 se califican por equipo</b>.</li>
     <li>El criterio <b>5 se califica por integrante</b>: la calidad de la evidencia del equipo fija el tope, y la respuesta de cada integrante a una pregunta al azar (TLS, RADIUS, Suricata o el escaneo) ajusta su nota dentro de ese tope. Dos integrantes del mismo equipo pueden tener notas distintas en este criterio.</li>
-    <li>Bono A (cabeceras y TLS ≥ 1.2) sube un nivel en el criterio 4; bono B (Suricata en modo IPS) sube un nivel en el criterio 3. Un bono nunca pasa de 1,0 en su criterio, solo se aplica con evidencia y <b>no suma fuera de 5,0</b>.</li>
+    <li><b>Bonos</b> (se suman a la nota final, solo con evidencia y <code>./lab check</code> en verde): <b>bono A</b> (cabeceras de seguridad y TLS ≥ 1.2 sin suites débiles) <b>+0,2</b>; <b>bono B</b> (Suricata en modo IPS con regla <code>drop</code> demostrada) <b>+0,3</b>. La nota final no pasa de 5,0.</li>
   </ul>
 </section>
 
