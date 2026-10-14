@@ -176,16 +176,16 @@
   <p class="lead">Cinco criterios de <b>1,0 punto</b>. Cada uno tiene cuatro niveles: <b>1,0 · 0,75 · 0,5 · 0</b>.</p>
   <div class="tbl-wrap"><table class="rubrica">
     <tr><th>#</th><th>Criterio</th><th>1,0</th><th>0,75</th><th>0,5</th><th>0</th></tr>
-    <tr><td class="crit">1</td><td><b>Cifrado en tránsito</b> (syslog TLS y HTTPS)</td><td>Funciona y hay evidencia de cifrado, identidad del servidor y tráfico real</td><td>Funciona, falta una evidencia técnica</td><td>Parcial o sin validar</td><td>No funciona</td></tr>
+    <tr><td class="crit">1</td><td><b>Cifrado en tránsito</b> (syslog con TLS)</td><td>Funciona y hay evidencia de cifrado, identidad del servidor y tráfico real</td><td>Funciona, falta una evidencia técnica</td><td>Parcial o sin validar</td><td>No funciona</td></tr>
     <tr><td class="crit">2</td><td><b>Identidad y acceso</b> (bastión, identidad individual, llaves, RADIUS y roles)</td><td>Origen restringido, identidad individual, rol mínimo y rechazo comprobado</td><td>Tres de los cuatro controles</td><td>Solo autenticación básica</td><td>Acceso inseguro o no demostrable</td></tr>
     <tr><td class="crit">3</td><td><b>Logging e IDS</b> (logs centralizados y Suricata)</td><td>Logs centralizados y alerta de Suricata correlacionada con la prueba</td><td>Ambos existen, correlación incompleta</td><td>Solo logging o solo IDS</td><td>Sin evidencia</td></tr>
-    <tr><td class="crit">4</td><td><b>Hardening</b> (nmap antes/después)</td><td>Escaneo antes/después, servicio reducido y tratamiento justificado</td><td>Corrección válida sin comparación completa</td><td>Hallazgos sin remediación suficiente</td><td>Sin análisis</td></tr>
+    <tr><td class="crit">4</td><td><b>Hardening</b> (nmap antes/después y HTTPS)</td><td>Escaneo antes/después, servicio reducido, HTTPS correcto y tratamiento justificado</td><td>Corrección válida sin comparación completa</td><td>Hallazgos sin remediación suficiente</td><td>Sin análisis</td></tr>
     <tr><td class="crit">5</td><td><b>Evidencia y defensa</b></td><td>Entrega reproducible; ambos integrantes explican decisiones y riesgos</td><td>Evidencia completa, explicación débil</td><td>Evidencia incompleta o un integrante no domina el trabajo</td><td>Evidencia no verificable</td></tr>
   </table></div>
   <ul>
     <li>Los criterios <b>1 a 4 se califican por equipo</b>.</li>
-    <li>El criterio <b>5 es individual</b>: cada integrante responde una pregunta al azar (TLS, RADIUS, Suricata o el escaneo).</li>
-    <li>Los bonos suben el nivel dentro de su criterio; <b>no suman fuera de 5,0</b>.</li>
+    <li>El criterio <b>5 se califica por integrante</b>: la calidad de la evidencia del equipo fija el tope, y la respuesta de cada integrante a una pregunta al azar (TLS, RADIUS, Suricata o el escaneo) ajusta su nota dentro de ese tope. Dos integrantes del mismo equipo pueden tener notas distintas en este criterio.</li>
+    <li>Bono A (cabeceras y TLS ≥ 1.2) sube un nivel en el criterio 4; bono B (Suricata en modo IPS) sube un nivel en el criterio 3. Un bono nunca pasa de 1,0 en su criterio, solo se aplica con evidencia y <b>no suma fuera de 5,0</b>.</li>
   </ul>
 </section>
 
