@@ -1,0 +1,41 @@
+! SW1 (Switch 2960) - configuracion INICIAL INSEGURA. Solo laboratorio: credenciales ficticias.
+enable
+configure terminal
+hostname SW1
+no ip domain-lookup
+username admin password Admin123
+enable password Cisco123
+line console 0
+ login local
+line vty 0 15
+ login local
+ transport input telnet
+cdp run
+vlan 10
+ name ADMIN
+vlan 20
+ name USUARIOS
+vlan 30
+ name SERVIDORES
+ip default-gateway 192.168.1.1
+interface vlan 1
+ ip address 192.168.1.2 255.255.255.0
+ no shutdown
+interface FastEthernet0/1
+ description Troncal hacia R1
+ switchport mode trunk
+interface FastEthernet0/2
+ description Troncal hacia SW2
+ switchport mode trunk
+interface FastEthernet0/3
+ description PC administracion
+ switchport mode access
+ switchport access vlan 10
+interface FastEthernet0/4
+ description Servidor SRV-01
+ switchport mode access
+ switchport access vlan 30
+interface range FastEthernet0/5-24
+ no shutdown
+end
+wr

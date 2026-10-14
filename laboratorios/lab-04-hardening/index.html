@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio 4: Hardening de dispositivos de red · CUC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px;
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: minmax(0, 1fr); }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
+    pre {
+      position: relative;
+      background: #211D18; color: #EFE7D9;
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid #3D362B;
+    }
+
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
+    }
+
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .rubric-weight { font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--vino); }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin: 14px 0 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagram-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .diagram-card svg { width: 100%; height: auto; display: block; }
+
+    .diagram-caption {
+      font-size: 12.5px; color: var(--ink-soft);
+      text-align: center; margin-top: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    figure.ref {
+      margin: 14px 0 24px;
+      max-width: 640px;
+    }
+
+    figure.ref img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: block;
+      background: #fff;
+    }
+
+    figure.ref img.logo-img {
+      max-width: 180px;
+      margin: 0 auto;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    figure.ref figcaption {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.5;
+    }
+
+    figure.ref figcaption a { color: var(--ink-soft); text-decoration: underline; }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    @media print {
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
+    }
+  </style>
+<body>
+
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
+
+<div class="shell">
+  <nav class="toc" id="toc">
+    <p class="toc-label">Contenido</p>
+    <a href="#intro"><span class="badge">·</span> Introducción</a>
+    <a href="#parteA"><span class="badge">A</span> Escenario y topología</a>
+    <a href="#parteB"><span class="badge">B</span> Síntomas y objetivos</a>
+    <a href="#parteC"><span class="badge">C</span> Entregables y evidencia</a>
+    <a href="#parteD"><span class="badge">D</span> Reglas y rúbrica</a>
+    <a href="#referencias"><span class="badge">·</span> Referencias</a>
+  </nav>
+
+  <div>
+    <header class="top portada">
+      <img class="portada-logo"
+           src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
+           onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
+           alt="Logo Universidad de la Costa (CUC)">
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes</div>
+      <h1>Laboratorio 4: Hardening de dispositivos de red</h1>
+      <p class="sub">Auditar, endurecer y demostrar con evidencia un router y dos switches con VLAN en Cisco Packet Tracer: gestión cifrada, credenciales, capa 2, árbol de expansión y superficie de ataque</p>
+      <div class="accent-bar"></div>
+      <div class="author-block">
+        <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
+        <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
+        <span>📅 <strong>Ponderación y semana: por definir · 2026-2</strong></span>
+        <span>📄 <a href="lab-04-hardening-packet-tracer.md" download>Descargar versión Markdown</a></span>
+      </div>
+    </header>
+
+    <main>
+      <section id="intro">
+        <p class="lede">Recibes una red que funciona: los equipos se ven, las VLAN responden y los usuarios llegan a sus servicios. Nadie la ha asegurado. Tu equipo debe auditarla, endurecerla y demostrar, con evidencia, que cada falla quedó corregida.</p>
+
+        <p>Este laboratorio no construye una red desde cero: parte de una red ya armada y configurada de forma insegura. El trabajo es encontrar las fallas a partir de sus síntomas, corregirlas en los dispositivos y dejar pruebas de cada corrección.</p>
+
+        <div class="callout note"><b>Equipos de máximo 2 personas · máximo 2 horas · aula.</b> Todo se resuelve dentro de Cisco Packet Tracer 8.x, sin Internet ni herramientas externas.</div>
+
+        <div class="callout note"><b>Solo laboratorio:</b> todas las credenciales de la configuración inicial son ficticias. No reutilices ninguna clave real.</div>
+      </section>
+
+      <!-- ============ PARTE A ============ -->
+      <section class="part" id="parteA">
+        <div class="part-head">
+          <span class="part-badge">A</span>
+          <h2>Escenario y topología</h2>
+        </div>
+
+        <p>Una oficina ficticia tiene un router (R1), dos switches (SW1 y SW2), tres VLAN de uso (ADMIN, USUARIOS y SERVIDORES) y una VLAN de gestión. Los equipos ya tienen configuración, pero no está endurecida.</p>
+
+        <p><b>Punto de partida:</b> el archivo <code class="inline">lab04-inicial.pkt</code> que entrega el docente. Contiene la topología y la configuración inicial. Trabajas sobre ese archivo.</p>
+
+        <div class="diagram-card">
+          <svg viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t04">
+            <title id="t04">Topología del Laboratorio 4: router R1 conectado por trunk a SW1; SW1 conectado por trunk a SW2; PC-ADM y SRV-01 conectados a SW1; PC-U1 y PC-U2 conectados a SW2</title>
+            <g style="stroke:var(--ink-soft);stroke-width:2.5;fill:none">
+              <line x1="320" y1="70" x2="320" y2="130"/>
+              <line x1="320" y1="180" x2="320" y2="260"/>
+              <line x1="250" y1="155" x2="150" y2="155"/>
+              <line x1="390" y1="155" x2="490" y2="155"/>
+              <line x1="270" y1="310" x2="125" y2="330"/>
+              <line x1="370" y1="310" x2="515" y2="330"/>
+            </g>
+            <g style="font-family:'IBM Plex Sans',sans-serif;font-size:19px;font-weight:700;text-anchor:middle">
+              <rect x="250" y="20" width="140" height="50" rx="10" style="fill:var(--vino);stroke:none"/>
+              <text x="320" y="42" style="fill:#fff">R1</text>
+              <text x="320" y="62" style="fill:#fff;font-size:14px;font-weight:500">Router 2911</text>
+
+              <rect x="250" y="130" width="140" height="50" rx="10" style="fill:var(--surface-2);stroke:var(--vino);stroke-width:2"/>
+              <text x="320" y="152" style="fill:var(--ink)">SW1</text>
+              <text x="320" y="172" style="fill:var(--ink-soft);font-size:14px;font-weight:500">Switch 2960</text>
+
+              <rect x="250" y="260" width="140" height="50" rx="10" style="fill:var(--surface-2);stroke:var(--vino);stroke-width:2"/>
+              <text x="320" y="282" style="fill:var(--ink)">SW2</text>
+              <text x="320" y="302" style="fill:var(--ink-soft);font-size:14px;font-weight:500">Switch 2960</text>
+
+              <rect x="20" y="130" width="130" height="50" rx="10" style="fill:var(--surface);stroke:var(--ink-soft);stroke-width:1.5"/>
+              <text x="85" y="152" style="fill:var(--ink)">PC-ADM</text>
+              <text x="85" y="172" style="fill:var(--ink-soft);font-size:14px;font-weight:500">VLAN 10</text>
+
+              <rect x="490" y="130" width="130" height="50" rx="10" style="fill:var(--surface);stroke:var(--ink-soft);stroke-width:1.5"/>
+              <text x="555" y="152" style="fill:var(--ink)">SRV-01</text>
+              <text x="555" y="172" style="fill:var(--ink-soft);font-size:14px;font-weight:500">VLAN 30</text>
+
+              <rect x="60" y="330" width="130" height="50" rx="10" style="fill:var(--surface);stroke:var(--ink-soft);stroke-width:1.5"/>
+              <text x="125" y="352" style="fill:var(--ink)">PC-U1</text>
+              <text x="125" y="372" style="fill:var(--ink-soft);font-size:14px;font-weight:500">VLAN 20</text>
+
+              <rect x="450" y="330" width="130" height="50" rx="10" style="fill:var(--surface);stroke:var(--ink-soft);stroke-width:1.5"/>
+              <text x="515" y="352" style="fill:var(--ink)">PC-U2</text>
+              <text x="515" y="372" style="fill:var(--ink-soft);font-size:14px;font-weight:500">VLAN 20</text>
+            </g>
+            <text x="332" y="104" style="font-family:'IBM Plex Mono',monospace;font-size:14px;fill:var(--ink-soft)">trunk</text>
+            <text x="332" y="234" style="font-family:'IBM Plex Mono',monospace;font-size:14px;fill:var(--ink-soft)">trunk</text>
+          </svg>
+        </div>
+        <p class="diagram-caption">Figura 1. Topología del laboratorio. El docente entrega el archivo <code class="inline">.pkt</code> ya armado.</p>
+
+        <h3>Direccionamiento del estado inicial</h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Dispositivo</th><th>Interfaz</th><th>VLAN</th><th>IP / máscara</th><th>Gateway</th></tr></thead>
+            <tbody>
+              <tr><td>R1</td><td class="mono">g0/0.1</td><td>1 (nativa)</td><td class="mono">192.168.1.1 / 24</td><td>—</td></tr>
+              <tr><td>R1</td><td class="mono">g0/0.10</td><td>10</td><td class="mono">192.168.10.1 / 24</td><td>—</td></tr>
+              <tr><td>R1</td><td class="mono">g0/0.20</td><td>20</td><td class="mono">192.168.20.1 / 24</td><td>—</td></tr>
+              <tr><td>R1</td><td class="mono">g0/0.30</td><td>30</td><td class="mono">192.168.30.1 / 24</td><td>—</td></tr>
+              <tr><td>SW1</td><td>VLAN 1 (SVI)</td><td>1</td><td class="mono">192.168.1.2 / 24</td><td class="mono">192.168.1.1</td></tr>
+              <tr><td>SW2</td><td>VLAN 1 (SVI)</td><td>1</td><td class="mono">192.168.1.3 / 24</td><td class="mono">192.168.1.1</td></tr>
+              <tr><td>PC-ADM</td><td>Ethernet</td><td>10</td><td class="mono">192.168.10.10 / 24</td><td class="mono">192.168.10.1</td></tr>
+              <tr><td>PC-U1</td><td>Ethernet</td><td>20</td><td class="mono">192.168.20.11 / 24</td><td class="mono">192.168.20.1</td></tr>
+              <tr><td>PC-U2</td><td>Ethernet</td><td>20</td><td class="mono">192.168.20.12 / 24</td><td class="mono">192.168.20.1</td></tr>
+              <tr><td>SRV-01</td><td>Ethernet</td><td>30</td><td class="mono">192.168.30.10 / 24</td><td class="mono">192.168.30.1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ PARTE B ============ -->
+      <section class="part" id="parteB">
+        <div class="part-head">
+          <span class="part-badge">B</span>
+          <h2>Síntomas y objetivos</h2>
+        </div>
+
+        <h3>Síntomas del estado inicial</h3>
+        <p>Un auditor de la oficina reporta lo siguiente. Cada síntoma corresponde a una falla de seguridad que deben encontrar y corregir.</p>
+        <ol class="steps">
+          <li>Al capturar el tráfico de administración de un switch se leen usuario y clave del administrador en texto claro.</li>
+          <li>Al revisar la configuración en ejecución de R1, las contraseñas aparecen legibles.</li>
+          <li>Un atacante puede intentar adivinar la clave de acceso remoto sin ningún límite de intentos.</li>
+          <li>Un equipo conectado a un puerto sin usar de SW2 llega a la misma red de gestión que los administradores.</li>
+          <li>Cualquier equipo conectado a un puerto de usuario puede introducir otro equipo o switch sin que el puerto reaccione.</li>
+          <li>Un equipo conectado a un puerto de acceso puede enviar BPDU y alterar el árbol de expansión sin que el switch lo bloquee.</li>
+          <li>Un vecino en el mismo segmento ve en la tabla de vecinos el modelo y la versión de cada equipo.</li>
+          <li>Cualquier PC de la red, incluida la de VLAN 20, puede abrir sesión de administración en los equipos.</li>
+        </ol>
+
+        <h3>Dónde mirar</h3>
+        <ul class="plain">
+          <li>La <b>configuración en ejecución</b> de cada dispositivo (R1, SW1 y SW2): revisa cada línea de acceso, cada contraseña y cada interfaz.</li>
+          <li>La <b>tabla de VLAN</b> y el <b>estado de las interfaces</b> de cada switch: qué VLAN usa cada puerto y cuáles están activos sin uso.</li>
+          <li>El <b>modo Simulation</b> de Packet Tracer: observa qué paquetes viajan, en qué VLAN y en qué orden.</li>
+          <li>Las <b>pruebas desde los PC</b>: desde PC-U1 y desde PC-ADM, intenta administrar R1, SW1 y SW2.</li>
+        </ul>
+
+        <h3>Objetivos medibles</h3>
+        <p>Al terminar, el equipo debe cumplir los ocho objetivos. Cada uno se demuestra con la evidencia indicada.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Objetivo</th><th>Cómo se demuestra</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">O1</td><td>Gestión remota cifrada: los tres equipos aceptan administración solo por SSH y Telnet queda inhabilitado.</td><td>Sesión SSH exitosa desde PC-ADM; intento de Telnet rechazado; configuración de las líneas de acceso.</td></tr>
+              <tr><td class="mono">O2</td><td>Credenciales protegidas: ninguna contraseña legible en la configuración en ejecución, y existe una contraseña de privilegio protegida.</td><td><code class="inline">show running-config</code> sin contraseñas en texto claro.</td></tr>
+              <tr><td class="mono">O3</td><td>Protección contra fuerza bruta: tres intentos fallidos bloquean el acceso durante un tiempo que el equipo define y documenta.</td><td>Captura de los tres intentos fallidos y del bloqueo.</td></tr>
+              <tr><td class="mono">O4</td><td>Capa 2 endurecida: la VLAN nativa y la de gestión dejan de ser la VLAN 1, y los puertos sin uso quedan apagados y aislados.</td><td><code class="inline">show vlan brief</code>, estado de interfaces y prueba de gestión desde PC-ADM.</td></tr>
+              <tr><td class="mono">O5</td><td>Control de puertos de acceso: cada puerto de usuario acepta solo la MAC aprendida y se bloquea ante otra MAC.</td><td>Prueba de cambio de equipo en un puerto y captura del puerto bloqueado.</td></tr>
+              <tr><td class="mono">O6</td><td>Árbol de expansión protegido: los puertos de acceso pasan a reenvío de inmediato y se apagan si reciben BPDU.</td><td>Estado de los puertos de acceso en la salida de árbol de expansión.</td></tr>
+              <tr><td class="mono">O7</td><td>Gestión limitada: solo PC-ADM (VLAN 10) puede administrar los equipos; PC-U1 y PC-U2 son rechazados.</td><td>Intento desde PC-U1 rechazado y sesión desde PC-ADM aceptada.</td></tr>
+              <tr><td class="mono">O8</td><td>Superficie reducida: el protocolo de descubrimiento de vecinos queda desactivado en los equipos.</td><td>Salida que muestra el protocolo desactivado y ausencia de vecinos en PC-U1.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ PARTE C ============ -->
+      <section class="part" id="parteC">
+        <div class="part-head">
+          <span class="part-badge">C</span>
+          <h2>Entregables y evidencia</h2>
+        </div>
+
+        <h3>Entregables (una entrega por equipo, por Teams)</h3>
+        <ol class="steps">
+          <li><b>Archivo <code class="inline">.pkt</code> final</b> del equipo, con el nombre <code class="inline">EQUIPO-lab04.pkt</code>.</li>
+          <li><b>Carpeta de capturas</b> (PNG o JPG) con la evidencia de la Parte D.</li>
+          <li><b><code class="inline">manifest.md</code></b> con la tabla objetivo-captura-comando, las salidas <code class="inline">show</code> solicitadas y la justificación (máximo 300 palabras).</li>
+        </ol>
+        <p>Cada integrante responde en aula una pregunta al azar sobre el trabajo del equipo (criterio individual de la rúbrica).</p>
+
+        <h3>Evidencia exigida</h3>
+        <ul class="plain">
+          <li>Al menos <b>una captura por objetivo</b> (O1 a O8). En O1, O2, O5 y O7, incluye una captura <b>antes</b> y otra <b>después</b> del cambio.</li>
+          <li>Cada captura muestra <b>la hora del sistema</b> y <b>el nombre del dispositivo</b> en el prompt o en la ventana activa.</li>
+          <li>En <code class="inline">manifest.md</code> pega la salida de cada comando <code class="inline">show</code> que uses como prueba. No basta con decir que algo "quedó bien".</li>
+          <li>La justificación (máximo 300 palabras) explica qué falla encontraron primero, por qué es un riesgo y cómo la corrigieron. No copies la configuración.</li>
+        </ul>
+      </section>
+
+      <!-- ============ PARTE D ============ -->
+      <section class="part" id="parteD">
+        <div class="part-head">
+          <span class="part-badge">D</span>
+          <h2>Reglas y rúbrica</h2>
+        </div>
+
+        <h3>Reglas</h3>
+        <ul class="plain">
+          <li>Equipos de <b>máximo 2 personas</b>. Máximo <b>2 horas</b> en aula.</li>
+          <li>Trabajo <b>100 % dentro de Packet Tracer 8.x</b>. Sin Internet y sin herramientas externas.</li>
+          <li>Puedes consultar la ayuda incluida en Packet Tracer.</li>
+          <li>Cualquier cambio en un equipo debe quedar anotado en <code class="inline">manifest.md</code>.</li>
+          <li>No cambies el direccionamiento de los PC ni del servidor sin anotarlo y justificarlo.</li>
+        </ul>
+
+        <h3>Rúbrica</h3>
+        <p>Ponderación y semana por definir. Cada criterio grupal vale hasta 1,0 y se evalúa con cuatro niveles.</p>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Criterio</th><th>1,0</th><th>0,75</th><th>0,5</th><th>0</th></tr></thead>
+            <tbody>
+              <tr><td><b>C1.</b> Gestión remota segura (O1, O3, O7)</td><td>SSH funciona, Telnet inhabilitado, límite de intentos y acceso restringido a la VLAN de gestión, todo verificado</td><td>Tres de las cuatro partes verificadas</td><td>Dos de las cuatro partes verificadas</td><td>Una o ninguna verificada</td></tr>
+              <tr><td><b>C2.</b> Credenciales y autenticación (O2)</td><td>Ninguna contraseña en claro y contraseña de privilegio protegida, verificadas en la configuración</td><td>Una contraseña en claro restante</td><td>Contraseña de privilegio protegida, pero otras en claro</td><td>Sin cambios</td></tr>
+              <tr><td><b>C3.</b> Capa 2: VLAN y puertos (O4, O5)</td><td>VLAN nativa y de gestión fuera de VLAN 1, puertos sin uso apagados y bloqueo por MAC demostrado</td><td>Una de las tres partes incompleta</td><td>Dos de las tres partes incompletas</td><td>Sin cambios</td></tr>
+              <tr><td><b>C4.</b> Árbol de expansión y superficie (O6, O8)</td><td>PortFast y protección ante BPDU en puertos de acceso, y protocolo de vecinos desactivado, verificados</td><td>Una de las tres partes incompleta</td><td>Dos de las tres partes incompletas</td><td>Sin cambios</td></tr>
+              <tr><td><b>C5.</b> Evidencia y documentación</td><td>Una captura por objetivo con hora y nombre visibles, manifest completo y justificación clara</td><td>Una captura o salida faltante</td><td>Evidencia parcial o sin hora</td><td>Sin evidencia</td></tr>
+              <tr><td><b>Individual.</b> Pregunta al azar por integrante</td><td>Respuesta técnica correcta y justificada sobre el trabajo del equipo</td><td>Respuesta correcta sin justificación</td><td>Respuesta parcial</td><td>No responde o incorrecta</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Checklist de avance</h3>
+        <ul class="checklist" id="checklist">
+          <li><span class="box"></span><span class="text">Encontré las fallas a partir de los síntomas (Parte B).</span></li>
+          <li><span class="box"></span><span class="text">O1: gestión por SSH funcionando y Telnet inhabilitado.</span></li>
+          <li><span class="box"></span><span class="text">O2: sin contraseñas en claro.</span></li>
+          <li><span class="box"></span><span class="text">O3: bloqueo de fuerza bruta configurado y probado.</span></li>
+          <li><span class="box"></span><span class="text">O4: VLAN nativa y de gestión fuera de VLAN 1; puertos sin uso apagados.</span></li>
+          <li><span class="box"></span><span class="text">O5: control de puertos de acceso probado.</span></li>
+          <li><span class="box"></span><span class="text">O6 y O8: árbol de expansión protegido y vecinos desactivados.</span></li>
+          <li><span class="box"></span><span class="text">O7: gestión restringida a VLAN 10 y probada desde PC-U1.</span></li>
+          <li><span class="box"></span><span class="text">Capturas con hora y nombre visibles; <code class="inline">manifest.md</code> con justificación de 300 palabras o menos.</span></li>
+        </ul>
+      </section>
+
+      <section id="referencias">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Referencias</h2>
+        <ul class="plain">
+          <li><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/security/command/sec-cr-book.html">Cisco IOS Security Command Reference</a> — ACLs, AAA, control de acceso.</li>
+          <li>Cisco Packet Tracer 8.x: ayuda incluida en la aplicación (menú Help).</li>
+        </ul>
+      </section>
+
+      <footer class="page">
+        <strong>Ing. Rodolfo Cañas Cervantes</strong> · Seguridad en Redes · Universidad de la Costa (CUC) · Barranquilla, Colombia · 2026-2
+      </footer>
+    </main>
+  </div>
+</div>
+
+
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toggleBackToTop();
+
+  const tocToggle = document.getElementById('toc-toggle');
+  const tocNav = document.getElementById('toc');
+  if (tocToggle && tocNav) {
+    tocToggle.addEventListener('click', () => {
+      tocNav.classList.toggle('mobile-open');
+      tocToggle.textContent = tocNav.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+    tocNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      tocNav.classList.remove('mobile-open');
+      tocToggle.textContent = '☰';
+    }));
+  }
+
+  const checklistItems = document.querySelectorAll('.checklist li');
+  const storageKey = 'cuc-lab04-hardening-chk';
+  let savedState = {};
+  try { savedState = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch (e) { savedState = {}; }
+  checklistItems.forEach((li, idx) => {
+    if (savedState[idx]) li.classList.add('done');
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+      savedState[idx] = li.classList.contains('done');
+      try { localStorage.setItem(storageKey, JSON.stringify(savedState)); } catch (e) { /* almacenamiento no disponible */ }
+    });
+  });
+</script>
+
+</body>
+</html>

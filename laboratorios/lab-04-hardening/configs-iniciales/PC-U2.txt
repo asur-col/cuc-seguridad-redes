@@ -1,0 +1,5 @@
+PC-U2 (PC, sin CLI: Desktop > IP Configuration)
+IP Address:      192.168.20.12
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.20.1
+Puerto: SW2 FastEthernet0/3 (VLAN 20)

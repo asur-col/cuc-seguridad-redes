@@ -1,0 +1,10 @@
+Estas configuraciones son el punto de partida INSEGURO del Laboratorio 4 (solo laboratorio, credenciales ficticias).
+1. En Packet Tracer 8.x arma la topologia de topologia-lab04.drawio: R1 (2911), SW1 y SW2 (2960), PC-ADM, PC-U1, PC-U2 y SRV-01.
+2. Cableado: R1 Gi0/0 con SW1 Fa0/1; SW1 Fa0/2 con SW2 Fa0/1; PC-ADM con SW1 Fa0/3; SRV-01 con SW1 Fa0/4; PC-U1 con SW2 Fa0/2; PC-U2 con SW2 Fa0/3.
+3. Pega en el CLI (modo privilegiado) cada archivo R1.txt, SW1.txt y SW2.txt en su equipo.
+4. Configura las IP de los PC y el servidor con los datos de cada .txt (pestana Desktop).
+5. Prueba: desde PC-ADM, ping 192.168.1.2 debe responder.
+6. Guarda el resultado como lab04-inicial.pkt y entregalo a los equipos; el .pkt lo arma el docente.
+7. Tiempo estimado de armado y carga: menos de 15 minutos.
+8. Si PT rechaza una linea, anotala en el reporte del docente; el resto del archivo se aplica igual.
+9. Los estudiantes no reciben estos .txt, solo el .pkt inicial; no reutilizar estas credenciales.

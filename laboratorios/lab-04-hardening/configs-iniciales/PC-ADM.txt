@@ -1,0 +1,5 @@
+PC-ADM (PC, sin CLI: Desktop > IP Configuration)
+IP Address:      192.168.10.10
+Subnet Mask:     255.255.255.0
+Default Gateway: 192.168.10.1
+Puerto: SW1 FastEthernet0/3 (VLAN 10)
