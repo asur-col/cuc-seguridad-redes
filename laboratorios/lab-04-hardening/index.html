@@ -507,25 +507,25 @@
            src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
            onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
            alt="Logo Universidad de la Costa (CUC)">
-      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes</div>
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes · Actividad individual · 10 %</div>
       <h1>Laboratorio 4: Hardening de dispositivos de red</h1>
       <p class="sub">Auditar, endurecer y demostrar con evidencia un router y dos switches con VLAN en Cisco Packet Tracer: gestión cifrada, credenciales, capa 2, árbol de expansión y superficie de ataque</p>
       <div class="accent-bar"></div>
       <div class="author-block">
         <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
         <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
-        <span>📅 <strong>Ponderación y semana: por definir · 2026-2</strong></span>
+        <span>📅 <strong>Actividad individual · 10 % · semana por definir · 2026-2</strong></span>
         <span>📄 <a href="lab-04-hardening-packet-tracer.md" download>Descargar versión Markdown</a></span>
       </div>
     </header>
 
     <main>
       <section id="intro">
-        <p class="lede">Recibes una red que funciona: los equipos se ven, las VLAN responden y los usuarios llegan a sus servicios. Nadie la ha asegurado. Tu equipo debe auditarla, endurecerla y demostrar, con evidencia, que cada falla quedó corregida.</p>
+        <p class="lede">Recibes una red que funciona: los equipos se ven, las VLAN responden y los usuarios llegan a sus servicios. Nadie la ha asegurado. Debes auditarla, endurecerla y demostrar, con evidencia, que cada falla quedó corregida.</p>
 
         <p>Este laboratorio no construye una red desde cero: parte de una red ya armada y configurada de forma insegura. El trabajo es encontrar las fallas a partir de sus síntomas, corregirlas en los dispositivos y dejar pruebas de cada corrección.</p>
 
-        <div class="callout note"><b>Equipos de máximo 2 personas · máximo 2 horas · aula.</b> Todo se resuelve dentro de Cisco Packet Tracer 8.x, sin Internet ni herramientas externas.</div>
+        <div class="callout note"><b>Actividad individual · máximo 2 horas · aula.</b> Todo se resuelve dentro de Cisco Packet Tracer 8.x, sin Internet ni herramientas externas.</div>
 
         <div class="callout note"><b>Solo laboratorio:</b> todas las credenciales de la configuración inicial son ficticias. No reutilices ninguna clave real.</div>
       </section>
@@ -636,14 +636,14 @@
         </ul>
 
         <h3>Objetivos medibles</h3>
-        <p>Al terminar, el equipo debe cumplir los ocho objetivos. Cada uno se demuestra con la evidencia indicada.</p>
+        <p>Al terminar, debes cumplir los ocho objetivos. Cada uno se demuestra con la evidencia indicada.</p>
         <div class="tbl-wrap">
           <table>
             <thead><tr><th>#</th><th>Objetivo</th><th>Cómo se demuestra</th></tr></thead>
             <tbody>
               <tr><td class="mono">O1</td><td>Gestión remota cifrada: los tres equipos aceptan administración solo por SSH y Telnet queda inhabilitado.</td><td>Sesión SSH exitosa desde PC-ADM; intento de Telnet rechazado; configuración de las líneas de acceso.</td></tr>
               <tr><td class="mono">O2</td><td>Credenciales protegidas: ninguna contraseña legible en la configuración en ejecución, y existe una contraseña de privilegio protegida.</td><td><code class="inline">show running-config</code> sin contraseñas en texto claro.</td></tr>
-              <tr><td class="mono">O3</td><td>Protección contra fuerza bruta: tres intentos fallidos bloquean el acceso durante un tiempo que el equipo define y documenta.</td><td>Captura de los tres intentos fallidos y del bloqueo.</td></tr>
+              <tr><td class="mono">O3</td><td>Protección contra fuerza bruta: tres intentos fallidos bloquean el acceso durante un tiempo que tú defines y documentas.</td><td>Captura de los tres intentos fallidos y del bloqueo.</td></tr>
               <tr><td class="mono">O4</td><td>Capa 2 endurecida: la VLAN nativa y la de gestión dejan de ser la VLAN 1, y los puertos sin uso quedan apagados y aislados.</td><td><code class="inline">show vlan brief</code>, estado de interfaces y prueba de gestión desde PC-ADM.</td></tr>
               <tr><td class="mono">O5</td><td>Control de puertos de acceso: cada puerto de usuario acepta solo la MAC aprendida y se bloquea ante otra MAC.</td><td>Prueba de cambio de equipo en un puerto y captura del puerto bloqueado.</td></tr>
               <tr><td class="mono">O6</td><td>Árbol de expansión protegido: los puertos de acceso pasan a reenvío de inmediato y se apagan si reciben BPDU.</td><td>Estado de los puertos de acceso en la salida de árbol de expansión.</td></tr>
@@ -661,20 +661,21 @@
           <h2>Entregables y evidencia</h2>
         </div>
 
-        <h3>Entregables (una entrega por equipo, por Teams)</h3>
+        <h3>Entregables (una entrega por estudiante, por Teams)</h3>
+        <p>Cada estudiante entrega una carpeta <code class="inline">apellido-nombre/</code> con:</p>
         <ol class="steps">
-          <li><b>Archivo <code class="inline">.pkt</code> final</b> del equipo, con el nombre <code class="inline">EQUIPO-lab04.pkt</code>.</li>
+          <li><b>Archivo <code class="inline">.pkt</code> final</b>, con el nombre <code class="inline">apellido-nombre-lab04.pkt</code>.</li>
           <li><b>Carpeta de capturas</b> (PNG o JPG) con la evidencia de la Parte D.</li>
           <li><b><code class="inline">manifest.md</code></b> con la tabla objetivo-captura-comando, las salidas <code class="inline">show</code> solicitadas y la justificación (máximo 300 palabras).</li>
         </ol>
-        <p>Cada integrante responde en aula una pregunta al azar sobre el trabajo del equipo (criterio individual de la rúbrica).</p>
+        <p>Cada estudiante responde en aula una pregunta al azar sobre su propio trabajo (criterio 5 de la rúbrica).</p>
 
         <h3>Evidencia exigida</h3>
         <ul class="plain">
           <li>Al menos <b>una captura por objetivo</b> (O1 a O8). En O1, O2, O5 y O7, incluye una captura <b>antes</b> y otra <b>después</b> del cambio.</li>
           <li>Cada captura muestra <b>la hora del sistema</b> y <b>el nombre del dispositivo</b> en el prompt o en la ventana activa.</li>
           <li>En <code class="inline">manifest.md</code> pega la salida de cada comando <code class="inline">show</code> que uses como prueba. No basta con decir que algo "quedó bien".</li>
-          <li>La justificación (máximo 300 palabras) explica qué falla encontraron primero, por qué es un riesgo y cómo la corrigieron. No copies la configuración.</li>
+          <li>La justificación (máximo 300 palabras) explica qué falla encontraste primero, por qué es un riesgo y cómo la corregiste. No copies la configuración.</li>
         </ul>
       </section>
 
@@ -687,7 +688,7 @@
 
         <h3>Reglas</h3>
         <ul class="plain">
-          <li>Equipos de <b>máximo 2 personas</b>. Máximo <b>2 horas</b> en aula.</li>
+          <li>Actividad <b>individual</b>. Máximo <b>2 horas</b> en aula.</li>
           <li>Trabajo <b>100 % dentro de Packet Tracer 8.x</b>. Sin Internet y sin herramientas externas.</li>
           <li>Puedes consultar la ayuda incluida en Packet Tracer.</li>
           <li>Cualquier cambio en un equipo debe quedar anotado en <code class="inline">manifest.md</code>.</li>
@@ -695,7 +696,7 @@
         </ul>
 
         <h3>Rúbrica</h3>
-        <p>Ponderación y semana por definir. Cada criterio grupal vale hasta 1,0 y se evalúa con cuatro niveles.</p>
+        <p>Cinco criterios, cada uno hasta 1,0 (total 5,0), evaluados de forma individual con cuatro niveles. Semana por definir.</p>
         <div class="tbl-wrap">
           <table>
             <thead><tr><th>Criterio</th><th>1,0</th><th>0,75</th><th>0,5</th><th>0</th></tr></thead>
@@ -704,8 +705,7 @@
               <tr><td><b>C2.</b> Credenciales y autenticación (O2)</td><td>Ninguna contraseña en claro y contraseña de privilegio protegida, verificadas en la configuración</td><td>Una contraseña en claro restante</td><td>Contraseña de privilegio protegida, pero otras en claro</td><td>Sin cambios</td></tr>
               <tr><td><b>C3.</b> Capa 2: VLAN y puertos (O4, O5)</td><td>VLAN nativa y de gestión fuera de VLAN 1, puertos sin uso apagados y bloqueo por MAC demostrado</td><td>Una de las tres partes incompleta</td><td>Dos de las tres partes incompletas</td><td>Sin cambios</td></tr>
               <tr><td><b>C4.</b> Árbol de expansión y superficie (O6, O8)</td><td>PortFast y protección ante BPDU en puertos de acceso, y protocolo de vecinos desactivado, verificados</td><td>Una de las tres partes incompleta</td><td>Dos de las tres partes incompletas</td><td>Sin cambios</td></tr>
-              <tr><td><b>C5.</b> Evidencia y documentación</td><td>Una captura por objetivo con hora y nombre visibles, manifest completo y justificación clara</td><td>Una captura o salida faltante</td><td>Evidencia parcial o sin hora</td><td>Sin evidencia</td></tr>
-              <tr><td><b>Individual.</b> Pregunta al azar por integrante</td><td>Respuesta técnica correcta y justificada sobre el trabajo del equipo</td><td>Respuesta correcta sin justificación</td><td>Respuesta parcial</td><td>No responde o incorrecta</td></tr>
+              <tr><td><b>C5.</b> Evidencia y defensa individual: entrega reproducible y pregunta al azar</td><td>El <code class="inline">.pkt</code> reproduce las pruebas; una captura por objetivo con hora y nombre visibles; manifest completo; justificación clara; respuesta técnica correcta y justificada a la pregunta al azar</td><td>Una captura o salida faltante, o respuesta correcta sin justificación</td><td>Evidencia parcial o sin hora, o respuesta parcial</td><td>Sin evidencia, o no responde o responde incorrectamente</td></tr>
             </tbody>
           </table>
         </div>
@@ -721,6 +721,7 @@
           <li><span class="box"></span><span class="text">O6 y O8: árbol de expansión protegido y vecinos desactivados.</span></li>
           <li><span class="box"></span><span class="text">O7: gestión restringida a VLAN 10 y probada desde PC-U1.</span></li>
           <li><span class="box"></span><span class="text">Capturas con hora y nombre visibles; <code class="inline">manifest.md</code> con justificación de 300 palabras o menos.</span></li>
+          <li><span class="box"></span><span class="text">Carpeta <code class="inline">apellido-nombre/</code> completa: <code class="inline">.pkt</code>, capturas y <code class="inline">manifest.md</code>.</span></li>
         </ul>
       </section>
 

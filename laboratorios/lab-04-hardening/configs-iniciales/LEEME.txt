@@ -4,7 +4,7 @@ Estas configuraciones son el punto de partida INSEGURO del Laboratorio 4 (solo l
 3. Pega en el CLI (modo privilegiado) cada archivo R1.txt, SW1.txt y SW2.txt en su equipo.
 4. Configura las IP de los PC y el servidor con los datos de cada .txt (pestana Desktop).
 5. Prueba: desde PC-ADM, ping 192.168.1.2 debe responder.
-6. Guarda el resultado como lab04-inicial.pkt y entregalo a los equipos; el .pkt lo arma el docente.
+6. Guarda el resultado como lab04-inicial.pkt y entrégalo a cada estudiante; el .pkt lo arma el docente.
 7. Tiempo estimado de armado y carga: menos de 15 minutos.
 8. Si PT rechaza una linea, anotala en el reporte del docente; el resto del archivo se aplica igual.
 9. Los estudiantes no reciben estos .txt, solo el .pkt inicial; no reutilizar estas credenciales.

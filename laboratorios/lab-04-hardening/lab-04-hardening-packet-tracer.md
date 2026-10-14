@@ -2,12 +2,12 @@
 
 **Curso:** Seguridad en Redes — Ingeniería de Sistemas
 **Docente:** Ing. Rodolfo Cañas Cervantes — Universidad de la Costa (CUC) · 2026-2
-**Unidad · Actividad · Ponderación:** por definir · semana por definir
-**Modalidad:** Cisco Packet Tracer 8.x, en aula · equipos de máximo 2 personas · máximo 2 horas
+**Actividad individual · 10 %** · unidad y corte por definir · semana por definir
+**Modalidad:** Cisco Packet Tracer 8.x, en aula · actividad individual · máximo 2 horas
 
 ## Introducción
 
-Recibes una red que funciona: los equipos se ven, las VLAN responden y los usuarios llegan a sus servicios. Nadie la ha asegurado. Tu equipo debe auditarla, endurecerla y demostrar, con evidencia, que cada falla quedó corregida.
+Recibes una red que funciona: los equipos se ven, las VLAN responden y los usuarios llegan a sus servicios. Nadie la ha asegurado. Debes auditarla, endurecerla y demostrar, con evidencia, que cada falla quedó corregida.
 
 Este laboratorio no construye una red desde cero: parte de una red ya armada y configurada de forma insegura. El trabajo es encontrar las fallas a partir de sus síntomas, corregirlas en los dispositivos y dejar pruebas de cada corrección.
 
@@ -17,7 +17,7 @@ Este laboratorio no construye una red desde cero: parte de una red ya armada y c
 
 Una oficina ficticia tiene un router (R1), dos switches (SW1 y SW2), tres VLAN de uso (ADMIN, USUARIOS y SERVIDORES) y una VLAN de gestión. Los switches y el router ya tienen configuración, pero no está endurecida.
 
-**Punto de partida:** el archivo `lab04-inicial.pkt` que entrega el docente. Contiene la topología y la configuración inicial. El `.pkt` lo arma el docente; ustedes trabajan sobre ese archivo.
+**Punto de partida:** el archivo `lab04-inicial.pkt` que entrega el docente. Contiene la topología y la configuración inicial. El `.pkt` lo arma el docente; trabajas sobre ese archivo.
 
 Figura 1 (en la versión HTML): topología con R1, SW1, SW2, PC-ADM, PC-U1, PC-U2 y SRV-01.
 
@@ -40,7 +40,7 @@ Figura 1 (en la versión HTML): topología con R1, SW1, SW2, PC-ADM, PC-U1, PC-U
 
 ### Síntomas del estado inicial
 
-Un auditor de la oficina reporta lo siguiente. Cada síntoma corresponde a una falla de seguridad que deben encontrar y corregir.
+Un auditor de la oficina reporta lo siguiente. Cada síntoma corresponde a una falla de seguridad que debes encontrar y corregir.
 
 1. Al capturar el tráfico de administración de un switch se leen usuario y clave del administrador en texto claro.
 2. Al revisar la configuración en ejecución de R1, las contraseñas aparecen legibles.
@@ -60,13 +60,13 @@ Un auditor de la oficina reporta lo siguiente. Cada síntoma corresponde a una f
 
 ### Objetivos medibles
 
-Al terminar, el equipo debe cumplir los ocho objetivos siguientes. Cada uno se demuestra con la evidencia indicada.
+Al terminar, debes cumplir los ocho objetivos siguientes. Cada uno se demuestra con la evidencia indicada.
 
 | # | Objetivo | Cómo se demuestra |
 |---|---|---|
 | O1 | Gestión remota cifrada: los tres equipos aceptan administración solo por SSH y Telnet queda inhabilitado. | Sesión SSH exitosa desde PC-ADM; intento de Telnet rechazado; configuración de las líneas de acceso. |
 | O2 | Credenciales protegidas: ninguna contraseña legible en la configuración en ejecución, y existe una contraseña de privilegio protegida. | `show running-config` sin contraseñas en texto claro. |
-| O3 | Protección contra fuerza bruta: tres intentos fallidos bloquean el acceso durante un tiempo que el equipo define y documenta. | Captura de los tres intentos fallidos y del bloqueo. |
+| O3 | Protección contra fuerza bruta: tres intentos fallidos bloquean el acceso durante un tiempo que tú defines y documentas. | Captura de los tres intentos fallidos y del bloqueo. |
 | O4 | Capa 2 endurecida: la VLAN nativa y la de gestión dejan de ser la VLAN 1, y los puertos sin uso quedan apagados y aislados. | `show vlan brief`, estado de interfaces y prueba de gestión desde PC-ADM. |
 | O5 | Control de puertos de acceso: cada puerto de usuario acepta solo la MAC aprendida y se bloquea ante otra MAC. | Prueba de cambio de equipo en un puerto y captura del puerto bloqueado. |
 | O6 | Árbol de expansión protegido: los puertos de acceso pasan a reenvío de inmediato y se apagan si reciben BPDU. | Estado de los puertos de acceso en la salida de árbol de expansión. |
@@ -75,26 +75,28 @@ Al terminar, el equipo debe cumplir los ocho objetivos siguientes. Cada uno se d
 
 ## Parte C — Entregables y evidencia
 
-### Entregables (una entrega por equipo, por Teams)
+### Entregables (una entrega por estudiante, por Teams)
 
-1. **Archivo `.pkt` final** del equipo, con el nombre `EQUIPO-lab04.pkt`.
+Cada estudiante entrega una carpeta `apellido-nombre/` con:
+
+1. **Archivo `.pkt` final**, con el nombre `apellido-nombre-lab04.pkt`.
 2. **Carpeta de capturas** (PNG o JPG), con la evidencia de la Parte D.
 3. **`manifest.md`** con la tabla objetivo-captura-comando, las salidas `show` solicitadas y la justificación (máximo 300 palabras).
 
-Cada integrante responde en aula una pregunta al azar sobre el trabajo del equipo (criterio individual de la rúbrica).
+Cada estudiante responde en aula una pregunta al azar sobre su propio trabajo (criterio 5 de la rúbrica).
 
 ### Evidencia exigida
 
 - Al menos **una captura por objetivo** (O1 a O8). En O1, O2, O5 y O7, incluye una captura **antes** y otra **después** del cambio.
 - Cada captura debe mostrar **la hora del sistema** y **el nombre del dispositivo** en el prompt o en la ventana activa.
 - En `manifest.md`, pega la salida de cada comando `show` que uses como prueba. No basta con decir que algo "quedó bien".
-- La justificación (máximo 300 palabras) explica qué falla encontraron primero, por qué es un riesgo y cómo la corrigieron. No copies la configuración.
+- La justificación (máximo 300 palabras) explica qué falla encontraste primero, por qué es un riesgo y cómo la corregiste. No copies la configuración.
 
 ## Parte D — Reglas y rúbrica
 
 ### Reglas
 
-- Equipos de **máximo 2 personas**. Máximo **2 horas** en aula.
+- Actividad **individual**. Máximo **2 horas** en aula.
 - Trabajo **100 % dentro de Packet Tracer 8.x**. Sin Internet y sin herramientas externas.
 - Puedes consultar la ayuda incluida en Packet Tracer.
 - Cualquier cambio en un equipo debe quedar anotado en `manifest.md`.
@@ -102,7 +104,7 @@ Cada integrante responde en aula una pregunta al azar sobre el trabajo del equip
 
 ### Rúbrica
 
-Ponderación y semana por definir. Cada criterio grupal vale hasta 1,0 y se evalúa con cuatro niveles.
+Cinco criterios, cada uno hasta 1,0 (total 5,0), evaluados de forma individual con cuatro niveles. Semana por definir.
 
 | Criterio | 1,0 | 0,75 | 0,5 | 0 |
 |---|---|---|---|---|
@@ -110,8 +112,7 @@ Ponderación y semana por definir. Cada criterio grupal vale hasta 1,0 y se eval
 | C2. Credenciales y autenticación (O2) | Ninguna contraseña en claro y contraseña de privilegio protegida, verificadas en la configuración | Una contraseña en claro restante | Contraseña de privilegio protegida pero otras en claro | Sin cambios |
 | C3. Capa 2: VLAN y puertos (O4, O5) | VLAN nativa y de gestión fuera de VLAN 1, puertos sin uso apagados, y bloqueo por MAC demostrado | Una de las tres partes incompleta | Dos de las tres partes incompletas | Sin cambios |
 | C4. Árbol de expansión y superficie (O6, O8) | PortFast y protección ante BPDU en puertos de acceso, y protocolo de vecinos desactivado, verificados | Una de las tres partes incompleta | Dos de las tres partes incompletas | Sin cambios |
-| C5. Evidencia y documentación | Una captura por objetivo con hora y nombre visibles, manifest completo y justificación clara | Una captura o salida faltante | Evidencia parcial o sin hora | Sin evidencia |
-| Individual: pregunta al azar por integrante | Respuesta técnica correcta y justificada sobre el trabajo del equipo | Respuesta correcta sin justificación | Respuesta parcial | No responde o incorrecta |
+| C5. Evidencia y defensa individual: entrega reproducible y pregunta al azar | El `.pkt` reproduce las pruebas; una captura por objetivo con hora y nombre visibles; manifest completo; justificación clara; respuesta técnica correcta y justificada a la pregunta al azar | Una captura o salida faltante, o respuesta correcta sin justificación | Evidencia parcial o sin hora, o respuesta parcial | Sin evidencia, o no responde o responde incorrectamente |
 
 ## Checklist de avance
 
@@ -124,6 +125,7 @@ Ponderación y semana por definir. Cada criterio grupal vale hasta 1,0 y se eval
 - [ ] O6 y O8: árbol de expansión protegido y vecinos desactivados.
 - [ ] O7: gestión restringida a VLAN 10 y probada desde PC-U1.
 - [ ] Capturas con hora y nombre visibles; `manifest.md` con justificación de 300 palabras o menos.
+- [ ] Carpeta `apellido-nombre/` completa: `.pkt`, capturas y `manifest.md`.
 
 ## Referencias
 
