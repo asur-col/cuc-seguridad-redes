@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Proyecto de aula del segundo corte de Seguridad en Redes (CUC, 2026-2): plano de gestión segura con bastión, identidad individual, RADIUS, syslog con TLS, Suricata y hardening. Laboratorio en contenedores sin Internet.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<title>Proyecto de Aula Corte 2 — Plano de gestión · Seguridad en Redes</title>
+<style>
+  html{scroll-behavior:smooth;scroll-padding-top:16px}
+  :root{
+    --bg:#FBF8F3; --surface:#FFFFFF; --surface-2:#F4EEE3;
+    --ink:#2A2A2A; --ink-soft:#6B6259;
+    --vino:#A6192E; --vino-strong:#7E1223; --vino-tint:#FBEBEC;
+    --dorado:#A9791C; --dorado-tint:#FBF3DE;
+    --line:#E5DCCB;
+    --ok:#0E7A4B; --ok-tint:#E8F5EE;
+    --warn:#B23A3A; --warn-tint:#FBE9E7;
+    --shadow:0 1px 2px rgba(42,26,20,.05),0 8px 24px rgba(42,26,20,.07);
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --serif:'Fraunces',Georgia,serif;
+  }
+  @media(prefers-color-scheme:dark){
+    :root:not([data-theme=light]){
+      --bg:#1B1613; --surface:#24201B; --surface-2:#2C2620;
+      --ink:#EFE7D9; --ink-soft:#B3A896;
+      --vino:#E2536B; --vino-strong:#F0748A; --vino-tint:#3A1E22;
+      --dorado:#E4BC5C; --dorado-tint:#3B321C; --line:#3D362B;
+      --ok:#5BD69E; --ok-tint:#1D3328;
+      --warn:#F0748A; --warn-tint:#3A1E22;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.65}
+  .layout{display:flex;align-items:flex-start;max-width:1400px;margin:0 auto;gap:0}
+  .wrap{flex:1 1 auto;min-width:0;max-width:1140px;margin:0 auto;padding:0 20px 80px}
+  .sidenav{position:sticky;top:0;flex:0 0 220px;padding:32px 12px 32px 20px;display:flex;flex-direction:column;gap:4px;align-self:flex-start;max-height:100vh;overflow-y:auto}
+  .sidenav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:8px 12px;border-radius:8px;border-left:2px solid transparent;line-height:1.4}
+  .sidenav a:hover{color:var(--vino);background:var(--surface-2)}
+  .sidenav a.active{color:var(--vino-strong);border-left-color:var(--vino);background:var(--vino-tint);font-weight:600}
+  @media(max-width:960px){
+    .layout{display:block}
+    .sidenav{position:static;flex-direction:row;flex-wrap:wrap;max-height:none;overflow-y:visible;padding:14px 20px 6px;gap:8px}
+    .sidenav a{border:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface-2);border-radius:20px;padding:6px 13px}
+    .sidenav a.active{border-color:var(--vino)}
+    .wrap{max-width:100%}
+  }
+  header.top{padding:44px 20px 30px;text-align:center;background:var(--surface-2);border-bottom:1px solid var(--line)}
+  header.top img.logo{height:52px;margin-bottom:14px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--vino);margin:0 0 6px;font-weight:500}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,38px);margin:0 0 10px;line-height:1.15}
+  .sub{color:var(--ink-soft);margin:0;font-size:16px;max-width:680px;margin-left:auto;margin-right:auto}
+  .accent-bar{width:72px;height:4px;background:linear-gradient(90deg,var(--vino),var(--dorado));margin:18px auto;border-radius:2px}
+  .meta{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);line-height:1.8;margin:0}
+  .meta b{color:var(--ink)}
+  section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 30px;margin-top:26px;box-shadow:var(--shadow)}
+  h2{font-family:var(--serif);font-size:23px;margin:0 0 4px;display:flex;align-items:center;gap:12px}
+  h2 .paso{font-family:var(--mono);font-size:13px;background:var(--vino);color:#fff;border-radius:8px;padding:3px 11px;font-weight:500;flex:none}
+  h3{font-size:17px;margin:26px 0 8px;color:var(--vino-strong);font-family:var(--serif)}
+  h4{font-size:15px;margin:18px 0 6px;color:var(--ink)}
+  .lead{color:var(--ink-soft);margin-top:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.8px;margin:14px 0}
+  th{text-align:left;background:var(--surface-2);padding:9px 12px;border:1px solid var(--line);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+  td{padding:8px 12px;border:1px solid var(--line);vertical-align:top}
+  .tbl-wrap{overflow-x:auto}
+  code{font-family:var(--mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  pre{font-family:var(--mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:12px 16px;overflow-x:auto;line-height:1.5}
+  blockquote{margin:14px 0;padding:14px 18px;border-left:4px solid var(--dorado);background:var(--dorado-tint);border-radius:0 8px 8px 0;font-style:italic;color:var(--ink)}
+  .tip,.warn,.danger{border-left:4px solid;border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14.5px}
+  .tip{border-color:var(--ok);background:var(--ok-tint)} .tip::before{content:"💡 TIP — ";font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ok)}
+  .warn{border-color:var(--dorado);background:var(--dorado-tint)} .warn::before{content:"⚠ ATENCIÓN — ";font-family:var(--mono);font-size:11px;font-weight:600;color:var(--dorado)}
+  .danger{border-color:var(--vino);background:var(--vino-tint)} .danger::before{content:"☠ MANDATO DEL CLIENTE — ";font-family:var(--mono);font-size:11px;font-weight:600;color:var(--vino)}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  figcaption{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px;letter-spacing:.03em}
+  .rubrica td:first-child, .rubrica th:first-child{font-family:var(--mono);text-align:center;width:28px}
+  .rubrica td.crit{font-weight:600;color:var(--vino-strong)}
+  .total td{font-weight:700;background:var(--surface-2)}
+  footer{margin-top:34px;padding:26px 20px;text-align:center;color:var(--ink-soft);font-family:var(--mono);font-size:12px;border-top:1px solid var(--line)}
+  a.ext{color:var(--vino);text-decoration:none;border-bottom:1px dotted var(--vino)}
+  a.ext:hover{color:var(--vino-strong);border-bottom-style:solid}
+</style>
+</head>
+<body>
+<header class="top">
+  <img class="logo" src="https://es.wikipedia.org/wiki/Special:FilePath/Logo_cuc.png" alt="Universidad de la Costa" referrerpolicy="no-referrer" onerror="this.style.display='none'">
+  <p class="eyebrow">Proyecto de Aula · Segundo Corte · Parcial 2</p>
+  <h1>Plano de gestión: rediseño seguro de la administración de red (Segundo Corte)</h1>
+  <div class="warn" style="max-width:680px;margin:14px auto 0;text-align:left"><b>Base del proyecto publicada para socializar.</b> Se desarrolla en clase el miércoles 21 de octubre de 2026. Pendiente: instrucciones detalladas del entorno (máquina virtual y <code>./lab</code>), que el docente publicará antes de la actividad.</div>
+  <p class="sub">Rediseñar la administración segura de una red y demostrarlo con evidencia: no hay receta, hay que descubrir qué está mal y decidir cómo arreglarlo</p>
+  <div class="accent-bar"></div>
+  <p class="meta">
+    <b>Curso:</b> Seguridad en Redes — Ingeniería de Sistemas<br>
+    <b>Docente:</b> Ing. Rodolfo Cañas Cervantes · Universidad de la Costa (CUC) · 2026-2<br>
+    <b>Modalidad:</b> equipo de máximo 2 integrantes &nbsp;·&nbsp; <b>Ponderación:</b> 20 % del Parcial 2 &nbsp;·&nbsp; <b>Actividad en clase:</b> miércoles 21 de octubre de 2026
+  </p>
+</header>
+
+<div class="layout">
+<nav class="sidenav">
+  <a href="#s1">1. Objetivo</a>
+  <a href="#s2">2. Escenario</a>
+  <a href="#s3">3. Qué deben lograr</a>
+  <a href="#s4">4. Plan de 120 min</a>
+  <a href="#s5">5. Rúbrica</a>
+  <a href="#s6">6. Evidencia</a>
+  <a href="#s7">7. Fechas</a>
+  <a href="#s8">8. Reglas</a>
+  <a href="#s9">9. Qué necesita cada equipo</a>
+  <a href="#s10">10. Entorno (VM)</a>
+</nav>
+<div class="wrap">
+
+<!-- ============ 1. OBJETIVO ============ -->
+<section id="s1">
+  <h2><span class="paso">1</span> Objetivo</h2>
+  <p>Los equipos reciben una red corporativa simulada cuyo <b>plano de gestión</b> (la forma en que se administran routers, servidores y registros) está mal diseñado. Deben investigarla, corregirla y demostrar con evidencia que quedó segura. No hay receta: el reto es descubrir qué está mal y decidir cómo arreglarlo.</p>
+  <p><b>Peso:</b> 20 % del Parcial 2 (proyecto de aula del segundo corte). <b>Equipos de máximo 2 personas.</b></p>
+  <div class="warn"><b>El laboratorio funciona sin Internet, dentro de la máquina virtual del aula; no se escanea ni se publica nada en la red de la universidad.</b></div>
+</section>
+
+<!-- ============ 2. ESCENARIO ============ -->
+<section id="s2">
+  <h2><span class="paso">2</span> Escenario</h2>
+  <p>La organización descubrió que sus dispositivos aceptan administración desde la red de usuarios, comparten una sola cuenta, usan contraseñas, publican HTTP, envían los registros (logs) sin cifrar y su sensor Suricata no ve el tráfico. El equipo de seguridad debe rediseñar el plano de gestión.</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>Segmento</th><th>Red</th><th>Qué hay</th></tr>
+    <tr><td>usuarios</td><td>10.10.1.0/24</td><td>Estación del usuario y router r1</td></tr>
+    <tr><td>tránsito</td><td>10.10.2.0/24</td><td>Routers r1 y r2 y el sensor Suricata</td></tr>
+    <tr><td>servidores</td><td>10.10.3.0/24</td><td>Router r2 y la aplicación web</td></tr>
+    <tr><td>gestión</td><td>10.10.9.0/24</td><td>Bastión, RADIUS (autenticación), servidor de logs</td></tr>
+    <tr><td>admin</td><td>10.10.8.0/24</td><td>Estación del administrador y bastión</td></tr>
+  </table></div>
+  <p>Todo corre en contenedores dentro de la máquina del estudiante, en redes aisladas: no sale a Internet ni a la red de la universidad.</p>
+</section>
+
+<!-- ============ 3. QUÉ DEBEN LOGRAR ============ -->
+<section id="s3">
+  <h2><span class="paso">3</span> Qué deben lograr los equipos</h2>
+  <h3>Seis objetivos obligatorios (sin indicar cómo)</h3>
+  <ol>
+    <li>Administrar r1, r2 y app solo a través del bastión.</li>
+    <li>Eliminar la cuenta compartida: cada persona entra con su identidad y con llave pública.</li>
+    <li>Autenticación centralizada (RADIUS) con dos roles: administrador y solo lectura, demostrando lo permitido y lo denegado.</li>
+    <li>Syslog cifrado con TLS desde los nodos hacia el servidor de logs, con autenticación del servidor.</li>
+    <li>Suricata detecta una prueba autorizada (reconocimiento con nmap) y la alerta se correlaciona con la evidencia.</li>
+    <li>Hardening: nmap antes y después, cerrar el servicio innecesario y dejar HTTPS correcto en la aplicación.</li>
+  </ol>
+  <h3>Dos bonos</h3>
+  <ul>
+    <li><b>(a)</b> Cabeceras de seguridad y TLS ≥ 1.2 sin suites débiles.</li>
+    <li><b>(b)</b> Suricata en modo de bloqueo (IPS) con una regla demostrada.</li>
+  </ul>
+</section>
+
+<!-- ============ 4. PLAN ============ -->
+<section id="s4">
+  <h2><span class="paso">4</span> Plan de trabajo (120 minutos)</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Etapa</th><th>Minutos</th></tr>
+    <tr><td>Descubrimiento de la red</td><td>15</td></tr>
+    <tr><td>Red de gestión y bastión</td><td>25</td></tr>
+    <tr><td>Autenticación (RADIUS) y roles</td><td>30</td></tr>
+    <tr><td>SSH, TLS y syslog</td><td>25</td></tr>
+    <tr><td>Suricata y hardening</td><td>15</td></tr>
+    <tr><td>Entrega de evidencia</td><td>10</td></tr>
+    <tr class="total"><td>Total</td><td>120</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 5. RÚBRICA ============ -->
+<section id="s5">
+  <h2><span class="paso">5</span> Cómo se evalúa (rúbrica sobre 5,0)</h2>
+  <p class="lead">Cinco criterios de <b>1,0 punto</b>. Cada uno tiene cuatro niveles: <b>1,0 · 0,75 · 0,5 · 0</b>.</p>
+  <div class="tbl-wrap"><table class="rubrica">
+    <tr><th>#</th><th>Criterio</th><th>1,0</th><th>0,75</th><th>0,5</th><th>0</th></tr>
+    <tr><td class="crit">1</td><td><b>Cifrado en tránsito</b> (syslog TLS y HTTPS)</td><td>Funciona y hay evidencia de cifrado, identidad del servidor y tráfico real</td><td>Funciona, falta una evidencia técnica</td><td>Parcial o sin validar</td><td>No funciona</td></tr>
+    <tr><td class="crit">2</td><td><b>Identidad y acceso</b> (bastión, identidad individual, llaves, RADIUS y roles)</td><td>Origen restringido, identidad individual, rol mínimo y rechazo comprobado</td><td>Tres de los cuatro controles</td><td>Solo autenticación básica</td><td>Acceso inseguro o no demostrable</td></tr>
+    <tr><td class="crit">3</td><td><b>Logging e IDS</b> (logs centralizados y Suricata)</td><td>Logs centralizados y alerta de Suricata correlacionada con la prueba</td><td>Ambos existen, correlación incompleta</td><td>Solo logging o solo IDS</td><td>Sin evidencia</td></tr>
+    <tr><td class="crit">4</td><td><b>Hardening</b> (nmap antes/después)</td><td>Escaneo antes/después, servicio reducido y tratamiento justificado</td><td>Corrección válida sin comparación completa</td><td>Hallazgos sin remediación suficiente</td><td>Sin análisis</td></tr>
+    <tr><td class="crit">5</td><td><b>Evidencia y defensa</b></td><td>Entrega reproducible; ambos integrantes explican decisiones y riesgos</td><td>Evidencia completa, explicación débil</td><td>Evidencia incompleta o un integrante no domina el trabajo</td><td>Evidencia no verificable</td></tr>
+  </table></div>
+  <ul>
+    <li>Los criterios <b>1 a 4 se califican por equipo</b>.</li>
+    <li>El criterio <b>5 es individual</b>: cada integrante responde una pregunta al azar (TLS, RADIUS, Suricata o el escaneo).</li>
+    <li>Los bonos suben el nivel dentro de su criterio; <b>no suman fuera de 5,0</b>.</li>
+  </ul>
+</section>
+
+<!-- ============ 6. EVIDENCIA ============ -->
+<section id="s6">
+  <h2><span class="paso">6</span> Evidencia que se entrega por Teams</h2>
+  <p>Una carpeta con la siguiente estructura:</p>
+  <pre>equipo-XX/
+├── manifest.md        integrantes, direcciones, decisiones, riesgos residuales
+│                      (máximo 300 palabras de justificación)
+└── evidencia/         capturas y archivos de cada objetivo</pre>
+  <p>Capturas y archivos de cada objetivo: acceso permitido y denegado, sesión TLS, mensajes de syslog, evento de Suricata, nmap antes y después.</p>
+  <div class="warn">No se aceptan capturas sin fecha, dirección IP o identidad visibles.</div>
+</section>
+
+<!-- ============ 7. FECHAS ============ -->
+<section id="s7">
+  <h2><span class="paso">7</span> Fechas</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Fecha</th><th>Qué ocurre</th></tr>
+    <tr><td>14 oct</td><td>Preparación de la máquina virtual y del aula (docente)</td></tr>
+    <tr><td>Semana del 14 al 20 oct</td><td>Prueba del laboratorio en una segunda PC y ajustes</td></tr>
+    <tr><td><b>Mié 21 oct de 2026</b></td><td>Desarrollo del laboratorio en clase (2 horas)</td></tr>
+    <tr><td><b>Fecha límite de entrega</b></td><td>Se publica en la actividad de Teams</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ 8. REGLAS ============ -->
+<section id="s8">
+  <h2><span class="paso">8</span> Reglas del laboratorio</h2>
+  <ul>
+    <li>Todo se hace dentro de las redes del laboratorio; los escaneos solo se dirigen a los contenedores del laboratorio.</li>
+    <li>Las contraseñas y certificados del laboratorio son solo de práctica.</li>
+    <li>No se necesita Internet durante la actividad.</li>
+    <li>Se permite consultar documentación; la evidencia debe ser del propio equipo.</li>
+  </ul>
+</section>
+
+<!-- ============ 9. QUÉ NECESITA CADA EQUIPO ============ -->
+<section id="s9">
+  <h2><span class="paso">9</span> Qué necesita cada equipo</h2>
+  <ul>
+    <li>Un PC con la máquina virtual del aula (Debian/Ubuntu con Docker) o Docker instalado.</li>
+    <li>Mínimo 6–8 GB de RAM en el equipo (la VM usa 4 GB).</li>
+    <li>Virtualización (VT-x / AMD-V) habilitada en la BIOS.</li>
+  </ul>
+  <p><b>Pendiente de publicar:</b> requisitos detallados del equipo y del entorno, que el docente publicará antes de la actividad.</p>
+</section>
+
+<!-- ============ 10. ENTORNO ============ -->
+<section id="s10">
+  <h2><span class="paso">10</span> Entorno: máquina virtual del aula</h2>
+  <p>El docente entrega la máquina virtual del aula: Debian/Ubuntu con Docker y el laboratorio ya cargado. Dentro de la VM el laboratorio se levanta con <code>./lab up</code>.</p>
+  <p><b>Pendiente de publicar:</b> las instrucciones detalladas del entorno (cómo obtener la máquina virtual y el uso de <code>./lab</code>). El docente informará dónde obtenerla y las publicará antes de la actividad.</p>
+</section>
+
+</div>
+</div>
+
+<footer>
+  Seguridad en Redes · Universidad de la Costa (CUC) · Periodo 2026-2 · Proyecto de Aula — Segundo Corte (Plano de gestión)
+</footer>
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.sidenav a'));
+  var sections = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var current = 0;
+    sections.forEach(function(s, i){ if (s && s.offsetTop <= pos) current = i; });
+    links.forEach(function(a, i){ a.classList.toggle('active', i === current); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
