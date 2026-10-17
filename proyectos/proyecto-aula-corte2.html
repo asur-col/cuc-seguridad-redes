@@ -75,6 +75,8 @@
   ul,ol{padding-left:22px}
   li{margin:6px 0}
   figcaption{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px;letter-spacing:.03em}
+  figure{margin:16px 0}
+  img.consola{max-width:100%;width:830px;height:auto;display:block;margin:0 auto;border:1px solid var(--line);border-radius:12px}
   .rubrica td:first-child, .rubrica th:first-child{font-family:var(--mono);text-align:center;width:28px}
   .rubrica td.crit{font-weight:600;color:var(--vino-strong)}
   .total td{font-weight:700;background:var(--surface-2)}
@@ -239,17 +241,11 @@
 <!-- ============ 10. ENTORNO ============ -->
 <section id="s10">
   <h2><span class="paso">10</span> Entorno: la máquina virtual y el cliente <code>./lab</code></h2>
-  <p class="lead">Todo el laboratorio se hace dentro de la <b>máquina virtual del aula</b> (Debian/Ubuntu con Docker, sin Internet). El cliente <code>./lab</code> levanta la red, evalúa tus objetivos y envía el resultado a la plataforma. Aquí se explica <b>cómo usarla</b>, paso a paso.</p>
+  <p class="lead">Todo el laboratorio y la rúbrica se hacen en la <b>consola de la máquina virtual del aula</b> (Debian/Ubuntu con Docker, sin Internet). Con el cliente <code>./lab</code> levantas la red, evalúas tus objetivos y envías el resultado. Aquí se explica <b>cómo usarla</b>, paso a paso, con pantallazos de la consola.</p>
 
-  <h3>10.1 · Entrar a la plataforma</h3>
-  <p>Con el correo y la clave que te da el docente, entra a <a class="ext" href="https://labs.proyectoasur.org">labs.proyectoasur.org</a>:</p>
-  <figure>
-    <img src="img/login-labs.png" alt="Pantalla de acceso a ASUR Labs: correo institucional y contraseña" style="border:1px solid var(--line);border-radius:12px;max-width:340px;width:100%;display:block;margin:0 auto">
-    <figcaption>labs.proyectoasur.org — usa el correo institucional que te dio el docente</figcaption>
-  </figure>
-  <p>Allí ves <b>«Mis laboratorios»</b> con los labs habilitados para tu grupo; para este proyecto verás <b>Parcial 2 — Plano de gestión y hardening</b>. Dentro de la VM, el cliente <code>./lab</code> se conecta a esta misma plataforma solo por HTTPS saliente (puerto 443).</p>
+  <div class="tip"><b>Trabajas solo en la consola.</b> No necesitas entrar a ninguna página web. El docente te da un correo y una clave, y los usas <b>dentro de la VM</b> con <code>./lab login</code>. La plataforma de laboratorios (<code>labs.proyectoasur.org</code>) es solo donde llegan tus objetivos automáticamente con <code>./lab entregar</code> y donde el docente carga tu nota; tú ves tu nota con <code>./lab estado</code>.</div>
 
-  <h3>10.2 · El cliente <code>./lab</code></h3>
+  <h3>10.1 · El cliente <code>./lab</code></h3>
   <p>Dentro de la VM, en la carpeta del paquete del estudiante, está el cliente <code>./lab</code> (un solo archivo). Tiene estos comandos:</p>
   <div class="tbl-wrap"><table>
     <tr><th>Comando</th><th>Qué hace</th></tr>
@@ -257,66 +253,65 @@
     <tr><td><code>./lab up</code></td><td>Construye y levanta la red completa (10 contenedores), con un preflight en el servidor. Al terminar abre tu entrega.</td></tr>
     <tr><td><code>./lab check</code></td><td>Evalúa los 6 objetivos y los 2 bonos: <b>verde</b> si se cumple, <b>rojo</b> si no. No revela la solución.</td></tr>
     <tr><td><code>./lab entregar</code></td><td>Vuelve a evaluar con el check real y envía el resultado a la plataforma (idempotente; si no hay red, lo guarda en cola local y reintenta).</td></tr>
-    <tr><td><code>./lab estado</code></td><td>Muestra contenedores, RAM, IPs, el estado de tu entrega y tu nota cuando el docente la publique.</td></tr>
+    <tr><td><code>./lab estado</code></td><td>Muestra contenedores, RAM, IPs, el estado de tu entrega y tu nota cuando el docente la cargue.</td></tr>
     <tr><td><code>./lab shell &lt;nodo&gt;</code></td><td>Entra a un nodo a trabajar. Nodos: <code>r1 r2 app bastion aaa logs ids est-usuario est-admin crypto</code>.</td></tr>
     <tr><td><code>./lab reset</code></td><td>Vuelve al estado inicial defectuoso (&lt; 60 s) sin borrar tu sesión ni tu entrega.</td></tr>
     <tr><td><code>./lab down</code></td><td>Detiene y elimina los contenedores y las redes (no borra tu sesión ni tu entrega).</td></tr>
   </table></div>
 
-  <h3>10.3 · Flujo completo paso a paso</h3>
+  <h3>10.2 · Flujo completo paso a paso</h3>
   <ol>
     <li><b>Entra a la VM</b> y ve a la carpeta del paquete del estudiante.</li>
-    <li><b>Inicia sesión:</b> <code>./lab login</code>.</li>
+    <li><b>Inicia sesión:</b> <code>./lab login</code> (correo y clave que te dio el docente).</li>
     <li><b>Levanta la red:</b> <code>./lab up</code>. Espera a ver la topología y «Enrutamiento entre redes: OK».</li>
     <li><b>Revisa el estado inicial:</b> <code>./lab check</code>. <b>Al principio todo está en rojo (0/6)</b>: esa es la red defectuosa que deben corregir.</li>
     <li><b>Trabaja en la red</b> con <code>./lab shell &lt;nodo&gt;</code> y vuelve a ejecutar <code>./lab check</code> hasta poner los objetivos en verde.</li>
     <li><b>Captura la evidencia</b> con fecha, IP e identidad visibles (ver <a class="ext" href="#s6">sección 6</a>).</li>
-    <li><b>Envía el resultado:</b> <code>./lab entregar</code>.</li>
+    <li><b>Envía el resultado:</b> <code>./lab entregar</code> (llega solo a la plataforma).</li>
     <li><b>Confirma la entrega:</b> <code>./lab estado</code> debe mostrar <i>recibida</i>.</li>
     <li><b>Apaga la VM:</b> <code>./lab down</code>.</li>
   </ol>
 
-  <h3>10.4 · Qué verás en pantalla</h3>
-  <p>Salidas reales del laboratorio <b>sin tocar nada</b> (estado inicial), como referencia de lo que verás tú. Los objetivos aparecen en rojo hasta que los corrijas.</p>
+  <h3>10.3 · Qué verás en la consola</h3>
+  <p>Pantallazos reales del laboratorio <b>sin tocar nada</b> (estado inicial), como referencia de lo que verás tú. Los objetivos aparecen en rojo hasta que los corrijas.</p>
 
-  <p><b><code>./lab up</code></b> — al terminar levanta los 10 nodos y confirma el enrutamiento:</p>
-  <pre>[up] nodos operativos: r1 r2 app bastion aaa logs ids est-usuario est-admin
-Laboratorio levantado. Topologia:
-NAME          STATUS
-aaa           Up 10 seconds
-app           Up 4 seconds
-bastion       Up 4 seconds
-...
-[red] Enrutamiento entre redes: OK
+  <p><b>1 · <code>./lab login</code></b> — inicia sesión dentro de la VM:</p>
+  <figure>
+    <img class="consola" src="img/consola-login.png" alt="Consola: ./lab login con correo y clave">
+    <figcaption><code>./lab login</code> — usa el correo y la clave dentro de la VM; el token nunca se muestra</figcaption>
+  </figure>
 
-[entrega] Entrega abierta (N.º 1) para: &lt;tu nombre&gt;.
-[entrega] La ventana cierra: &lt;fecha límite&gt;.</pre>
+  <p><b>2 · <code>./lab up</code></b> — levanta los 10 nodos y confirma el enrutamiento:</p>
+  <figure>
+    <img class="consola" src="img/consola-up.png" alt="Consola: ./lab up con la topología de 10 nodos">
+    <figcaption><code>./lab up</code> — topología de 10 nodos y «Enrutamiento entre redes: OK»</figcaption>
+  </figure>
 
-  <p><b><code>./lab check</code></b> — el estado inicial, con todo en rojo:</p>
-  <pre>== Objetivos obligatorios ==
-Objetivo 1 : ROJO  (SSH en app accesible desde usuarios)
-Objetivo 2 : ROJO  (ana no entra con su llave a r1)
-Objetivo 3 : ROJO  (no hay registro RADIUS de aceptacion)
-Objetivo 4 : ROJO  (UDP 514 en claro sigue abierto)
-Objetivo 5 : ROJO  (Suricata no detecto el reconocimiento autorizado)
-Objetivo 6 : ROJO  (HTTP en claro sigue sirviendo sin redirigir)
-== Bonos ==
-Bonus A (cabeceras + TLS fuerte) : ROJO  (TLS 1.2 no disponible)
-Bonus B (Suricata IPS con regla drop) : ROJO  (el puerto 4444 sigue alcanzable)
+  <p><b>3 · <code>./lab check</code></b> — el estado inicial, con todo en rojo:</p>
+  <figure>
+    <img class="consola" src="img/consola-check.png" alt="Consola: ./lab check mostrando 0 de 6 objetivos en rojo">
+    <figcaption><code>./lab check</code> — 0/6 objetivos y 0/2 bonos: la red defectuosa que deben corregir</figcaption>
+  </figure>
 
-Resumen: 0/6 obligatorios en verde, 0/2 bonos en verde</pre>
+  <p><b>4 · <code>./lab entregar</code></b> — envía el resultado a la plataforma:</p>
+  <figure>
+    <img class="consola" src="img/consola-entregar.png" alt="Consola: ./lab entregar confirmando que la plataforma recibió la entrega">
+    <figcaption><code>./lab entregar</code> — la plataforma recibe tu entrega automáticamente</figcaption>
+  </figure>
 
-  <p><b><code>./lab estado</code></b> — el estado de tu entrega en la plataforma:</p>
-  <pre>== Entrega en la plataforma ==
-  Sesion: &lt;tu nombre&gt; &lt;tu correo&gt;
-  Entrega abierta: N.º 1 · Integrantes: &lt;tu nombre&gt;
-  Cola local: vacia
-  Ultimo recibo: &lt;fecha&gt; · 0/6 obligatorios y 0/2 bonos en verde
-  Estado en la plataforma: recibida · objetivos 0/6 · bonos 0/2
-  Recibida: &lt;fecha&gt;
-  Nota publicada: &lt;cuando el docente publique la nota&gt;</pre>
+  <p><b>5 · <code>./lab estado</code></b> — tu entrega y tu nota:</p>
+  <figure>
+    <img class="consola" src="img/consola-estado.png" alt="Consola: ./lab estado con entrega recibida y nota">
+    <figcaption><code>./lab estado</code> — contenedores, RAM, IPs, entrega «recibida» y la nota cuando el docente la cargue</figcaption>
+  </figure>
 
-  <div class="danger">La entrega <b>válida</b> es la carpeta <code>equipo-XX/</code> por Teams (ver <a class="ext" href="#s6">sección 6</a>). <code>./lab entregar</code> es un <b>complemento automático</b>: solo cuenta si <code>./lab estado</code> lo muestra como <i>recibido</i>. El laboratorio funciona igual sin conexión (modo sin entrega).</div>
+  <p><b>6 · <code>./lab down</code></b> — apaga y limpia el laboratorio:</p>
+  <figure>
+    <img class="consola" src="img/consola-down.png" alt="Consola: ./lab down confirmando que el laboratorio se detuvo">
+    <figcaption><code>./lab down</code> — «Laboratorio detenido», sin contenedores</figcaption>
+  </figure>
+
+  <div class="danger">La entrega <b>válida</b> es la carpeta <code>equipo-XX/</code> por Teams (ver <a class="ext" href="#s6">sección 6</a>). <code>./lab entregar</code> es un <b>complemento automático</b>: envía el verde/rojo de los objetivos a la plataforma, pero la <b>verificación del docente se hace en la máquina del equipo</b> (<code>./lab check</code> y la carpeta, durante la defensa). El laboratorio funciona igual sin conexión (modo sin entrega).</div>
 </section>
 
 </div>
