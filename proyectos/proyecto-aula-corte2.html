@@ -235,13 +235,15 @@
     <li>Mínimo 8 GB de RAM en el equipo (la VM usa de 4 a 5 GB).</li>
     <li>Virtualización (VT-x / AMD-V) habilitada en la BIOS.</li>
   </ul>
-  <p>El paquete del laboratorio (con el cliente <code>./lab</code>) y la máquina virtual se entregan en clase. El uso detallado de la VM y de <code>./lab</code> está en la <a class="ext" href="#s10">sección 10</a>.</p>
+  <p>La máquina virtual del aula se <b>descarga aquí</b>: <a class="ext" href="https://drive.google.com/drive/folders/1Ozi7T9XvWjP2Yx8XAMb7k3648gcnGc-n?usp=sharing" target="_blank" rel="noopener">carpeta de Google Drive con la VM</a>. El uso detallado de la VM y de <code>./lab</code> está en la <a class="ext" href="#s10">sección 10</a>.</p>
 </section>
 
 <!-- ============ 10. ENTORNO ============ -->
 <section id="s10">
   <h2><span class="paso">10</span> Entorno: la máquina virtual y el cliente <code>./lab</code></h2>
   <p class="lead">Todo el laboratorio y la rúbrica se hacen en la <b>consola de la máquina virtual del aula</b> (Debian/Ubuntu con Docker, sin Internet). Con el cliente <code>./lab</code> levantas la red, evalúas tus objetivos y envías el resultado. Aquí se explica <b>cómo usarla</b>, paso a paso, con pantallazos de la consola.</p>
+
+  <div class="warn"><b>Descarga la máquina virtual aquí</b> (antes de la actividad, no el día): <a class="ext" href="https://drive.google.com/drive/folders/1Ozi7T9XvWjP2Yx8XAMb7k3648gcnGc-n?usp=sharing" target="_blank" rel="noopener">Carpeta de Google Drive con la VM del aula</a>. Es una imagen con Docker y el paquete del estudiante ya cargado; solo la abres en VirtualBox/VMware y entras.</div>
 
   <div class="tip"><b>Trabajas solo en la consola.</b> No necesitas entrar a ninguna página web. El docente te da un correo y una clave, y los usas <b>dentro de la VM</b> con <code>./lab login</code>. La plataforma de laboratorios (<code>labs.proyectoasur.org</code>) es solo donde llegan tus objetivos automáticamente con <code>./lab entregar</code> y donde el docente carga tu nota; tú ves tu nota con <code>./lab estado</code>.</div>
 
