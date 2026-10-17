@@ -88,7 +88,7 @@
   <img class="logo" src="https://es.wikipedia.org/wiki/Special:FilePath/Logo_cuc.png" alt="Universidad de la Costa" referrerpolicy="no-referrer" onerror="this.style.display='none'">
   <p class="eyebrow">Proyecto de Aula · Segundo Corte · Parcial 2</p>
   <h1>Plano de gestión: rediseño seguro de la administración de red (Segundo Corte)</h1>
-  <div class="warn" style="max-width:680px;margin:14px auto 0;text-align:left"><b>Base del proyecto publicada para socializar.</b> Se desarrolla en clase el miércoles 21 de octubre de 2026. Pendiente: instrucciones detalladas del entorno (máquina virtual y <code>./lab</code>), que el docente publicará antes de la actividad.</div>
+  <div class="warn" style="max-width:680px;margin:14px auto 0;text-align:left"><b>Proyecto de aula del segundo corte.</b> Se desarrolla en clase el miércoles 21 de octubre de 2026. Las instrucciones de uso de la máquina virtual y del cliente <code>./lab</code> están en la <a class="ext" href="#s10">sección 10</a>.</div>
   <p class="sub">Rediseñar la administración segura de una red y demostrarlo con evidencia: no hay receta, hay que descubrir qué está mal y decidir cómo arreglarlo</p>
   <div class="accent-bar"></div>
   <p class="meta">
@@ -233,14 +233,90 @@
     <li>Mínimo 8 GB de RAM en el equipo (la VM usa de 4 a 5 GB).</li>
     <li>Virtualización (VT-x / AMD-V) habilitada en la BIOS.</li>
   </ul>
-  <p><b>Pendiente de publicar:</b> requisitos detallados del equipo y del entorno, que el docente publicará antes de la actividad.</p>
+  <p>El paquete del laboratorio (con el cliente <code>./lab</code>) y la máquina virtual se entregan en clase. El uso detallado de la VM y de <code>./lab</code> está en la <a class="ext" href="#s10">sección 10</a>.</p>
 </section>
 
 <!-- ============ 10. ENTORNO ============ -->
 <section id="s10">
-  <h2><span class="paso">10</span> Entorno: máquina virtual del aula</h2>
-  <p>El docente entrega la máquina virtual del aula: Debian/Ubuntu con Docker y el laboratorio ya cargado. Dentro de la VM el laboratorio se levanta con <code>./lab up</code>.</p>
-  <p><b>Pendiente de publicar:</b> las instrucciones detalladas del entorno (cómo obtener la máquina virtual y el uso de <code>./lab</code>). El docente informará dónde obtenerla y las publicará antes de la actividad.</p>
+  <h2><span class="paso">10</span> Entorno: la máquina virtual y el cliente <code>./lab</code></h2>
+  <p class="lead">Todo el laboratorio se hace dentro de la <b>máquina virtual del aula</b> (Debian/Ubuntu con Docker, sin Internet). El cliente <code>./lab</code> levanta la red, evalúa tus objetivos y envía el resultado a la plataforma. Aquí se explica <b>cómo usarla</b>, paso a paso.</p>
+
+  <h3>10.1 · Entrar a la plataforma</h3>
+  <p>Con el correo y la clave que te da el docente, entra a <a class="ext" href="https://labs.proyectoasur.org">labs.proyectoasur.org</a>:</p>
+  <figure>
+    <img src="img/login-labs.png" alt="Pantalla de acceso a ASUR Labs: correo institucional y contraseña" style="border:1px solid var(--line);border-radius:12px;max-width:340px;width:100%;display:block;margin:0 auto">
+    <figcaption>labs.proyectoasur.org — usa el correo institucional que te dio el docente</figcaption>
+  </figure>
+  <p>Allí ves <b>«Mis laboratorios»</b> con los labs habilitados para tu grupo; para este proyecto verás <b>Parcial 2 — Plano de gestión y hardening</b>. Dentro de la VM, el cliente <code>./lab</code> se conecta a esta misma plataforma solo por HTTPS saliente (puerto 443).</p>
+
+  <h3>10.2 · El cliente <code>./lab</code></h3>
+  <p>Dentro de la VM, en la carpeta del paquete del estudiante, está el cliente <code>./lab</code> (un solo archivo). Tiene estos comandos:</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>Comando</th><th>Qué hace</th></tr>
+    <tr><td><code>./lab login</code></td><td>Inicia sesión en la plataforma (pide correo y clave; guarda un token con permisos 600, que nunca se muestra).</td></tr>
+    <tr><td><code>./lab up</code></td><td>Construye y levanta la red completa (10 contenedores), con un preflight en el servidor. Al terminar abre tu entrega.</td></tr>
+    <tr><td><code>./lab check</code></td><td>Evalúa los 6 objetivos y los 2 bonos: <b>verde</b> si se cumple, <b>rojo</b> si no. No revela la solución.</td></tr>
+    <tr><td><code>./lab entregar</code></td><td>Vuelve a evaluar con el check real y envía el resultado a la plataforma (idempotente; si no hay red, lo guarda en cola local y reintenta).</td></tr>
+    <tr><td><code>./lab estado</code></td><td>Muestra contenedores, RAM, IPs, el estado de tu entrega y tu nota cuando el docente la publique.</td></tr>
+    <tr><td><code>./lab shell &lt;nodo&gt;</code></td><td>Entra a un nodo a trabajar. Nodos: <code>r1 r2 app bastion aaa logs ids est-usuario est-admin crypto</code>.</td></tr>
+    <tr><td><code>./lab reset</code></td><td>Vuelve al estado inicial defectuoso (&lt; 60 s) sin borrar tu sesión ni tu entrega.</td></tr>
+    <tr><td><code>./lab down</code></td><td>Detiene y elimina los contenedores y las redes (no borra tu sesión ni tu entrega).</td></tr>
+  </table></div>
+
+  <h3>10.3 · Flujo completo paso a paso</h3>
+  <ol>
+    <li><b>Entra a la VM</b> y ve a la carpeta del paquete del estudiante.</li>
+    <li><b>Inicia sesión:</b> <code>./lab login</code>.</li>
+    <li><b>Levanta la red:</b> <code>./lab up</code>. Espera a ver la topología y «Enrutamiento entre redes: OK».</li>
+    <li><b>Revisa el estado inicial:</b> <code>./lab check</code>. <b>Al principio todo está en rojo (0/6)</b>: esa es la red defectuosa que deben corregir.</li>
+    <li><b>Trabaja en la red</b> con <code>./lab shell &lt;nodo&gt;</code> y vuelve a ejecutar <code>./lab check</code> hasta poner los objetivos en verde.</li>
+    <li><b>Captura la evidencia</b> con fecha, IP e identidad visibles (ver <a class="ext" href="#s6">sección 6</a>).</li>
+    <li><b>Envía el resultado:</b> <code>./lab entregar</code>.</li>
+    <li><b>Confirma la entrega:</b> <code>./lab estado</code> debe mostrar <i>recibida</i>.</li>
+    <li><b>Apaga la VM:</b> <code>./lab down</code>.</li>
+  </ol>
+
+  <h3>10.4 · Qué verás en pantalla</h3>
+  <p>Salidas reales del laboratorio <b>sin tocar nada</b> (estado inicial), como referencia de lo que verás tú. Los objetivos aparecen en rojo hasta que los corrijas.</p>
+
+  <p><b><code>./lab up</code></b> — al terminar levanta los 10 nodos y confirma el enrutamiento:</p>
+  <pre>[up] nodos operativos: r1 r2 app bastion aaa logs ids est-usuario est-admin
+Laboratorio levantado. Topologia:
+NAME          STATUS
+aaa           Up 10 seconds
+app           Up 4 seconds
+bastion       Up 4 seconds
+...
+[red] Enrutamiento entre redes: OK
+
+[entrega] Entrega abierta (N.º 1) para: &lt;tu nombre&gt;.
+[entrega] La ventana cierra: &lt;fecha límite&gt;.</pre>
+
+  <p><b><code>./lab check</code></b> — el estado inicial, con todo en rojo:</p>
+  <pre>== Objetivos obligatorios ==
+Objetivo 1 : ROJO  (SSH en app accesible desde usuarios)
+Objetivo 2 : ROJO  (ana no entra con su llave a r1)
+Objetivo 3 : ROJO  (no hay registro RADIUS de aceptacion)
+Objetivo 4 : ROJO  (UDP 514 en claro sigue abierto)
+Objetivo 5 : ROJO  (Suricata no detecto el reconocimiento autorizado)
+Objetivo 6 : ROJO  (HTTP en claro sigue sirviendo sin redirigir)
+== Bonos ==
+Bonus A (cabeceras + TLS fuerte) : ROJO  (TLS 1.2 no disponible)
+Bonus B (Suricata IPS con regla drop) : ROJO  (el puerto 4444 sigue alcanzable)
+
+Resumen: 0/6 obligatorios en verde, 0/2 bonos en verde</pre>
+
+  <p><b><code>./lab estado</code></b> — el estado de tu entrega en la plataforma:</p>
+  <pre>== Entrega en la plataforma ==
+  Sesion: &lt;tu nombre&gt; &lt;tu correo&gt;
+  Entrega abierta: N.º 1 · Integrantes: &lt;tu nombre&gt;
+  Cola local: vacia
+  Ultimo recibo: &lt;fecha&gt; · 0/6 obligatorios y 0/2 bonos en verde
+  Estado en la plataforma: recibida · objetivos 0/6 · bonos 0/2
+  Recibida: &lt;fecha&gt;
+  Nota publicada: &lt;cuando el docente publique la nota&gt;</pre>
+
+  <div class="danger">La entrega <b>válida</b> es la carpeta <code>equipo-XX/</code> por Teams (ver <a class="ext" href="#s6">sección 6</a>). <code>./lab entregar</code> es un <b>complemento automático</b>: solo cuenta si <code>./lab estado</code> lo muestra como <i>recibido</i>. El laboratorio funciona igual sin conexión (modo sin entrega).</div>
 </section>
 
 </div>
