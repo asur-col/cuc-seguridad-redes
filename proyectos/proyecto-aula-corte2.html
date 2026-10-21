@@ -245,13 +245,13 @@
 
   <div class="warn"><b>Descarga la máquina virtual aquí</b> (antes de la actividad, no el día): <a class="ext" href="https://drive.google.com/drive/folders/1Ozi7T9XvWjP2Yx8XAMb7k3648gcnGc-n?usp=sharing" target="_blank" rel="noopener">Carpeta de Google Drive con la VM del aula</a>. Es una imagen con Docker y el paquete del estudiante ya cargado; solo la abres en VirtualBox/VMware y entras.</div>
 
-  <div class="tip"><b>Trabajas solo en la consola.</b> No necesitas entrar a ninguna página web. El docente te da un correo y una clave, y los usas <b>dentro de la VM</b> con <code>./lab login</code>. La plataforma de laboratorios (<code>labs.proyectoasur.org</code>) es solo donde llegan tus objetivos automáticamente con <code>./lab entregar</code> y donde el docente carga tu nota; tú ves tu nota con <code>./lab estado</code>.</div>
+  <div class="tip"><b>Trabajas solo en la consola.</b> No necesitas entrar a ninguna página web. Tu correo es el <b>institucional completo</b> (<code>usuario@cuc.edu.co</code>) y tu clave inicial es tu <b>número de documento</b> (sin puntos ni espacios); los usas <b>dentro de la VM</b> con <code>./lab login</code> y <b>no hace falta cambiarla antes</b>. Si ya la cambiaste en la página web, usa la nueva. La plataforma de laboratorios (<code>labs.proyectoasur.org</code>) es solo donde llegan tus objetivos automáticamente con <code>./lab entregar</code> y donde el docente carga tu nota; tú ves tu nota con <code>./lab estado</code>.</div>
 
   <h3>10.1 · El cliente <code>./lab</code></h3>
   <p>Dentro de la VM, en la carpeta del paquete del estudiante, está el cliente <code>./lab</code> (un solo archivo). Tiene estos comandos:</p>
   <div class="tbl-wrap"><table>
     <tr><th>Comando</th><th>Qué hace</th></tr>
-    <tr><td><code>./lab login</code></td><td>Inicia sesión en la plataforma (pide correo y clave; guarda un token con permisos 600, que nunca se muestra).</td></tr>
+    <tr><td><code>./lab login</code></td><td>Inicia sesión en la plataforma (pide el correo institucional completo y la clave —tu documento si no la has cambiado—; guarda un token con permisos 600, que nunca se muestra).</td></tr>
     <tr><td><code>./lab up</code></td><td>Construye y levanta la red completa (10 contenedores), con un preflight en el servidor. Al terminar abre tu entrega.</td></tr>
     <tr><td><code>./lab check</code></td><td>Evalúa los 6 objetivos y los 2 bonos: <b>verde</b> si se cumple, <b>rojo</b> si no. No revela la solución.</td></tr>
     <tr><td><code>./lab entregar</code></td><td>Vuelve a evaluar con el check real y envía el resultado a la plataforma (idempotente; si no hay red, lo guarda en cola local y reintenta).</td></tr>
@@ -264,7 +264,7 @@
   <h3>10.2 · Flujo completo paso a paso</h3>
   <ol>
     <li><b>Entra a la VM</b> y ve a la carpeta del paquete del estudiante.</li>
-    <li><b>Inicia sesión:</b> <code>./lab login</code> (correo y clave que te dio el docente).</li>
+    <li><b>Inicia sesión:</b> <code>./lab login</code> (correo institucional completo y tu documento como clave).</li>
     <li><b>Levanta la red:</b> <code>./lab up</code>. Espera a ver la topología y «Enrutamiento entre redes: OK».</li>
     <li><b>Revisa el estado inicial:</b> <code>./lab check</code>. <b>Al principio todo está en rojo (0/6)</b>: esa es la red defectuosa que deben corregir.</li>
     <li><b>Trabaja en la red</b> con <code>./lab shell &lt;nodo&gt;</code> y vuelve a ejecutar <code>./lab check</code> hasta poner los objetivos en verde.</li>
@@ -319,7 +319,7 @@
   <table>
     <tr><th>Qué ves</th><th>Qué hacer</th></tr>
     <tr><td><code>./lab estado</code> muestra «Entrega abierta… Integrantes: Estudiante de Prueba» o «HTTP 403: esa entrega no es tuya»</td><td>La VM trae una entrega vieja de prueba del docente. Bórrala y abre la tuya: <code>cd ~/paquete-estudiante &amp;&amp; rm -rf .entrega &amp;&amp; ./lab login &amp;&amp; ./lab up</code>. Después, <code>./lab estado</code> debe mostrar tu nombre en «Integrantes».</td></tr>
-    <tr><td><code>./lab login</code> dice «correo o clave incorrectos»</td><td>Escribe el <b>correo institucional completo</b> (por ejemplo <code>usuario@cuc.edu.co</code>), no solo el usuario ni <code>cuc</code>. La clave inicial es tu número de documento, sin puntos ni espacios. Si sigue fallando, avisa al docente: él restablece tu clave en segundos.</td></tr>
+    <tr><td><code>./lab login</code> dice «correo o clave incorrectos»</td><td>Escribe el <b>correo institucional completo</b> (por ejemplo <code>usuario@cuc.edu.co</code>), no solo el usuario ni <code>cuc</code>. La clave inicial es tu número de documento, sin puntos ni espacios, y sirve para <code>./lab login</code> sin cambiarla. Si sigue fallando, avisa al docente: él restablece tu clave en segundos.</td></tr>
     <tr><td>No puedes iniciar sesión o la red falla</td><td>Sigue trabajando: <code>./lab up</code>, <code>./lab check</code>, <code>./lab reset</code> y <code>./lab shell</code> funcionan <b>sin iniciar sesión</b>. La entrega válida es la carpeta <code>equipo-XX/</code> por Teams.</td></tr>
   </table>
 </section>
