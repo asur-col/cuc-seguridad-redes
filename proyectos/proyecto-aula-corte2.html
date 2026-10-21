@@ -314,6 +314,14 @@
   </figure>
 
   <div class="danger">La entrega <b>válida</b> es la carpeta <code>equipo-XX/</code> por Teams (ver <a class="ext" href="#s6">sección 6</a>). <code>./lab entregar</code> es un <b>complemento automático</b>: envía el verde/rojo de los objetivos a la plataforma, pero la <b>verificación del docente se hace en la máquina del equipo</b> (<code>./lab check</code> y la carpeta, durante la defensa). El laboratorio funciona igual sin conexión (modo sin entrega).</div>
+
+  <h3>10.4 · Si algo falla</h3>
+  <table>
+    <tr><th>Qué ves</th><th>Qué hacer</th></tr>
+    <tr><td><code>./lab estado</code> muestra «Entrega abierta… Integrantes: Estudiante de Prueba» o «HTTP 403: esa entrega no es tuya»</td><td>La VM trae una entrega vieja de prueba del docente. Bórrala y abre la tuya: <code>cd ~/paquete-estudiante &amp;&amp; rm -rf .entrega &amp;&amp; ./lab login &amp;&amp; ./lab up</code>. Después, <code>./lab estado</code> debe mostrar tu nombre en «Integrantes».</td></tr>
+    <tr><td><code>./lab login</code> dice «correo o clave incorrectos»</td><td>Escribe el <b>correo institucional completo</b> (por ejemplo <code>usuario@cuc.edu.co</code>), no solo el usuario ni <code>cuc</code>. La clave inicial es tu número de documento, sin puntos ni espacios. Si sigue fallando, avisa al docente: él restablece tu clave en segundos.</td></tr>
+    <tr><td>No puedes iniciar sesión o la red falla</td><td>Sigue trabajando: <code>./lab up</code>, <code>./lab check</code>, <code>./lab reset</code> y <code>./lab shell</code> funcionan <b>sin iniciar sesión</b>. La entrega válida es la carpeta <code>equipo-XX/</code> por Teams.</td></tr>
+  </table>
 </section>
 
 </div>
