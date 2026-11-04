@@ -13,10 +13,10 @@
   {
     "id": "lab06",
     "titulo": "Lab 6 — Detección y mitigación de tráfico anómalo (DoS/DDoS)",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "estado": "activo",
     "url_paquete": "/laboratorios/lab-06-deteccion-dos/paquete/paquete.tar.gz",
-    "sha256": "b2d80d074ec5005803e848ce7e37025cf88cf2348aa159b1ea12d0c5e3716248",
+    "sha256": "0fa7d08e0062f75c97b6be178944a0571e2dc4a344780fd564924afa09373ce2",
     "partes": [
       "/laboratorios/lab-06-deteccion-dos/paquete/imagenes.tar.gz.part-aa",
       "/laboratorios/lab-06-deteccion-dos/paquete/imagenes.tar.gz.part-ab"

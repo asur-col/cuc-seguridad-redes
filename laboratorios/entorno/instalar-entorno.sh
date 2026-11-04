@@ -196,6 +196,7 @@ $SUDO systemctl enable asur-issue.service || true
 info "6/7 Instalando cliente asur-lab y temporizador de autoactualización..."
 ASUR_LAB_URL="${ASUR_LAB_URL:-https://asur-col.github.io/cuc-seguridad-redes}"
 su - "$REAL_USER" -c "curl -fsSL ${ASUR_LAB_URL}/laboratorios/instalar-asur-lab.sh | bash" || true
+$SUDO ln -sf "/home/$REAL_USER/.local/bin/asur-lab" /usr/local/bin/asur-lab
 
 # Script de autoactualización asur-lab-sync.sh
 cat << 'SYNCSH' | $SUDO tee /usr/local/bin/asur-lab-sync.sh >/dev/null

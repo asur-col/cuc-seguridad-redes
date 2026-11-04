@@ -475,6 +475,7 @@ export PATH="$HOME/.local/bin:$PATH"</pre>
 <p>Luego descarga y levanta el laboratorio, y entra a su carpeta:</p>
 <pre>asur-lab iniciar lab06
 cd ~/labs/lab06</pre>
+<div class="callout note"><b>Si ya tenías el lab instalado:</b> vuelve a ejecutar <code>asur-lab iniciar lab06</code>. Detecta la versión nueva y se actualiza solo, sin borrar tus archivos de <code>reglas/</code> ni de <code>evidencia/</code>.</div>
 <p>Comandos disponibles: <code>./lab up</code>, <code>./lab down</code>, <code>./lab reset</code>, <code>./lab estado</code>, <code>./lab base</code>, <code>./lab ataque &lt;syn|http|multi&gt;</code>, <code>./lab recargar</code>, <code>./lab check</code>, <code>./lab shell &lt;c&gt;</code>, <code>./lab evidencia</code>.</p>
 </section>
 <section id="parte1">
@@ -492,32 +493,32 @@ cd ~/labs/lab06</pre>
   
 </section><section id="parte2">
 <div class="part-head"><span class="part-badge">2</span><h2>Análisis de capturas (20 min)</h2></div>
-<p class="docref">Herramientas: tshark sobre datos/*.pcap</p>
+<p class="docref">Herramientas: tcpdump sobre /datos/*.pcap</p>
 
-  <p>Copie la plantilla y complétela con <code>tshark</code> sobre los pcap de
-  <code>datos/</code> (dentro del contenedor <code>fw</code> o del generador):</p>
-  <pre>$ ./lab shell fw
-# tcpdump -q -n -r /datos/syn-flood.pcap | head -3
-&lt;encabezados de los primeros paquetes&gt;
-# tshark -r /datos/syn-flood.pcap -T fields -e ip.src | sort -u | wc -l
-&lt;conteo&gt;</pre>
-  <p>Complete <code>evidencia/analisis-pcap.txt</code> con sus propios hallazgos
-  (objetivo 2) — estos valores los mide usted con <code>tshark</code>, no se copian:</p>
-  <ul>
-    <li><code>flag_dominante=</code> — qué bandera TCP domina el flood (mídala con <code>tshark -e tcp.flags</code>).</li>
-    <li><code>origenes_syn=</code> — cuántas direcciones IP originan el SYN flood (<code>-e ip.src | sort -u | wc -l</code>).</li>
-    <li><code>tasa_syn_pps=</code> — tasa aproximada medida con tshark (<code>-e frame.time_relative</code> para el intervalo).</li>
-    <li><code>http_flood=</code> — qué tipo de petición HTTP envía el http-flood (<code>-e http.request.method</code>).</li>
-    <li><code>diferencia=</code> — por qué el SYN flood satura el servidor sin completar el three-way handshake (medio saludo).</li>
-  </ul>
-  
+  <p>Copia la plantilla y mide sobre las capturas de <code>/datos</code>, dentro del contenedor <code>fw</code>:</p>
+<pre>cp plantillas/analisis-pcap.txt evidencia/
+./lab shell fw</pre>
+<p>Ya dentro del contenedor:</p>
+<pre>tcpdump -nn -r /datos/syn-flood.pcap | head -3
+tcpdump -nn -r /datos/syn-flood.pcap | wc -l
+tcpdump -tt -nn -r /datos/syn-flood.pcap | sed -n '1p;$p'
+tcpdump -nn -r /datos/syn-flood.pcap | awk '{print $3}' | cut -d. -f1-4 | sort -u | wc -l
+tcpdump -A -nn -r /datos/http-flood.pcap | grep -a -m3 'HTTP/1'
+exit</pre>
+<p>Completa <code>evidencia/analisis-pcap.txt</code> con tus hallazgos (objetivo 2):</p>
+<ul>
+<li><code>flag_dominante=</code> — qué bandera TCP domina el flood: <code>[S]</code> es SYN (escribe <code>SYN</code>, <code>ACK</code>…).</li>
+<li><code>origenes_syn=</code> — cuántas direcciones IP originan el SYN flood.</li>
+<li><code>tasa_syn_pps=</code> — paquetes dividido entre los segundos que dura la captura.</li>
+<li><code>http_flood=</code> — qué método HTTP envía el http-flood.</li>
+<li><code>diferencia=</code> — por qué el SYN flood satura el servidor sin completar el three-way handshake (medio saludo).</li>
+</ul>
 </section><section id="parte3">
 <div class="part-head"><span class="part-badge">3</span><h2>Detección (20 min)</h2></div>
 <p class="docref">Herramientas: 2 reglas Suricata con threshold</p>
 
   <p>Edite <code>reglas/lab.rules</code>. Escriba dos reglas con <code>threshold</code>
-  (umbral por origen). La plantilla deja huecos <code>N</code> y <code>M</code> para que usted
-  los ajuste (ejemplo sin resolver):</p>
+  (umbral por origen). La plantilla trae las reglas comentadas: quita el <code>#</code> y reemplaza <code>N</code> y <code>M</code> (ejemplo sin resolver):</p>
   <pre>alert tcp any any -&gt; any 80 (msg:"SYN flood"; flags:S;
   threshold: type threshold, track by_src, count N, seconds M; sid:1000001; rev:1;)
 alert tcp any any -&gt; any 80 (msg:"HTTP flood"; flags:PA; content:"GET "; depth:4;
@@ -530,10 +531,10 @@ alert tcp any any -&gt; any 80 (msg:"HTTP flood"; flags:PA; content:"GET "; dept
 <div class="part-head"><span class="part-badge">4</span><h2>Mitigación (20 min)</h2></div>
 <p class="docref">Herramientas: nftables: rate limit, connlimit, set dinámico</p>
 
-  <p>Edite <code>reglas/nftables.fw</code> (base vacía incluida) y aplíquelo con
+  <p>Edite <code>reglas/nftables.fw</code> (se crea con la plantilla base al iniciar el lab) y aplíquelo con
   <code>./lab recargar</code>. Conceptos a explicar (sin entregar el archivo resuelto):</p>
   <ul>
-    <li><b>Límite de tasa SYN por IP</b>: <code>limit rate</code> sobre <code>tcp flags syn</code> — evita que una sola origine saturen el servidor.</li>
+    <li><b>Límite de tasa SYN por IP</b>: <code>limit rate over N/second</code> sobre <code>tcp flags syn</code>, con <code>drop</code> — evita que un solo origen sature el servidor. <b>Ojo:</b> sin <code>over</code>, la regla coincide con lo que va <i>por debajo</i> del límite y descartarías al cliente legítimo.</li>
     <li><b>Límite de conexiones simultáneas</b>: <code>ct count over N</code> por IP de origen — protege contra muchas conexiones pendientes.</li>
     <li><b>Set dinámico con <code>timeout</code></b> (bono): bloquea temporalmente el origen que supera el umbral con <code>update @set { ip saddr }</code> y <code>flags dynamic,timeout</code>.</li>
     <li><b>SYN cookies</b> y <b>limit_req</b> de nginx: en el servidor web, no en el firewall.</li>
@@ -575,7 +576,6 @@ $ ./lab check
   <li><b>Suricata no alerta:</b> revise que <code>reglas/lab.rules</code> tenga <code>sid</code> único y <code>threshold</code>, y ejecute <code>./lab recargar</code>.</li>
   <li><b>El ataque llega al servidor:</b> añada el límite de tasa SYN por IP en <code>reglas/nftables.fw</code> y <code>./lab recargar</code>.</li>
   <li><b>El cliente legítimo cae:</b> sus reglas son demasiado estrictas; relaje el umbral y vuelva a <code>./lab recargar</code>.</li>
-  <li><b>Docker ≥ 29 en el servidor docente:</b> <code>./lab up</code> intenta aplicar automáticamente el arreglo de enrutamiento del bridge (<code>DOCKER-USER</code>); en las VM del aula (Docker 28) no es necesario.</li>
 </ul>
 
 </section>
@@ -583,8 +583,8 @@ $ ./lab check
 <p>Ejecute <code>./lab evidencia</code> para generar <code>evidencia.tar.gz</code> con
 <code>evidencia/linea-base.txt</code>, <code>evidencia/analisis-pcap.txt</code> y las
 últimas líneas de <code>eve.json</code> y del log de nginx. Suba el archivo por Teams
-junto con una captura del <code>./lab check</code> con su resultado.</p>
-<div class="callout note"><b>Objetivo 6 en revisión:</b> si tu ataque queda contenido y solo falla el objetivo 6 («muy pocas peticiones del cliente»), el resultado 5/6 es válido por ahora.</div>
+junto con una captura del <code>./lab check</code>.</p>
+
 </section>
 </main>
 </div>
