@@ -3,73 +3,454 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lab 6 — Detección y mitigación de tráfico anómalo (DoS/DDoS) · CUC</title>
+  <title>Lab 6 — Detección y mitigación DoS/DDoS · CUC</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
     :root {
-      --bg: #FBF8F3; --surface: #FFFFFF; --surface-2: #F4EEE3;
-      --ink: #2A2A2A; --ink-soft: #6B6259;
-      --vino: #A6192E; --vino-strong: #7E1223; --vino-tint: #FBEBEC;
-      --dorado: #A9791C; --dorado-tint: #FBF3DE; --line: #E5DCCB;
-      --code-bg: #F1EADA; --code-ink: #4A4030; --shadow: 0 1px 3px rgba(42,26,20,.05);
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
     }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      margin: 0; background: var(--bg); color: var(--ink);
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
       font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-      font-size: 15.5px; line-height: 1.65;
+      font-size: 15.5px;
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
-    header { background: var(--vino); color: #fff; padding: 14px 24px; }
-    header h1 { margin: 0; font-family: 'Fraunces', serif; font-size: 21px; }
-    header p { margin: 2px 0 0; font-size: 13px; opacity: .9; }
-    main { max-width: 1100px; margin: 28px auto; padding: 0 20px; }
-    h2 { font-family: 'Fraunces', serif; color: var(--vino-strong); margin: 32px 0 12px; font-size: 24px; }
-    h3 { color: var(--ink); margin: 20px 0 8px; font-size: 17px; }
-    p { margin: 0 0 12px; }
-    ul, ol { margin: 4px 0 14px 20px; }
-    li { margin-bottom: 6px; }
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
     a { color: var(--vino); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .card { background: var(--surface); border: 1px solid var(--line);
-            border-left: 5px solid var(--dorado); border-radius: 8px;
-            padding: 14px 18px; margin: 16px 0; }
-    .card b { color: var(--vino-strong); }
-    .alerta { background: var(--vino-tint); border-left: 5px solid var(--vino);
-              border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
-    .alerta b { color: var(--vino-strong); }
-    pre, code { font-family: 'IBM Plex Mono', monospace; }
-    pre {
-      background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--line);
-      border-radius: 6px; padding: 12px 16px; overflow-x: auto; margin: 10px 0;
-      font-size: 13px; line-height: 1.45;
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
     }
-    code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 0.9em; }
-    .etapa { border: 1px solid var(--line); border-radius: 10px; margin: 22px 0;
-             overflow: hidden; background: var(--surface); }
-    .etapa .etapa-head { background: var(--surface-2); border-bottom: 1px solid var(--line);
-                         padding: 10px 16px; font-weight: 700; color: var(--vino-strong);
-                         display: flex; justify-content: space-between; align-items: center; }
-    .etapa .etapa-body { padding: 16px 20px; }
-    .badge { display:inline-block; background: var(--dorado); color: #fff;
-             font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
-    .tabla { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
-    .tabla th, .tabla td { border: 1px solid var(--line); padding: 7px 10px;
-                           text-align: left; }
-    .tabla th { background: var(--surface-2); color: var(--vino-strong); }
-    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
-    .footer { margin-top: 40px; padding: 18px 0; border-top: 1px solid var(--line);
-              color: var(--ink-soft); font-size: 13px; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: minmax(0, 1fr); }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
+    pre {
+      position: relative;
+      background: #211D18; color: #EFE7D9;
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid #3D362B;
+    }
+
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
+    }
+
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    @media print {
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
-<header>
-  <h1>Lab 6 · Detección y mitigación de tráfico anómalo (DoS/DDoS)</h1>
-  <p>Seguridad en Redes · Universidad de la Costa (CUC) · Unidad 3 · Semana 13 · 4 de noviembre de 2026 · 2026-2</p>
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
+<div class="shell">
+<nav class="toc" id="toc"><p class="toc-label">Contenido</p>
+<a href="#intro"><span class="badge">·</span> Introducción</a>
+<a href="#inicio"><span class="badge">0</span> Antes de empezar</a>
+<a href="#parte1"><span class="badge">1</span> Línea base (15 min)</a>
+<a href="#parte2"><span class="badge">2</span> Análisis de capturas (20 min)</a>
+<a href="#parte3"><span class="badge">3</span> Detección (20 min)</a>
+<a href="#parte4"><span class="badge">4</span> Mitigación (20 min)</a>
+<a href="#parte5"><span class="badge">5</span> Verificación (10 min)</a>
+<a href="#parte6"><span class="badge">6</span> Reflexión (5 min)</a>
+<a href="#si-algo-falla"><span class="badge">·</span> Si algo falla</a>
+<a href="#entrega"><span class="badge">·</span> Entrega</a>
+</nav>
+<div>
+<header class="top portada">
+<img class="portada-logo" src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png" onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';" alt="Logo Universidad de la Costa (CUC)">
+<div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes · Actividad formativa · S13 · 2026-2</div>
+<h1>Laboratorio 6: Detección y mitigación de tráfico anómalo (DoS/DDoS)</h1>
+<p class="sub">Detecta con Suricata y mitiga con nftables un SYN flood, un HTTP flood y un ataque multi-origen, en contenedores dentro de tu VM.</p>
+<div class="accent-bar"></div>
+<div class="author-block"><span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span><span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span><span>📅 <strong>Semana 13 · Formativa · ~90 min · 2026-2</strong></span></div>
 </header>
-
 <main>
+<section id="intro">
+
 <p><b>Objetivo:</b> detectar y mitigar un ataque de denegación de servicio (SYN flood,
 HTTP flood y multi-origen) sobre un servidor web, usando únicamente contenedores Docker
 en redes internas (sin puertos publicados, sin Internet en tiempo de ejecución). El
@@ -78,39 +459,28 @@ que el tráfico legítimo siga funcionando.</p>
 <p><b>Duración aproximada:</b> 90 minutos. <b>Entrega:</b> <code>./lab evidencia</code>
 genera <code>evidencia.tar.gz</code> para subir por Teams.</p>
 
-<div class="alerta"><b>Marco ético (Ley 1273 de 2009, Colombia):</b> este laboratorio
+<div class="callout warn"><b>Marco ético (Ley 1273 de 2009, Colombia):</b> este laboratorio
 se ejecuta exclusivamente sobre entornos propios y autorizados. El contenedor
 <code>generador</code> solo reproduce capturas pregrabadas contra el servidor del propio
 laboratorio (10.30.0.10, red Docker interna). Destino, tasas y duración están fijados
 en el código; no es configurable por el estudiante y no se entregan herramientas para
 atacar sistemas de terceros.</div>
 
-<h2>1. Antes de empezar — descargar y ejecutar</h2>
-<p>Si la VM aún no tiene el cliente <code>asur-lab</code>, instálelo una vez y
-arranque el lab. Ruta rápida (atajo real <code>lab06.sh</code>):</p>
-<pre>$ bash ~/Descargas/lab06.sh
-[INFO]   descargando e instalando asur-lab...
-[OK]     asur-lab instalado en /home/<usuario>/.local/bin/asur-lab
-[INFO]   descargando lab06 v1.0.2
-[OK]     paquete verificado
-[OK]     parte imagenes.tar.gz.part-aa verificada
-[OK]     parte imagenes.tar.gz.part-ab verificada
-[INFO]   reensamblando imágenes
-[INFO]   cargando imágenes en Docker
-[OK]     imágenes cargadas
-[INFO]   levantando 'lab06' con ./lab up
-[OK]     lab 'lab06' arriba
-[OK]     lab 'lab06' instalado en /home/<usuario>/labs/lab06</pre>
-<p>O directamente, con el cliente ya instalado:</p>
-<pre>$ asur-lab iniciar lab06</pre>
-<p>El lab queda instalado en <code>~/labs/lab06</code> (una carpeta por lab). Comandos disponibles: <code>./lab up</code>,
-<code>./lab down</code>, <code>./lab reset</code>, <code>./lab estado</code>,
-<code>./lab base</code>, <code>./lab ataque &lt;syn|http|multi&gt;</code>,
-<code>./lab check</code>, <code>./lab shell &lt;c&gt;</code>, <code>./lab evidencia</code>.</p>
+</section>
+<section id="inicio">
+<div class="part-head"><span class="part-badge">0</span><h2>Antes de empezar</h2></div>
+<p>Trabaja dentro de tu VM de Ubuntu (por consola, SSH o escritorio en el navegador). Si aún no tienes el cliente <code>asur-lab</code>, instálalo una sola vez:</p>
+<pre>curl -fsSL https://asur-col.github.io/cuc-seguridad-redes/laboratorios/instalar-asur-lab.sh | bash
+export PATH="$HOME/.local/bin:$PATH"</pre>
+<p>Luego descarga y levanta el laboratorio, y entra a su carpeta:</p>
+<pre>asur-lab iniciar lab06
+cd ~/labs/lab06</pre>
+<p>Comandos disponibles: <code>./lab up</code>, <code>./lab down</code>, <code>./lab reset</code>, <code>./lab estado</code>, <code>./lab base</code>, <code>./lab ataque &lt;syn|http|multi&gt;</code>, <code>./lab recargar</code>, <code>./lab check</code>, <code>./lab shell &lt;c&gt;</code>, <code>./lab evidencia</code>.</p>
+</section>
+<section id="parte1">
+<div class="part-head"><span class="part-badge">1</span><h2>Línea base (15 min)</h2></div>
+<p class="docref">Herramientas: ss · tcpdump · logs nginx</p>
 
-<div class="etapa">
-  <div class="etapa-head">Parte 1 · Línea base (15 min) <span class="badge">ss · tcpdump · logs nginx</span></div>
-  <div class="etapa-body">
   <p>Mida el tráfico legítimo <b>antes</b> de escribir cualquier regla de mitigación:</p>
   <pre>$ ./lab base 30
 [INFO]   midiendo la línea base durante 30 s (no lances ataques)
@@ -119,19 +489,18 @@ arranque el lab. Ruta rápida (atajo real <code>lab06.sh</code>):</p>
   <p>El archivo <code>evidencia/linea-base.txt</code> registra pps, SYN-RECV y orígenes
   únicos (objetivo 1 del <code>./lab check</code>). Valores razonables para el tráfico
   normal del lab: pps entre 3 y 60, SYN-RECV entre 0 y 50, 1–5 orígenes.</p>
-  </div>
-</div>
+  
+</section><section id="parte2">
+<div class="part-head"><span class="part-badge">2</span><h2>Análisis de capturas (20 min)</h2></div>
+<p class="docref">Herramientas: tshark sobre datos/*.pcap</p>
 
-<div class="etapa">
-  <div class="etapa-head">Parte 2 · Análisis de capturas (20 min) <span class="badge">tshark sobre datos/*.pcap</span></div>
-  <div class="etapa-body">
   <p>Copie la plantilla y complétela con <code>tshark</code> sobre los pcap de
   <code>datos/</code> (dentro del contenedor <code>fw</code> o del generador):</p>
   <pre>$ ./lab shell fw
 # tcpdump -q -n -r /datos/syn-flood.pcap | head -3
-<encabezados de los primeros paquetes>
+&lt;encabezados de los primeros paquetes&gt;
 # tshark -r /datos/syn-flood.pcap -T fields -e ip.src | sort -u | wc -l
-<conteo></pre>
+&lt;conteo&gt;</pre>
   <p>Complete <code>evidencia/analisis-pcap.txt</code> con sus propios hallazgos
   (objetivo 2) — estos valores los mide usted con <code>tshark</code>, no se copian:</p>
   <ul>
@@ -141,28 +510,26 @@ arranque el lab. Ruta rápida (atajo real <code>lab06.sh</code>):</p>
     <li><code>http_flood=</code> — qué tipo de petición HTTP envía el http-flood (<code>-e http.request.method</code>).</li>
     <li><code>diferencia=</code> — por qué el SYN flood satura el servidor sin completar el three-way handshake (medio saludo).</li>
   </ul>
-  </div>
-</div>
+  
+</section><section id="parte3">
+<div class="part-head"><span class="part-badge">3</span><h2>Detección (20 min)</h2></div>
+<p class="docref">Herramientas: 2 reglas Suricata con threshold</p>
 
-<div class="etapa">
-  <div class="etapa-head">Parte 3 · Detección (20 min) <span class="badge">2 reglas Suricata con threshold</span></div>
-  <div class="etapa-body">
   <p>Edite <code>reglas/lab.rules</code>. Escriba dos reglas con <code>threshold</code>
   (umbral por origen). La plantilla deja huecos <code>N</code> y <code>M</code> para que usted
   los ajuste (ejemplo sin resolver):</p>
-  <pre>alert tcp any any -> any 80 (msg:"SYN flood"; flags:S;
+  <pre>alert tcp any any -&gt; any 80 (msg:"SYN flood"; flags:S;
   threshold: type threshold, track by_src, count N, seconds M; sid:1000001; rev:1;)
-alert tcp any any -> any 80 (msg:"HTTP flood"; flags:PA; content:"GET "; depth:4;
+alert tcp any any -&gt; any 80 (msg:"HTTP flood"; flags:PA; content:"GET "; depth:4;
   threshold: type threshold, track by_src, count N, seconds M; sid:1000002; rev:1;)</pre>
   <p>Luego <code>./lab recargar</code> y lance <code>./lab ataque syn</code> y
   <code>./lab ataque http</code>. Verifique alertas en
   <code>./lab shell ids → tail /var/log/suricata/eve.json</code> (objetivos 3 y 4).</p>
-  </div>
-</div>
+  
+</section><section id="parte4">
+<div class="part-head"><span class="part-badge">4</span><h2>Mitigación (20 min)</h2></div>
+<p class="docref">Herramientas: nftables: rate limit, connlimit, set dinámico</p>
 
-<div class="etapa">
-  <div class="etapa-head">Parte 4 · Mitigación (20 min) <span class="badge">nftables: rate limit, connlimit, set dinámico</span></div>
-  <div class="etapa-body">
   <p>Edite <code>reglas/nftables.fw</code> (base vacía incluida) y aplíquelo con
   <code>./lab recargar</code>. Conceptos a explicar (sin entregar el archivo resuelto):</p>
   <ul>
@@ -172,15 +539,14 @@ alert tcp any any -> any 80 (msg:"HTTP flood"; flags:PA; content:"GET "; depth:4
     <li><b>SYN cookies</b> y <b>limit_req</b> de nginx: en el servidor web, no en el firewall.</li>
   </ul>
   <div class="two">
-  <div class="card"><b>¿Por qué un límite fijo no basta?</b> Un DDoS volumétrico real satura el enlace antes de llegar al firewall; allí se necesita el ISP, CDN o scrubbing. Umbrales muy bajos generan falsos positivos contra usuarios legítimos.</div>
-  <div class="card"><b>Puente al Lab 7:</b> los umbrales fijos son difíciles de ajustar; la IA (NDR con ML) aprende la línea base y detecta anomalías sin reglas escritas a mano.</div>
+  <div class="callout note"><b>¿Por qué un límite fijo no basta?</b> Un DDoS volumétrico real satura el enlace antes de llegar al firewall; allí se necesita el ISP, CDN o scrubbing. Umbrales muy bajos generan falsos positivos contra usuarios legítimos.</div>
+  <div class="callout note"><b>Puente al Lab 7:</b> los umbrales fijos son difíciles de ajustar; la IA (NDR con ML) aprende la línea base y detecta anomalías sin reglas escritas a mano.</div>
   </div>
-  </div>
-</div>
+  
+</section><section id="parte5">
+<div class="part-head"><span class="part-badge">5</span><h2>Verificación (10 min)</h2></div>
+<p class="docref">Herramientas: ./lab check</p>
 
-<div class="etapa">
-  <div class="etapa-head">Parte 5 · Verificación (10 min) <span class="badge">./lab check</span></div>
-  <div class="etapa-body">
   <p>Repita el ataque y verifique que el cliente legítimo sigue recibiendo HTTP 200:</p>
   <pre>$ ./lab ataque syn
 [OK]   ataque syn lanzado
@@ -194,19 +560,16 @@ $ ./lab check
 [OK]     6/6 El cliente se mantuvo con 96% de intentos OK durante el ataque
 [OK]     bono Set dinámico con timeout presente
 == Resultados: 6/6 objetivos · bono 1/1 (90 s) ==</pre>
-  </div>
-</div>
+  
+</section><section id="parte6">
+<div class="part-head"><span class="part-badge">6</span><h2>Reflexión (5 min)</h2></div>
 
-<div class="etapa">
-  <div class="etapa-head">Parte 6 · Reflexión (5 min)</div>
-  <div class="etapa-body">
+
   <p>¿Por qué no basta este lab frente a un DDoS volumétrico real? ¿Dónde fijar los
   umbrales sin bloquear usuarios legítimos? ¿Cómo ayudaría la IA (puente al Lab 7)?
   Responda por escrito y agréguelo al final de <code>evidencia/analisis-pcap.txt</code>.</p>
-  </div>
-</div>
-
-<h2>Si algo falla</h2>
+  
+</section><section id="si-algo-falla"><div class="part-head"><span class="part-badge">·</span><h2>Si algo falla</h2></div>
 <ul>
   <li><b>Contenedor no arranca:</b> <code>./lab estado</code> y revise los logs del contenedor con <code>docker logs lab06-fw</code>.</li>
   <li><b>Suricata no alerta:</b> revise que <code>reglas/lab.rules</code> tenga <code>sid</code> único y <code>threshold</code>, y ejecute <code>./lab recargar</code>.</li>
@@ -215,16 +578,62 @@ $ ./lab check
   <li><b>Docker ≥ 29 en el servidor docente:</b> <code>./lab up</code> intenta aplicar automáticamente el arreglo de enrutamiento del bridge (<code>DOCKER-USER</code>); en las VM del aula (Docker 28) no es necesario.</li>
 </ul>
 
-<h2>Entrega</h2>
+</section>
+<section id="entrega"><div class="part-head"><span class="part-badge">·</span><h2>Entrega</h2></div>
 <p>Ejecute <code>./lab evidencia</code> para generar <code>evidencia.tar.gz</code> con
 <code>evidencia/linea-base.txt</code>, <code>evidencia/analisis-pcap.txt</code> y las
 últimas líneas de <code>eve.json</code> y del log de nginx. Suba el archivo por Teams
-junto con una captura del <code>./lab check</code> mostrando 6/6.</p>
-
-<div class="footer">
-  Universidad de la Costa (CUC) · Seguridad en Redes 2026-2 · Ing. Rodolfo Cañas Cervantes ·
-  Ley 1273 de 2009 — solo entornos propios y autorizados.
-</div>
+junto con una captura del <code>./lab check</code> con su resultado.</p>
+<div class="callout note"><b>Objetivo 6 en revisión:</b> si tu ataque queda contenido y solo falla el objetivo 6 («muy pocas peticiones del cliente»), el resultado 5/6 es válido por ahora.</div>
+</section>
 </main>
+</div>
+</div>
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+    pre.appendChild(btn);
+  });
+</script>
 </body>
 </html>
