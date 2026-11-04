@@ -1,0 +1,338 @@
+#!/usr/bin/env bash
+# asur-lab — Cliente único de laboratorios ASUR (sin sudo).
+# Universidad de la Costa · 2026-2
+#
+# Uso:
+#   asur-lab lista                          lista labs del catálogo
+#   asur-lab iniciar <id>                   descarga, verifica, carga, ./lab up
+#   asur-lab detener <id>                   ./lab down
+#   asur-lab borrar <id>                    baja contenedores, imágenes y carpeta
+#   asur-lab actualizar                     se auto-actualiza desde el catálogo
+#   asur-lab ayuda
+#
+# El catálogo público vive en el repo del curso (GitHub Pages) y el cliente
+# respeta ASUR_LAB_URL (por defecto la del curso) para pruebas locales.
+# Solo un lab activo a la vez (3,8 GB RAM en las VM del aula).
+
+set -u
+
+: "${ASUR_LAB_URL:=https://asur-col.github.io/cuc-seguridad-redes}"
+CATALOGO_PATH="laboratorios/catalogo.json"
+LABS_DIR="$HOME/labs"
+ASUR_LAB_VERSION="${ASUR_LAB_VERSION:-1.0.0}"
+mkdir -p "$LABS_DIR"
+
+ok()   { printf '\033[32m[OK]\033[0m   %s\n' "$*"; }
+mal()  { printf '\033[31m[ERROR]\033[0m %s\n' "$*" >&2; }
+aviso(){ printf '\033[33m[AVISO]\033[0m %s\n' "$*"; }
+info() { printf '\033[36m[INFO]\033[0m %s\n' "$*"; }
+
+http_get() { # http_get <url> <salida>
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --connect-timeout 10 -o "$2" "$1" || return 1
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q --connect-timeout=10 -O "$2" "$1" || return 1
+  else
+    mal "se necesita curl o wget"; return 1
+  fi
+}
+
+sha_ok() { # sha_ok <archivo> <sha_esperada>
+  local esperado="$2" real
+  real=$(sha256sum "$1" 2>/dev/null | cut -d' ' -f1)
+  [ "$real" = "$esperado" ]
+}
+
+# --- Catálogo -----------------------------------------------------------------
+catalogo_tmp=$(mktemp)
+trap 'rm -f "$catalogo_tmp"' EXIT
+
+cargar_catalogo() {
+  http_get "${ASUR_LAB_URL}/${CATALOGO_PATH}" "$catalogo_tmp" || {
+    mal "no se pudo leer el catálogo desde ${ASUR_LAB_URL}/${CATALOGO_PATH}"
+    return 1
+  }
+}
+
+# Extrae un campo JSON simple (sin jq): campo de un objeto por id.
+campo_json() { # campo_json <archivo> <id> <campo>
+  python3 - "$1" "$2" "$3" <<'PY' 2>/dev/null
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+    for e in d:
+        if e.get("id") == sys.argv[2]:
+            v = e.get(sys.argv[3], "")
+            if isinstance(v, list):          # "partes", "partes_sha256": -> a,b,c
+                print(",".join(str(x) for x in v))
+            else:
+                print(v)
+            break
+except Exception:
+    pass
+PY
+}
+
+# ¿Es confiable (HTTPS) o una prueba local (loopback / red privada)?
+url_confiable() { # url_confiable <url>
+  case "$1" in
+    https://*) return 0 ;;
+    http://127.0.0.1*|http://localhost*) return 0 ;;
+    http://10.*|http://192.168.*|http://172.1[6-9].*|http://172.2[0-9].*|http://172.3[01].*|http://200.30.*)
+      return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+cmd_lista() {
+  cargar_catalogo || return 1
+  python3 - "$catalogo_tmp" "$LABS_DIR" <<'PY'
+import json, os, sys
+cat = json.load(open(sys.argv[1]))
+labs_dir = sys.argv[2]
+for e in cat:
+    if e.get("estado") == "cliente":   # la entrada del propio asur-lab no es un lab
+        continue
+    i = e["id"]
+    instalado = os.path.isdir(os.path.join(labs_dir, i))
+    estado = e.get("estado", "activo")
+    marca = "[instalado]" if instalado else "[-----]"
+    print(f"{i:28} {estado:12} {marca}  {e.get('titulo','')}")
+PY
+}
+
+# Respaldo offline: buscar <id>-paquete.tar* en ~/Descargas y /media/$USER/*
+buscar_offline() {
+  local patron="$1"
+  for f in ~/Downloads/${patron}* ~/Descargas/${patron}* /media/*/${patron}* /media/$USER/${patron}*; do
+    [ -f "$f" ] && { echo "$f"; return 0; }
+  done
+  return 1
+}
+
+descargar_parte() { # descargar_parte <url> <destino>
+  if [ -s "$2" ]; then return 0; fi
+  if http_get "$1" "$2.part"; then
+    mv "$2.part" "$2"; return 0
+  fi
+  return 1
+}
+
+cmd_iniciar() {
+  local id="$1"
+  [ -n "$id" ] || { mal "uso: asur-lab iniciar <id>"; return 1; }
+  cargar_catalogo || return 1
+
+  local titulo version estado url_paquete sha256 partes partes_sha256 ram_mb
+  titulo=$(campo_json "$catalogo_tmp" "$id" "titulo")
+  version=$(campo_json "$catalogo_tmp" "$id" "version")
+  estado=$(campo_json "$catalogo_tmp" "$id" "estado")
+  url_paquete=$(campo_json "$catalogo_tmp" "$id" "url_paquete")
+  sha256=$(campo_json "$catalogo_tmp" "$id" "sha256")
+  partes=$(campo_json "$catalogo_tmp" "$id" "partes")
+  partes_sha256=$(campo_json "$catalogo_tmp" "$id" "partes_sha256")
+  ram_mb=$(campo_json "$catalogo_tmp" "$id" "ram_mb")
+
+  [ -z "$titulo" ] && { mal "lab '$id' no está en el catálogo"; return 1; }
+  [ "$estado" = "archivado" ] && { aviso "lab '$id' está archivado (sin paquete público)"; return 1; }
+  [ "$estado" = "activo" ] || { aviso "lab '$id' no está activo todavía (estado: ${estado:-desconocido})"; return 1; }
+
+  # Solo un lab activo a la vez
+  local activo=""
+  for d in "$LABS_DIR"/*/; do
+    [ -d "$d" ] || continue
+    local nombre; nombre=$(basename "$d")
+    if [ -f "$d/.asur-lab-activo" ] && [ "$nombre" != "$id" ]; then
+      activo="$nombre"; break
+    fi
+  done
+  if [ -n "$activo" ]; then
+    info "deteniendo lab previo '$activo' (solo uno a la vez)"
+    (cd "$LABS_DIR/$activo" && ./lab down >/dev/null 2>&1 || true)
+    rm -f "$LABS_DIR/$activo/.asur-lab-activo"
+  fi
+
+  local destino="$LABS_DIR/$id"
+  mkdir -p "$destino"
+
+  # Si ya está instalado y la versión coincide, no re-descarga
+  if [ -f "$destino/.asur-lab-version" ] && [ "$(cat "$destino/.asur-lab-version")" = "$version" ]; then
+    ok "lab '$id' versión $version ya instalado"
+  else
+    # descargar paquete
+    local nombre_paquete; nombre_paquete=$(basename "$url_paquete")
+    if descargar_parte "${ASUR_LAB_URL}${url_paquete}" "$destino/$nombre_paquete"; then
+      if [ -n "$sha256" ] && ! sha_ok "$destino/$nombre_paquete" "$sha256"; then
+        mal "SHA-256 del paquete no coincide"; return 1
+      fi
+      ok "paquete verificado"
+    else
+      aviso "descarga falló, buscando respaldo offline"
+      if f=$(buscar_offline "$nombre_paquete"); then
+        cp "$f" "$destino/$nombre_paquete" && ok "paquete desde respaldo offline"
+      else
+        mal "no se pudo obtener el paquete"; return 1
+      fi
+    fi
+    # descargar partes de imágenes si las hay (cada una con su SHA-256)
+    local PARTES_ARRAY=() SHAS_ARRAY=()
+    if [ -n "$partes" ]; then
+      IFS=',' read -ra PARTES_ARRAY <<< "$partes"
+      IFS=',' read -ra SHAS_ARRAY <<< "${partes_sha256:-}"
+      local i=0 p sha_p
+      for p in "${PARTES_ARRAY[@]}"; do
+        p=$(echo "$p" | xargs)  # trim
+        [ -z "$p" ] && { i=$((i+1)); continue; }
+        local url_part="${ASUR_LAB_URL}${p}"
+        local nombre_part; nombre_part=$(basename "$p")
+        sha_p=$(echo "${SHAS_ARRAY[$i]:-}" | xargs)
+        if descargar_parte "$url_part" "$destino/$nombre_part"; then
+          if [ -n "$sha_p" ] && ! sha_ok "$destino/$nombre_part" "$sha_p"; then
+            rm -f "$destino/$nombre_part"
+            mal "SHA-256 de la parte $nombre_part no coincide: archivo rechazado"
+            return 1
+          fi
+          if [ -n "$sha_p" ]; then ok "parte $nombre_part verificada"; fi
+        elif f=$(buscar_offline "$nombre_part") && cp "$f" "$destino/$nombre_part"; then
+          if [ -n "$sha_p" ] && ! sha_ok "$destino/$nombre_part" "$sha_p"; then
+            rm -f "$destino/$nombre_part"
+            mal "SHA-256 de la parte offline $nombre_part no coincide: rechazada"
+            return 1
+          fi
+          ok "parte $nombre_part desde respaldo offline"
+        else
+          aviso "faltaba parte $nombre_part"
+        fi
+        i=$((i+1))
+      done
+      # reensamblar imágenes si hay partes
+      local n_partes=${#PARTES_ARRAY[@]}
+      if [ "$n_partes" -gt 0 ] && [ ! -s "$destino/imagenes.tar.gz" ]; then
+        info "reensamblando imágenes"
+        local primero; primero=$(basename "${PARTES_ARRAY[0]}")
+        local base; base="${primero%.*}"   # quita .part-aa -> ... queda el nombre base
+        # base es algo como "imagenes.tar.gz.part-aa"; quitar sufijo a partir de .part
+        base="${base%%.part-*}"
+        cat "$destino"/"$base".part-* > "$destino/imagenes.tar.gz" 2>/dev/null || true
+      fi
+    fi
+    # extraer paquete
+    if [ -s "$destino/$nombre_paquete" ]; then
+      (cd "$destino" && tar -xzf "$nombre_paquete" 2>/dev/null || true)
+      rm -f "$destino/$nombre_paquete"
+    fi
+    echo "$version" > "$destino/.asur-lab-version"
+    ok "lab '$id' instalado en $destino"
+  fi
+
+  # cargar imágenes si existen (y registrar cuáles aportó este lab, para borrarlas después)
+  if [ -s "$destino/imagenes.tar.gz" ]; then
+    info "cargando imágenes en Docker"
+    local snap_antes snap_despues
+    snap_antes=$(mktemp); snap_despues=$(mktemp)
+    docker images --format '{{.Repository}}:{{.Tag}}' | sort -u > "$snap_antes" 2>/dev/null || true
+    ( cd "$destino" && docker load -i imagenes.tar.gz >/dev/null 2>&1 ) \
+      && ok "imágenes cargadas" || aviso "no se pudieron cargar las imágenes (./lab up las construirá)"
+    docker images --format '{{.Repository}}:{{.Tag}}' | sort -u > "$snap_despues" 2>/dev/null || true
+    comm -13 "$snap_antes" "$snap_despues" > "$destino/.asur-lab-imagenes" 2>/dev/null || true
+    rm -f "$snap_antes" "$snap_despues"
+  fi
+  # además: imágenes cuyo repositorio parte con el id del lab (cobertura si no hubo load)
+  docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | grep -E "^$id([:/]|$)" \
+    >> "$destino/.asur-lab-imagenes" 2>/dev/null || true
+  sort -u "$destino/.asur-lab-imagenes" -o "$destino/.asur-lab-imagenes" 2>/dev/null || true
+
+  # levantar
+  info "levantando '$id' con ./lab up"
+  ( cd "$destino" && ./lab up >/tmp/asur-lab-$id-up.log 2>&1 ) \
+    && { touch "$destino/.asur-lab-activo"; ok "lab '$id' arriba"; } \
+    || { mal "falló ./lab up (ver /tmp/asur-lab-$id-up.log)"; return 1; }
+}
+
+cmd_detener() {
+  local id="$1"; [ -n "$id" ] || { mal "uso: asur-lab detener <id>"; return 1; }
+  local d="$LABS_DIR/$id"
+  [ -d "$d" ] || { mal "el lab '$id' no está instalado"; return 1; }
+  (cd "$d" && ./lab down >/dev/null 2>&1 || true) && ok "lab '$id' detenido" || mal "falló ./lab down"
+  rm -f "$d/.asur-lab-activo"
+}
+
+cmd_borrar() {
+  local id="$1"; [ -n "$id" ] || { mal "uso: asur-lab borrar <id>"; return 1; }
+  local d="$LABS_DIR/$id"
+  [ -d "$d" ] || { mal "el lab '$id' no está instalado"; return 1; }
+  (cd "$d" && ./lab down >/dev/null 2>&1 || true)
+  # imágenes del lab: (1) registradas al instalar, (2) etiqueta del proyecto compose,
+  # (3) repositorios cuyo nombre parte con el id del lab. Nada fijo en el código.
+  {
+    [ -f "$d/.asur-lab-imagenes" ] && cat "$d/.asur-lab-imagenes"
+    docker ps -aq --filter "label=com.docker.compose.project=$id" 2>/dev/null \
+      | while read -r c; do docker inspect -f '{{.Config.Image}}' "$c" 2>/dev/null; done
+    docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | grep -E "^$id([:/]|$)" || true
+  } 2>/dev/null | sed '/^[[:space:]]*$/d' | sort -u | while read -r img; do
+    docker rmi -f "$img" >/dev/null 2>&1 || true
+  done
+  rm -rf "$d"
+  ok "lab '$id' borrado"
+}
+
+cmd_actualizar() {
+  info "auto-actualizando asur-lab desde el catálogo"
+  local destino="$HOME/.local/bin/asur-lab"
+  cargar_catalogo || { mal "no hay conexión con el catálogo (se conserva la versión actual)"; return 1; }
+  local url_cli sha_cli version_remota
+  url_cli=$(campo_json "$catalogo_tmp" "asur-lab" "url")
+  sha_cli=$(campo_json "$catalogo_tmp" "asur-lab" "sha256")
+  version_remota=$(campo_json "$catalogo_tmp" "asur-lab" "version")
+  [ -n "$url_cli" ] || { mal "el catálogo no define el cliente"; return 1; }
+  url_cli="${ASUR_LAB_URL}${url_cli}"
+  if ! url_confiable "$url_cli"; then
+    mal "URL del cliente no confiable (se exige HTTPS): $url_cli"
+    return 1
+  fi
+  if [ -n "$version_remota" ] && [ "$version_remota" = "$ASUR_LAB_VERSION" ]; then
+    ok "asur-lab ya está en la última versión ($version_remota)"
+    return 0
+  fi
+  if http_get "$url_cli" "$destino.new"; then
+    if [ -n "$sha_cli" ] && ! sha_ok "$destino.new" "$sha_cli"; then
+      rm -f "$destino.new"
+      mal "SHA-256 de asur-lab no coincide: actualización rechazada"
+      return 1
+    fi
+    cp -p "$destino" "$destino.prev" 2>/dev/null || true   # respaldo para revertir
+    chmod +x "$destino.new" && mv "$destino.new" "$destino" \
+      && { ok "asur-lab actualizado: $ASUR_LAB_VERSION -> ${version_remota:-?}"; \
+           info "para revertir: cp -p $destino.prev $destino"; } \
+      || mal "falló la actualización"
+  else
+    mal "no se pudo descargar la nueva versión de asur-lab"
+    return 1
+  fi
+}
+
+cmd_ayuda() {
+  cat <<FIN
+asur-lab — Cliente único de laboratorios ASUR (sin sudo)
+
+  asur-lab lista                        lista labs del catálogo (activo / próximo / instalado)
+  asur-lab iniciar <id>                 descarga, verifica SHA-256, carga imágenes, ./lab up
+  asur-lab detener <id>                 para el lab (./lab down)
+  asur-lab borrar <id>                  elimina contenedores, imágenes y carpeta del lab
+  asur-lab actualizar                   se auto-actualiza verificando SHA-256
+  asur-lab ayuda                        esta ayuda
+
+URL base: variable ASUR_LAB_URL (defecto: GitHub Pages del curso).
+Solo un lab activo a la vez.
+FIN
+}
+
+case "${1:-ayuda}" in
+  lista)     cmd_lista;;
+  iniciar)   shift; cmd_iniciar "${1:-}";;
+  detener)   shift; cmd_detener "${1:-}";;
+  borrar)    shift; cmd_borrar "${1:-}";;
+  actualizar) cmd_actualizar;;
+  ayuda|help) cmd_ayuda;;
+  *)         cmd_ayuda;;
+esac

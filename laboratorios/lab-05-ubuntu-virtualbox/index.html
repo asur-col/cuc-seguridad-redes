@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio 5: Instalar Ubuntu en VirtualBox · CUC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px;
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: minmax(0, 1fr); }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
+    pre {
+      position: relative;
+      background: #211D18; color: #EFE7D9;
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid #3D362B;
+    }
+
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
+    }
+
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    @media print {
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
+
+<div class="shell">
+  <nav class="toc" id="toc">
+    <p class="toc-label">Contenido</p>
+    <a href="#intro"><span class="badge">·</span> Introducción</a>
+    <a href="#requisitos"><span class="badge">1</span> Requisitos y verificación previa</a>
+    <a href="#crear-vm"><span class="badge">2</span> Crear la máquina virtual</a>
+    <a href="#instalacion"><span class="badge">3</span> Instalación de Ubuntu Server paso a paso</a>
+    <a href="#primer-arranque"><span class="badge">4</span> Primer arranque y configuración inicial</a>
+    <a href="#ssh"><span class="badge">5</span> Conexión por SSH desde el anfitrión</a>
+    <a href="#docker"><span class="badge">6</span> Instalar Docker y dejar la VM lista para la U3</a>
+    <a href="#retos"><span class="badge">7</span> Retos cortos de terminal</a>
+    <a href="#si-algo-falla"><span class="badge">·</span> Si algo falla</a>
+    <a href="#glosario"><span class="badge">·</span> Glosario</a>
+    <a href="#entrega"><span class="badge">·</span> Entrega y evidencia</a>
+    <a href="#rubrica"><span class="badge">·</span> Rúbrica de evaluación</a>
+    <a href="#referencias"><span class="badge">·</span> Referencias</a>
+  </nav>
+
+  <div>
+    <header class="top portada">
+      <img class="portada-logo"
+           src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
+           onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
+           alt="Logo Universidad de la Costa (CUC)">
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes · Actividad formativa · S12 · 2026-2</div>
+      <h1>Laboratorio 5: Instalar Ubuntu en VirtualBox</h1>
+      <p class="sub">Guía paso a paso para crear una máquina virtual con Ubuntu Server 24.04 LTS en VirtualBox, conectar por SSH y dejarla lista para los laboratorios de la Unidad 3. Adaptador puente para acceso remoto desde el aula.</p>
+      <div class="accent-bar"></div>
+      <div class="author-block">
+        <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
+        <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
+        <span>📅 <strong>Semana 12 · Formativa · ~90 min · 2026-2</strong></span>
+      </div>
+    </header>
+
+    <main>
+      <section id="intro">
+        <p class="lede">En este laboratorio instalarás Ubuntu Server 24.04 LTS en una máquina virtual de VirtualBox y la configurarás para que sea accesible desde tu PC anfitrión mediante SSH. La VM quedará lista para los laboratorios de la Unidad 3, donde trabajarás con herramientas de seguridad de redes sobre este mismo entorno.</p>
+        <div class="callout note"><b>Actividad formativa:</b> no suma nota, pero es requisito para continuar con la Unidad 3. Tiempo estimado: ~90 minutos. Individual.</div>
+        <div class="callout note"><b>Importante:</b> los pantallazos de este documento son capturas reales ejecutadas en el entorno de laboratorio o marcadores <code class="inline">[CAPTURA PENDIENTE: …]</code> cuando aún no se dispone de la captura real.</div>
+      </section>
+
+      <section class="part" id="requisitos">
+        <div class="part-head">
+          <span class="part-badge">1</span>
+          <h2>Requisitos y verificación previa</h2>
+        </div>
+        <p>Antes de instalar, verifica que el PC del aula cumpla los requisitos para ejecutar VirtualBox y una máquina virtual con Ubuntu Server.</p>
+        <h3 class="sub">Checklist de requisitos</h3>
+        <ul class="plain">
+          <li><b>VirtualBox instalado:</b> versión 7.x o superior, disponible en <code class="inline">virtualbox.org</code>.</li>
+          <li><b>Virtualización habilitada en BIOS/UEFI:</b> VT-x (Intel) o AMD-V (AMD) activo.</li>
+          <li><b>RAM disponible:</b> mínimo 4 GB libres para asignar 2–4 GB a la VM.</li>
+          <li><b>Disco disponible:</b> mínimo 30 GB libres para el disco dinámico de 25 GB de la VM.</li>
+          <li><b>ISO de Ubuntu Server 24.04 LTS:</b> descargar desde <code class="inline">ubuntu.com/download/server</code>.</li>
+        </ul>
+        <h3 class="sub">Descarga y verificación de la ISO</h3>
+        <p>Descarga la imagen ISO de Ubuntu Server 24.04 LTS y verifica su integridad con SHA-256 antes de usarla.</p>
+        <pre><code># PowerShell (Windows)
+Get-FileHash -Algorithm SHA256 ruta-al-archivo/ubuntu-24.04-live-server-amd64.iso
+
+# certutil (Windows)
+certutil -hashfile ruta-al-archivo/ubuntu-24.04-live-server-amd64.iso SHA256
+
+# Linux/macOS
+sha256sum ubuntu-24.04-live-server-amd64.iso
+</code></pre>
+        <p>Compara el hash resultante con el publicado en la página de descarga de Ubuntu. Si no coinciden, no uses esa ISO.</p>
+        <div class="callout note"><b>[CAPTURA PENDIENTE: pantallazo de la descarga de la ISO desde ubuntu.com y del comando Get-FileHash/certutil mostrando el SHA-256]</b></div>
+      </section>
+
+      <section class="part" id="crear-vm">
+        <div class="part-head">
+          <span class="part-badge">2</span>
+          <h2>Crear la máquina virtual</h2>
+        </div>
+        <p>Abre VirtualBox y crea una nueva máquina virtual con los siguientes parámetros.</p>
+        <h3 class="sub">Configuración de la VM</h3>
+        <div class="tbl-wrap"><table>
+<thead><tr><th>Parámetro</th><th>Valor</th><th>Nota</th></tr></thead>
+<tbody>
+<tr><td>Nombre</td><td>Ubuntu-Server-S12</td><td>Identificativa para el lab</td></tr>
+<tr><td>Tipo</td><td>Linux</td><td></td></tr>
+<tr><td>Versión</td><td>Ubuntu (64-bit)</td><td></td></tr>
+<tr><td>RAM base</td><td>4096 MB (mínimo 2048)</td><td>Más RAM = mejor rendimiento</td></tr>
+<tr><td>Procesadores</td><td>2 vCPU</td><td></td></tr>
+<tr><td>Disco duro</td><td>25 GB, dinámico (VHD/VMDK)</td><td>Se expande según uso</td></tr>
+<tr><td>Red</td><td><b>Adaptador puente</b></td><td>Elegir interfaz física correcta</td></tr>
+</tbody></table></div>
+        <h3 class="sub">¿Por qué adaptador puente?</h3>
+        <p>El adaptador puente conecta la VM directamente a la red física del aula. La VM obtiene su propia dirección IP del servidor DHCP de la red, es visible como cualquier otro equipo y permite conexiones SSH desde el PC anfitrión. Si el puente no obtiene IP, usa NAT como alternativa (pero entonces no habrá acceso remoto).</p>
+        <div class="callout warn"><b>[CAPTURA PENDIENTE: pantallazo del asistente de creación de VM de VirtualBox mostrando la configuración de red con adaptador puente]</b></div>
+      </section>
+
+      <section class="part" id="instalacion">
+        <div class="part-head">
+          <span class="part-badge">3</span>
+          <h2>Instalación de Ubuntu Server paso a paso</h2>
+        </div>
+        <p>Inicia la VM con la ISO montada y sigue el instalador de Ubuntu Server.</p>
+        <h3 class="sub">Pasos de la instalación</h3>
+        <ol class="steps">
+          <li><b>Idioma y teclado:</b> selecciona español (España o Latinoamérica) y teclado español.</li>
+          <li><b>Red:</b> con adaptador puente, el instalador obtendrá una IP por DHCP automáticamente.</li>
+          <li><b>Disco:</b> elige "Usar un disco completo" y selecciona el disco virtual de 25 GB.</li>
+          <li><b>Usuario:</b> crea tu usuario y contraseña. Anótalos.</li>
+          <li><b>OpenSSH server:</b> <strong>marca sí</strong> para instalar el servidor SSH (necesario para acceso remoto).</li>
+          <li><b>Snaps extras:</b> no instales snaps adicionales (opcional).</li>
+          <li><b>Finalizar:</b> el instalador reiniciará la VM. Retira la ISO de la unidad virtual.</li>
+        </ol>
+        <div class="callout note"><b>[CAPTURA PENDIENTE: pantallazo de la pantalla de selección de "OpenSSH server" durante la instalación de Ubuntu Server]</b></div>
+        <div class="callout warn"><b>Importante:</b> no instales el entorno de escritorio (GUI) a menos que sea necesario. Ubuntu Server sin GUI consume menos recursos y es más seguro.</div>
+      </section>
+
+      <section class="part" id="primer-arranque">
+        <div class="part-head">
+          <span class="part-badge">4</span>
+          <h2>Primer arranque y configuración inicial</h2>
+        </div>
+        <p>Tras la instalación, inicia la VM y verifica que la red funciona correctamente.</p>
+        <h3 class="sub">Verificar la dirección IP</h3>
+        <pre><code>$ ip -br a
+lo               UNKNOWN        127.0.0.1/8
+enp0s3           UP             192.168.1.XX/24
+</code></pre>
+        <p>La dirección IP de la interfaz de red (enp0s3, eth0 o similar) es la que usarás para conectarte por SSH. Anótala.</p>
+        <h3 class="sub">Verificar conectividad</h3>
+        <pre><code>$ ping -c 3 1.1.1.1
+$ ping -c 3 192.168.1.1   # puerta de enlace del aula (ajusta según tu red)
+</code></pre>
+        <h3 class="sub">Actualizar el sistema</h3>
+        <pre><code>$ sudo apt update && sudo apt upgrade -y
+</code></pre>
+        <h3 class="sub">Configurar el nombre del equipo</h3>
+        <pre><code>$ sudo hostnamectl set-hostname ubuntu-s12
+</code></pre>
+        <h3 class="sub">Crear usuario adicional (opcional)</h3>
+        <pre><code>$ sudo adduser estudiante
+$ sudo usermod -aG sudo estudiante
+</code></pre>
+        <div class="callout note"><b>[CAPTURA PENDIENTE: pantallazo del comando ip a mostrando la IP obtenida por el adaptador puente]</b></div>
+      </section>
+
+      <section class="part" id="ssh">
+        <div class="part-head">
+          <span class="part-badge">5</span>
+          <h2>Conexión por SSH desde el PC anfitrión</h2>
+        </div>
+        <p>Desde PowerShell o el símbolo del sistema de tu PC anfitrión, conéctate a la VM mediante SSH usando la IP obtenida en el paso anterior.</p>
+        <h3 class="sub">Comando SSH</h3>
+        <pre><code>ssh tuusuario@192.168.1.XX
+</code></pre>
+        <p>Reemplaza <code class="inline">tuusuario</code> por el nombre de usuario que creaste durante la instalación y <code class="inline">192.168.1.XX</code> por la IP real de tu VM.</p>
+        <div class="callout note"><b>[CAPTURA PENDIENTE: pantallazo de la conexión SSH desde PowerShell a la VM de Ubuntu]</b></div>
+        <div class="callout warn"><b>Si SSH no conecta:</b> verifica que OpenSSH server se instaló durante la instalación de Ubuntu, que la IP es correcta y que el adaptador puente obtuvo una dirección IP válida.</div>
+
+        <h3 class="sub">Acceso moderno por navegador (Escritorio Web noVNC)</h3>
+        <p>A partir de la Semana 13, la VM cuenta con un entorno de escritorio ligero (XFCE) accesible directamente desde cualquier navegador web sin instalar clientes VNC adicionales. Ejecuta una sola vez en la consola de la VM:</p>
+        <pre><code>curl -fsSL https://asur-col.github.io/cuc-seguridad-redes/laboratorios/entorno/instalar-entorno.sh | bash</code></pre>
+        <p>Una vez finalizado:</p>
+        <ul>
+          <li><strong>Adaptador Puente (recomendado en aula):</strong> abre en tu navegador <code>http://&lt;IP-de-tu-VM&gt;:6080/vnc.html</code></li>
+          <li><strong>Modo NAT (si la red bloquea puente):</strong> configura reenvío de puertos en VirtualBox (Anfitrión <code>6080</code> &rarr; Invitado <code>6080</code>) y accede a <code>http://127.0.0.1:6080/vnc.html</code></li>
+          <li><strong>Contraseña de acceso:</strong> se genera de forma única por VM y se muestra en la pantalla de inicio o ejecutando <code>cat ~/.vnc/clave.txt</code></li>
+          <li><strong>SSH como respaldo:</strong> la conexión SSH tradicional se mantiene 100% activa como canal de administración y soporte.</li>
+        </ul>
+      </section>
+
+      <section class="part" id="docker">
+        <div class="part-head">
+          <span class="part-badge">6</span>
+          <h2>Instalar Docker y dejar la VM lista para la U3</h2>
+        </div>
+        <p>Instala Docker en la VM para desplegar herramientas de seguridad en contenedores durante los laboratorios de la Unidad 3.</p>
+        <h3 class="sub">Instalación de Docker</h3>
+        <pre><code>$ sudo apt install docker.io -y
+$ sudo usermod -aG docker $USER
+$ newgrp docker
+</code></pre>
+        <p>Cierra sesión y vuelve a entrar (o reinicia la VM) para que el cambio de grupo surta efecto.</p>
+        <h3 class="sub">Verificar Docker</h3>
+        <pre><code>$ docker run hello-world
+</code></pre>
+        <p>Si ves el mensaje "Hello from Docker!", la instalación es correcta. La VM está lista para los labs de la Unidad 3.</p>
+        <div class="callout note"><b>[CAPTURA PENDIENTE: pantallazo del comando docker run hello-world mostrando el mensaje de éxito]</b></div>
+      </section>
+
+      <section class="part" id="retos">
+        <div class="part-head">
+          <span class="part-badge">7</span>
+          <h2>Retos cortos de terminal</h2>
+        </div>
+        <p>Resuelve los siguientes 10 retos usando la terminal de tu VM Ubuntu. Cada reto refuerza los comandos vistos en la Parte 2 y Parte 3 del deck S12.</p>
+        <div class="tbl-wrap"><table>
+<thead><tr><th>Nº</th><th>Reto</th><th>Comando sugerido</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Mostrar el directorio de trabajo actual y tu usuario</td><td><code class="inline">pwd</code>, <code class="inline">whoami</code></td></tr>
+<tr><td>2</td><td>Listar el contenido de /etc con detalle</td><td><code class="inline">ls -l /etc</code></td></tr>
+<tr><td>3</td><td>Cambiar a /var/log y listar archivos</td><td><code class="inline">cd /var/log && ls</code></td></tr>
+<tr><td>4</td><td>Crear un directorio de prueba y un archivo dentro</td><td><code class="inline">mkdir lab5 && echo hola > lab5/prueba.txt</code></td></tr>
+<tr><td>5</td><td>Copiar y renombrar el archivo</td><td><code class="inline">cp lab5/prueba.txt lab5/copia.txt && mv lab5/copia.txt lab5/final.txt</code></td></tr>
+<tr><td>6</td><td>Leer las primeras 5 líneas de /etc/os-release</td><td><code class="inline">head -5 /etc/os-release</code></td></tr>
+<tr><td>7</td><td>Buscar la palabra "VERSION" en /etc/os-release</td><td><code class="inline">grep -n VERSION /etc/os-release</code></td></tr>
+<tr><td>8</td><td>Contar cuántos binarios hay en /usr/bin</td><td><code class="inline">ls /usr/bin | wc -l</code></td></tr>
+<tr><td>9</td><td>Mostrar tus grupos y si tienes sudo</td><td><code class="inline">id</code>, <code class="inline">id $USER</code></td></tr>
+<tr><td>10</td><td>Mostrar puertos en escucha en la VM</td><td><code class="inline">ss -tulpn</code></td></tr>
+</tbody></table></div>
+        <div class="callout warn"><b>[CAPTURA PENDIENTE: pantallazos de al menos 3 retos resueltos en la terminal de la VM]</b></div>
+      </section>
+
+      <section id="si-algo-falla">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Si algo falla</h2>
+        <div class="tbl-wrap"><table>
+<thead><tr><th>Síntoma</th><th>Posible causa</th><th>Solución</th></tr></thead>
+<tbody>
+<tr><td>VT-x/AMD-V desactivado</td><td>Virtualización desactivada en BIOS/UEFI</td><td>Entra al BIOS/UEFI, activa VT-x (Intel) o AMD-V (AMD), guarda cambios y reinicia.</td></tr>
+<tr><td>Puente sin IP (no obtiene dirección)</td><td>Interfaz física incorrecta seleccionada o red sin DHCP</td><td>En VirtualBox, configuración de red > Adaptador puente, elige la interfaz física correcta (Wi-Fi o Ethernet). Si persiste, usa NAT como alternativa temporal.</td></tr>
+<tr><td>Teclado español no funciona en la instalación</td><td>Distribución de teclado no seleccionada</td><td>Durante la instalación de Ubuntu, elige "Español" como distribución de teclado.</td></tr>
+<tr><td>Disco lleno durante la instalación</td><td>Disco virtual demasiado pequeño o dinámico sin espacio en el host</td><td>Libera espacio en el disco del PC anfitrión o aumenta el disco virtual a 30+ GB.</td></tr>
+<tr><td>SSH no conecta desde el anfitrión</td><td>OpenSSH no instalado o IP incorrecta</td><td>Verifica que OpenSSH server se instaló durante la instalación de Ubuntu. Usa <code class="inline">ip a</code> para confirmar la IP.</td></tr>
+<tr><td>Docker no tiene permisos</td><td>Usuario no en el grupo docker</td><td>Ejecuta <code class="inline">sudo usermod -aG docker $USER</code>, cierra sesión y vuelve a entrar.</td></tr>
+</tbody></table></div>
+      </section>
+
+      <section id="glosario">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Glosario</h2>
+        <ul class="plain">
+          <li><b>VM (máquina virtual):</b> emulación de una computadora completa que se ejecuta como un proceso sobre el SO anfitrión.</li>
+          <li><b>Hipervisor tipo 2:</b> software de virtualización que se instala sobre un sistema operativo existente (VirtualBox es tipo 2).</li>
+          <li><b>Adaptador puente:</b> modo de red de VirtualBox donde la VM obtiene su propia IP en la red física y es visible como cualquier otro equipo.</li>
+          <li><b>ISO:</b> imagen de disco que contiene el instalador de un sistema operativo.</li>
+          <li><b>SSH:</b> protocolo de acceso remoto seguro y cifrado.</li>
+          <li><b>Docker:</b> plataforma para crear y ejecutar contenedores, más ligeros que las VM.</li>
+          <li><b>Contenedor:</b> instancia aislada de una aplicación que comparte el kernel del host.</li>
+          <li><b>DHCP:</b> protocolo que asigna direcciones IP automáticamente en una red.</li>
+          <li><b>FQDN:</b> nombre de dominio completo que identifica un equipo en la red.</li>
+        </ul>
+      </section>
+
+      <section id="entrega">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Entrega y evidencia</h2>
+        <p>Cada estudiante entrega por Teams una carpeta con los siguientes elementos:</p>
+        <ol class="steps">
+          <li><b>Captura de <code class="inline">ip a</code></code> mostrando la IP obtenida por el adaptador puente.</li>
+          <li><b>Captura de <code class="inline">ss -tulpn</code></code> mostrando los puertos en escucha (al menos ssh en el puerto 22).</li>
+          <li><b>Captura de <code class="inline">docker run hello-world</code></code> mostrando el mensaje de éxito.</li>
+          <li><b>Capturas de al menos 3 retos</b> resueltos en la terminal de la VM.</li>
+          <li><b>Captura de la conexión SSH</b> desde el PC anfitrión a la VM.</li>
+        </ol>
+        <div class="callout note"><b>Formativo:</b> esta actividad no suma nota, pero es requisito para continuar con los laboratorios de la Unidad 3.</div>
+      </section>
+
+      <section id="rubrica">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Rúbrica de evaluación</h2>
+        <div class="tbl-wrap"><table>
+<thead><tr><th>Criterio</th><th>1,0</th><th>0,75</th><th>0,5</th><th>0</th></tr></thead>
+<tbody>
+<tr><td>C1. VM creada y configurada</td><td>VM con Ubuntu 24.04, 2 vCPU, 4 GB RAM, 25 GB disco, adaptador puente</td><td>Falta un parámetro</td><td>Faltan dos parámetros</td><td>VM no creada</td></tr>
+<tr><td>C2. Red y conectividad</td><td>IP obtenida por puente, ping a gateway respondiendo</td><td>IP obtenida pero sin ping</td><td>Sin IP de red</td><td>Sin red configurada</td></tr>
+<tr><td>C3. SSH funcional</td><td>Conexión SSH desde el anfitrión exitosa</td><td>SSH instalado pero no conecta</td><td>SSH no instalado</td><td>Sin SSH</td></tr>
+<tr><td>C4. Docker instalado</td><td><code class="inline">docker run hello-world</code> ejecuta correctamente</td><td>Docker instalado pero comando falla</td><td>Docker no instalado</td><td>Sin Docker</td></tr>
+<tr><td>C5. Entrega completa</td><td>Todas las capturas entregadas con hora y nombre visibles</td><td>Falta una captura</td><td>Faltan dos o más capturas</td><td>Sin entrega</td></tr>
+</tbody></table></div>
+      </section>
+
+      <section id="referencias">
+        <h2 style="font-size:22px; margin-top:44px; color:var(--vino);">Referencias</h2>
+        <ul class="plain">
+          <li><a href="https://virtualbox.org">VirtualBox — documentación oficial</a></li>
+          <li><a href="https://ubuntu.com/download/server">Ubuntu Server 24.04 LTS — descarga oficial</a></li>
+          <li><a href="https://docs.docker.com/engine/install/ubuntu/">Docker — instalación en Ubuntu</a></li>
+          <li><a href="https://ubuntu.com/server/docs">Ubuntu Server — documentación oficial</a></li>
+        </ul>
+      </section>
+
+      <footer class="page">
+        <strong>Ing. Rodolfo Cañas Cervantes</strong> · Seguridad en Redes · Universidad de la Costa (CUC) · Barranquilla, Colombia · 2026-2 · Semana 12 · Formativa
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+    pre.appendChild(btn);
+  });
+</script>
+</body>
+</html>

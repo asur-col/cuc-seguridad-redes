@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 6 — Detección y mitigación de tráfico anómalo (DoS/DDoS) · CUC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    :root {
+      --bg: #FBF8F3; --surface: #FFFFFF; --surface-2: #F4EEE3;
+      --ink: #2A2A2A; --ink-soft: #6B6259;
+      --vino: #A6192E; --vino-strong: #7E1223; --vino-tint: #FBEBEC;
+      --dorado: #A9791C; --dorado-tint: #FBF3DE; --line: #E5DCCB;
+      --code-bg: #F1EADA; --code-ink: #4A4030; --shadow: 0 1px 3px rgba(42,26,20,.05);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px; line-height: 1.65;
+    }
+    header { background: var(--vino); color: #fff; padding: 14px 24px; }
+    header h1 { margin: 0; font-family: 'Fraunces', serif; font-size: 21px; }
+    header p { margin: 2px 0 0; font-size: 13px; opacity: .9; }
+    main { max-width: 1100px; margin: 28px auto; padding: 0 20px; }
+    h2 { font-family: 'Fraunces', serif; color: var(--vino-strong); margin: 32px 0 12px; font-size: 24px; }
+    h3 { color: var(--ink); margin: 20px 0 8px; font-size: 17px; }
+    p { margin: 0 0 12px; }
+    ul, ol { margin: 4px 0 14px 20px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card { background: var(--surface); border: 1px solid var(--line);
+            border-left: 5px solid var(--dorado); border-radius: 8px;
+            padding: 14px 18px; margin: 16px 0; }
+    .card b { color: var(--vino-strong); }
+    .alerta { background: var(--vino-tint); border-left: 5px solid var(--vino);
+              border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+    .alerta b { color: var(--vino-strong); }
+    pre, code { font-family: 'IBM Plex Mono', monospace; }
+    pre {
+      background: var(--code-bg); color: var(--code-ink); border: 1px solid var(--line);
+      border-radius: 6px; padding: 12px 16px; overflow-x: auto; margin: 10px 0;
+      font-size: 13px; line-height: 1.45;
+    }
+    code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 0.9em; }
+    .etapa { border: 1px solid var(--line); border-radius: 10px; margin: 22px 0;
+             overflow: hidden; background: var(--surface); }
+    .etapa .etapa-head { background: var(--surface-2); border-bottom: 1px solid var(--line);
+                         padding: 10px 16px; font-weight: 700; color: var(--vino-strong);
+                         display: flex; justify-content: space-between; align-items: center; }
+    .etapa .etapa-body { padding: 16px 20px; }
+    .badge { display:inline-block; background: var(--dorado); color: #fff;
+             font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+    .tabla { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+    .tabla th, .tabla td { border: 1px solid var(--line); padding: 7px 10px;
+                           text-align: left; }
+    .tabla th { background: var(--surface-2); color: var(--vino-strong); }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+    .footer { margin-top: 40px; padding: 18px 0; border-top: 1px solid var(--line);
+              color: var(--ink-soft); font-size: 13px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Lab 6 · Detección y mitigación de tráfico anómalo (DoS/DDoS)</h1>
+  <p>Seguridad en Redes · Universidad de la Costa (CUC) · Unidad 3 · Semana 13 · 4 de noviembre de 2026 · 2026-2</p>
+</header>
+
+<main>
+<p><b>Objetivo:</b> detectar y mitigar un ataque de denegación de servicio (SYN flood,
+HTTP flood y multi-origen) sobre un servidor web, usando únicamente contenedores Docker
+en redes internas (sin puertos publicados, sin Internet en tiempo de ejecución). El
+estudiante escribe las reglas de detección (Suricata) y mitigación (nftables) y verifica
+que el tráfico legítimo siga funcionando.</p>
+<p><b>Duración aproximada:</b> 90 minutos. <b>Entrega:</b> <code>./lab evidencia</code>
+genera <code>evidencia.tar.gz</code> para subir por Teams.</p>
+
+<div class="alerta"><b>Marco ético (Ley 1273 de 2009, Colombia):</b> este laboratorio
+se ejecuta exclusivamente sobre entornos propios y autorizados. El contenedor
+<code>generador</code> solo reproduce capturas pregrabadas contra el servidor del propio
+laboratorio (10.30.0.10, red Docker interna). Destino, tasas y duración están fijados
+en el código; no es configurable por el estudiante y no se entregan herramientas para
+atacar sistemas de terceros.</div>
+
+<h2>1. Antes de empezar — descargar y ejecutar</h2>
+<p>Si la VM aún no tiene el cliente <code>asur-lab</code>, instálelo una vez y
+arranque el lab. Ruta rápida (atajo real <code>lab06.sh</code>):</p>
+<pre>$ bash ~/Descargas/lab06.sh
+[INFO]   descargando e instalando asur-lab...
+[OK]     asur-lab instalado en /home/<usuario>/.local/bin/asur-lab
+[INFO]   descargando lab06 v1.0.2
+[OK]     paquete verificado
+[OK]     parte imagenes.tar.gz.part-aa verificada
+[OK]     parte imagenes.tar.gz.part-ab verificada
+[INFO]   reensamblando imágenes
+[INFO]   cargando imágenes en Docker
+[OK]     imágenes cargadas
+[INFO]   levantando 'lab06' con ./lab up
+[OK]     lab 'lab06' arriba
+[OK]     lab 'lab06' instalado en /home/<usuario>/labs/lab06</pre>
+<p>O directamente, con el cliente ya instalado:</p>
+<pre>$ asur-lab iniciar lab06</pre>
+<p>El lab queda instalado en <code>~/labs/lab06</code> (una carpeta por lab). Comandos disponibles: <code>./lab up</code>,
+<code>./lab down</code>, <code>./lab reset</code>, <code>./lab estado</code>,
+<code>./lab base</code>, <code>./lab ataque &lt;syn|http|multi&gt;</code>,
+<code>./lab check</code>, <code>./lab shell &lt;c&gt;</code>, <code>./lab evidencia</code>.</p>
+
+<div class="etapa">
+  <div class="etapa-head">Parte 1 · Línea base (15 min) <span class="badge">ss · tcpdump · logs nginx</span></div>
+  <div class="etapa-body">
+  <p>Mida el tráfico legítimo <b>antes</b> de escribir cualquier regla de mitigación:</p>
+  <pre>$ ./lab base 30
+[INFO]   midiendo la línea base durante 30 s (no lances ataques)
+[OK]     escrito ~/labs/lab06/evidencia/linea-base.txt
+  pps=22 · SYN-RECV=0 · orígenes=3</pre>
+  <p>El archivo <code>evidencia/linea-base.txt</code> registra pps, SYN-RECV y orígenes
+  únicos (objetivo 1 del <code>./lab check</code>). Valores razonables para el tráfico
+  normal del lab: pps entre 3 y 60, SYN-RECV entre 0 y 50, 1–5 orígenes.</p>
+  </div>
+</div>
+
+<div class="etapa">
+  <div class="etapa-head">Parte 2 · Análisis de capturas (20 min) <span class="badge">tshark sobre datos/*.pcap</span></div>
+  <div class="etapa-body">
+  <p>Copie la plantilla y complétela con <code>tshark</code> sobre los pcap de
+  <code>datos/</code> (dentro del contenedor <code>fw</code> o del generador):</p>
+  <pre>$ ./lab shell fw
+# tcpdump -q -n -r /datos/syn-flood.pcap | head -3
+<encabezados de los primeros paquetes>
+# tshark -r /datos/syn-flood.pcap -T fields -e ip.src | sort -u | wc -l
+<conteo></pre>
+  <p>Complete <code>evidencia/analisis-pcap.txt</code> con sus propios hallazgos
+  (objetivo 2) — estos valores los mide usted con <code>tshark</code>, no se copian:</p>
+  <ul>
+    <li><code>flag_dominante=</code> — qué bandera TCP domina el flood (mídala con <code>tshark -e tcp.flags</code>).</li>
+    <li><code>origenes_syn=</code> — cuántas direcciones IP originan el SYN flood (<code>-e ip.src | sort -u | wc -l</code>).</li>
+    <li><code>tasa_syn_pps=</code> — tasa aproximada medida con tshark (<code>-e frame.time_relative</code> para el intervalo).</li>
+    <li><code>http_flood=</code> — qué tipo de petición HTTP envía el http-flood (<code>-e http.request.method</code>).</li>
+    <li><code>diferencia=</code> — por qué el SYN flood satura el servidor sin completar el three-way handshake (medio saludo).</li>
+  </ul>
+  </div>
+</div>
+
+<div class="etapa">
+  <div class="etapa-head">Parte 3 · Detección (20 min) <span class="badge">2 reglas Suricata con threshold</span></div>
+  <div class="etapa-body">
+  <p>Edite <code>reglas/lab.rules</code>. Escriba dos reglas con <code>threshold</code>
+  (umbral por origen). La plantilla deja huecos <code>N</code> y <code>M</code> para que usted
+  los ajuste (ejemplo sin resolver):</p>
+  <pre>alert tcp any any -> any 80 (msg:"SYN flood"; flags:S;
+  threshold: type threshold, track by_src, count N, seconds M; sid:1000001; rev:1;)
+alert tcp any any -> any 80 (msg:"HTTP flood"; flags:PA; content:"GET "; depth:4;
+  threshold: type threshold, track by_src, count N, seconds M; sid:1000002; rev:1;)</pre>
+  <p>Luego <code>./lab recargar</code> y lance <code>./lab ataque syn</code> y
+  <code>./lab ataque http</code>. Verifique alertas en
+  <code>./lab shell ids → tail /var/log/suricata/eve.json</code> (objetivos 3 y 4).</p>
+  </div>
+</div>
+
+<div class="etapa">
+  <div class="etapa-head">Parte 4 · Mitigación (20 min) <span class="badge">nftables: rate limit, connlimit, set dinámico</span></div>
+  <div class="etapa-body">
+  <p>Edite <code>reglas/nftables.fw</code> (base vacía incluida) y aplíquelo con
+  <code>./lab recargar</code>. Conceptos a explicar (sin entregar el archivo resuelto):</p>
+  <ul>
+    <li><b>Límite de tasa SYN por IP</b>: <code>limit rate</code> sobre <code>tcp flags syn</code> — evita que una sola origine saturen el servidor.</li>
+    <li><b>Límite de conexiones simultáneas</b>: <code>ct count over N</code> por IP de origen — protege contra muchas conexiones pendientes.</li>
+    <li><b>Set dinámico con <code>timeout</code></b> (bono): bloquea temporalmente el origen que supera el umbral con <code>update @set { ip saddr }</code> y <code>flags dynamic,timeout</code>.</li>
+    <li><b>SYN cookies</b> y <b>limit_req</b> de nginx: en el servidor web, no en el firewall.</li>
+  </ul>
+  <div class="two">
+  <div class="card"><b>¿Por qué un límite fijo no basta?</b> Un DDoS volumétrico real satura el enlace antes de llegar al firewall; allí se necesita el ISP, CDN o scrubbing. Umbrales muy bajos generan falsos positivos contra usuarios legítimos.</div>
+  <div class="card"><b>Puente al Lab 7:</b> los umbrales fijos son difíciles de ajustar; la IA (NDR con ML) aprende la línea base y detecta anomalías sin reglas escritas a mano.</div>
+  </div>
+  </div>
+</div>
+
+<div class="etapa">
+  <div class="etapa-head">Parte 5 · Verificación (10 min) <span class="badge">./lab check</span></div>
+  <div class="etapa-body">
+  <p>Repita el ataque y verifique que el cliente legítimo sigue recibiendo HTTP 200:</p>
+  <pre>$ ./lab ataque syn
+[OK]   ataque syn lanzado
+$ ./lab check
+[INFO]   verificando 6 objetivos + bono (tarda ~2 min)
+[OK]     1/6 Línea base razonable
+[OK]     2/6 Análisis de capturas correcto
+[OK]     3/6 Regla de SYN con umbral por origen activa: 1 alerta(s)
+[OK]     4/6 Regla de HTTP repetido con umbral: 1 alerta(s)
+[OK]     5/6 nftables con límite de tasa SYN en fw
+[OK]     6/6 El cliente se mantuvo con 96% de intentos OK durante el ataque
+[OK]     bono Set dinámico con timeout presente
+== Resultados: 6/6 objetivos · bono 1/1 (90 s) ==</pre>
+  </div>
+</div>
+
+<div class="etapa">
+  <div class="etapa-head">Parte 6 · Reflexión (5 min)</div>
+  <div class="etapa-body">
+  <p>¿Por qué no basta este lab frente a un DDoS volumétrico real? ¿Dónde fijar los
+  umbrales sin bloquear usuarios legítimos? ¿Cómo ayudaría la IA (puente al Lab 7)?
+  Responda por escrito y agréguelo al final de <code>evidencia/analisis-pcap.txt</code>.</p>
+  </div>
+</div>
+
+<h2>Si algo falla</h2>
+<ul>
+  <li><b>Contenedor no arranca:</b> <code>./lab estado</code> y revise los logs del contenedor con <code>docker logs lab06-fw</code>.</li>
+  <li><b>Suricata no alerta:</b> revise que <code>reglas/lab.rules</code> tenga <code>sid</code> único y <code>threshold</code>, y ejecute <code>./lab recargar</code>.</li>
+  <li><b>El ataque llega al servidor:</b> añada el límite de tasa SYN por IP en <code>reglas/nftables.fw</code> y <code>./lab recargar</code>.</li>
+  <li><b>El cliente legítimo cae:</b> sus reglas son demasiado estrictas; relaje el umbral y vuelva a <code>./lab recargar</code>.</li>
+  <li><b>Docker ≥ 29 en el servidor docente:</b> <code>./lab up</code> intenta aplicar automáticamente el arreglo de enrutamiento del bridge (<code>DOCKER-USER</code>); en las VM del aula (Docker 28) no es necesario.</li>
+</ul>
+
+<h2>Entrega</h2>
+<p>Ejecute <code>./lab evidencia</code> para generar <code>evidencia.tar.gz</code> con
+<code>evidencia/linea-base.txt</code>, <code>evidencia/analisis-pcap.txt</code> y las
+últimas líneas de <code>eve.json</code> y del log de nginx. Suba el archivo por Teams
+junto con una captura del <code>./lab check</code> mostrando 6/6.</p>
+
+<div class="footer">
+  Universidad de la Costa (CUC) · Seguridad en Redes 2026-2 · Ing. Rodolfo Cañas Cervantes ·
+  Ley 1273 de 2009 — solo entornos propios y autorizados.
+</div>
+</main>
+</body>
+</html>

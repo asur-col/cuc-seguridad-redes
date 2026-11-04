@@ -1,0 +1,74 @@
+[
+  {
+    "id": "asur-lab",
+    "titulo": "Cliente asur-lab (auto-actualización del cliente)",
+    "version": "1.0.0",
+    "estado": "cliente",
+    "url": "/laboratorios/asur-lab",
+    "sha256": "87817dfa45f5aea688305dc2cc75a23df36c20b020a8c76c0069848815cebbba",
+    "partes": [],
+    "partes_sha256": [],
+    "ram_mb": 0
+  },
+  {
+    "id": "lab06",
+    "titulo": "Lab 6 — Detección y mitigación de tráfico anómalo (DoS/DDoS)",
+    "version": "1.0.3",
+    "estado": "activo",
+    "url_paquete": "/laboratorios/lab-06-deteccion-dos/paquete/paquete.tar.gz",
+    "sha256": "b2d80d074ec5005803e848ce7e37025cf88cf2348aa159b1ea12d0c5e3716248",
+    "partes": [
+      "/laboratorios/lab-06-deteccion-dos/paquete/imagenes.tar.gz.part-aa",
+      "/laboratorios/lab-06-deteccion-dos/paquete/imagenes.tar.gz.part-ab"
+    ],
+    "partes_sha256": [
+      "f2b228ce6dd85bb8fce22db7ff61846ed3ac961c5d1eea174b4a3f955e3ff423",
+      "925337f3753d736bf6b456650881e837d0fed9e9e49df9618cf786ce7bd5535e"
+    ],
+    "ram_mb": 600
+  },
+  {
+    "id": "p2-plano-gestion",
+    "titulo": "Parcial 2 — Plano de gestión (archivado)",
+    "version": "1.0.0",
+    "estado": "archivado",
+    "url_paquete": "",
+    "sha256": "",
+    "partes": [],
+    "partes_sha256": [],
+    "ram_mb": 0
+  },
+  {
+    "id": "lab07",
+    "titulo": "Lab 7 — Clasificador de tráfico (NDR con ML)",
+    "version": "1.0.0",
+    "estado": "proximamente",
+    "url_paquete": "",
+    "sha256": "",
+    "partes": [],
+    "partes_sha256": [],
+    "ram_mb": 0
+  },
+  {
+    "id": "lab08",
+    "titulo": "Lab 8 — Reconocimiento y análisis de vulnerabilidades en sandbox",
+    "version": "1.0.0",
+    "estado": "proximamente",
+    "url_paquete": "",
+    "sha256": "",
+    "partes": [],
+    "partes_sha256": [],
+    "ram_mb": 0
+  },
+  {
+    "id": "lab09",
+    "titulo": "Lab 9 — Asistente con IA que prioriza hallazgos",
+    "version": "1.0.0",
+    "estado": "proximamente",
+    "url_paquete": "",
+    "sha256": "",
+    "partes": [],
+    "partes_sha256": [],
+    "ram_mb": 0
+  }
+]
