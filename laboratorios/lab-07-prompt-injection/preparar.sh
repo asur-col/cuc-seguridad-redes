@@ -28,7 +28,7 @@ if [ "${1:-}" = "--ssh" ]; then
 fi
 
 # 3. OpenCode
-command -v opencode >/dev/null 2>&1 || { info "instalando OpenCode..."; curl -fsSL https://opencode.ai/install | bash </dev/null >/dev/null 2>&1; }
+command -v opencode >/dev/null 2>&1 || { info "instalando OpenCode..."; I=$(mktemp); curl -fsSL https://opencode.ai/install -o "$I" && bash "$I" </dev/null >/dev/null 2>&1; rm -f "$I"; export PATH="$HOME/.opencode/bin:$PATH"; }
 command -v opencode >/dev/null 2>&1 && ok "OpenCode $(opencode --version 2>/dev/null)" || mal "no pude instalar OpenCode (revisa internet)"
 
 # 4. Catálogo local y cliente asur-lab
