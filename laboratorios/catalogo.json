@@ -40,9 +40,10 @@
   },
   {
     "id": "lab07",
-    "titulo": "Lab 7 — Clasificador de tráfico (NDR con ML)",
+    "titulo": "Lab 7 — Prompt injection y defensas (AWS Academy)",
     "version": "1.0.0",
-    "estado": "proximamente",
+    "estado": "externo",
+    "url": "/laboratorios/lab-07-prompt-injection/",
     "url_paquete": "",
     "sha256": "",
     "partes": [],
