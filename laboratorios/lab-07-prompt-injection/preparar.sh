@@ -23,8 +23,14 @@ ok "PATH y ASUR_LAB_URL configurados (también en ~/.bashrc)"
 
 # 2. SSH con contraseña (solo si se pide)
 if [ "${1:-}" = "--ssh" ]; then
-  sudo rm -f /etc/ssh/sshd_config.d/10-a3.conf && sudo systemctl restart ssh </dev/null \
-    && ok "SSH: $(sudo sshd -T | grep -E '^passwordauthentication')"
+  info "habilitando SSH con contraseña (pide la clave de sudo)"
+  sudo rm -f /etc/ssh/sshd_config.d/10-a3.conf /etc/sudoers.d/90-operador </dev/null
+  sudo sshd -t </dev/null && sudo systemctl restart ssh </dev/null
+  if sudo sshd -T </dev/null | grep -q '^passwordauthentication yes'; then
+    ok "SSH: passwordauthentication yes (ya puedes entrar con usuario y clave)"
+  else
+    mal "SSH sigue sin contraseña: revisa /etc/ssh/sshd_config.d/"
+  fi
 fi
 
 # 3. OpenCode
