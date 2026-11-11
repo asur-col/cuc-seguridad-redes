@@ -33,6 +33,13 @@ if true; then  # siempre: SSH con contraseña
   fi
 fi
 
+# 2b. Escritorio VNC con clave estándar del curso: cuc
+if command -v vncpasswd >/dev/null 2>&1 && [ -d "$HOME/.vnc" ]; then
+  printf 'cuc\n' | vncpasswd -f > "$HOME/.vnc/passwd" && chmod 600 "$HOME/.vnc/passwd" && echo cuc > "$HOME/.vnc/clave.txt"
+  sudo systemctl restart asur-desktop </dev/null 2>/dev/null
+  ok "VNC: http://$(hostname -I | cut -d' ' -f1):6080/vnc.html  clave: cuc"
+fi
+
 # 3. OpenCode
 command -v opencode >/dev/null 2>&1 || { info "instalando OpenCode..."; I=$(mktemp); curl -fsSL https://opencode.ai/install -o "$I" && bash "$I" </dev/null >/dev/null 2>&1; rm -f "$I"; export PATH="$HOME/.opencode/bin:$PATH"; }
 command -v opencode >/dev/null 2>&1 && ok "OpenCode $(opencode --version 2>/dev/null)" || mal "no pude instalar OpenCode (revisa internet)"
