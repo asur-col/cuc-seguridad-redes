@@ -531,13 +531,30 @@
 <li>Abre una terminal en la VM del curso y confirma que el asistente aparece en el catálogo:</li>
 </ol>
 <pre>asur-lab lista</pre>
-<p>Debes ver la línea <code>lab09</code> con estado <code>activo</code>. Instálalo y levántalo:</p>
+<p>Debes ver la línea <code>lab09</code> con estado <code>activo</code>.</p>
+<div class="callout warn"><b>¿No aparece <code>lab09</code>, o la terminal dice <i>asur-lab: orden no encontrada</i>?</b> Actualiza el catálogo por consola, en este orden, en la misma terminal:
+<pre># 1. Que la terminal encuentre el cliente asur-lab
+export PATH=$HOME/.local/bin:$PATH
+
+# 2. Que asur-lab lea el catálogo local de la VM (no el de internet)
+export ASUR_LAB_URL=http://127.0.0.1:8088
+
+# 3. Comprobar que el catálogo local responde y trae el lab09
+curl -s http://127.0.0.1:8088/laboratorios/catalogo.json | grep -c lab09
+
+# 4. Actualizar el cliente (necesario para que exista «asur-lab check»)
+asur-lab actualizar
+
+# 5. Volver a listar
+asur-lab lista</pre>
+Si el paso 3 imprime <code>0</code> o no responde, reinicia el servicio del catálogo local con <code>sudo systemctl restart asur-catalogo</code> y repite desde el paso 3. Si aun así no aparece, avisa al docente: tu VM es una copia anterior y hay que reemplazarla. Para que los pasos 1 y 2 queden fijos en las próximas terminales: <code>echo 'export PATH=$HOME/.local/bin:$PATH; export ASUR_LAB_URL=http://127.0.0.1:8088' &gt;&gt; ~/.bashrc</code>.</div>
+<p>Instálalo y levántalo:</p>
 <pre>asur-lab iniciar lab09
 cd ~/labs/lab09
 ./lab up</pre>
 <p>El laboratorio <b>no usa contenedores</b>: el asistente corre sobre el OpenCode de la VM. El modelo es <b>NVIDIA NIM</b> y necesita una clave personal. Cada estudiante crea la suya, <b>gratuita</b>, en <a href="https://build.nvidia.com">build.nvidia.com</a> (cuenta propia, sin compartirla) y la exporta en la misma terminal:</p>
 <pre>export NVIDIA_API_KEY=tu_clave_personal</pre>
-<p>Sin esa variable el asistente se niega a responder con un mensaje claro. La primera consulta puede tardar entre 5 y 30 segundos. No escribas la clave en el informe ni la subas al repositorio.</p>
+<p>Sin esa variable el asistente se niega a responder con un mensaje claro. Cada consulta puede tardar entre 10 y 60 segundos. No escribas la clave en el informe ni la subas al repositorio.</p>
 <div class="callout note"><b>Captura 1:</b> la terminal con <code>asur-lab iniciar lab09</code> y <code>./lab up</code> terminando en <code>[OK]</code>. Se debe ver el nombre del laboratorio y, si la clave está puesta, el aviso de clave presente.</div>
 </section>
 
@@ -642,7 +659,7 @@ nano defensas/d3-filtro-salida.sh</pre>
 <ul>
 <li><b>"Falta NVIDIA_API_KEY":</b> el asistente usa NVIDIA NIM y necesita tu clave personal. Crea una cuenta gratuita en <a href="https://build.nvidia.com">build.nvidia.com</a>, genera la clave y ejecuta <code>export NVIDIA_API_KEY=tu_clave</code> en la misma terminal. No se comparte ni se guarda en el repositorio.</li>
 <li><b>NVIDIA rechaza la clave o limita las consultas:</b> revisa que copiaste la clave completa y vigente; si responde <i>rate limit</i>, espera unos segundos y reintenta. Cada estudiante usa su propia clave, no la de un compañero.</li>
-<li><b>Las consultas tardan mucho:</b> es lo esperado (5–30 s por consulta). Las consultas bloqueadas por D2 responden al instante.</li>
+<li><b>Las consultas tardan mucho:</b> es lo esperado (10–60 s por consulta). Las consultas bloqueadas por D2 responden al instante.</li>
 <li><b>El modelo filtra el secreto sin defensa:</b> es el hallazgo central del lab, no un error. Si no filtra en ninguna de las cinco técnicas, inténtalo con otro modelo con <code>ASUR_LAB_MODELO</code> y documenta ambos resultados.</li>
 <li><b><code>asur-lab check lab09</code> en rojo:</b> corre el check desde la carpeta del laboratorio (<code>cd ~/labs/lab09</code>) y lee la pista de cada objetivo: dice qué revisar, no la respuesta.</li>
 <li><b>Borré la tabla por error:</b> la batería <em>añade</em> bloques; si borras <code>tabla-antes-despues.md</code>, vuelve a correr la medición sin defensas y con defensas antes de entregar.</li>
