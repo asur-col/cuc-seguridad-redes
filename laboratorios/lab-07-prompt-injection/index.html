@@ -528,11 +528,17 @@
 <div class="part-head"><span class="part-badge">0</span><h2>Antes de empezar (10 min)</h2></div>
 <p class="docref">Herramientas: VM del curso · cliente <code>asur-lab</code> · OpenCode ya instalado</p>
 <ol>
-<li>Abre una terminal en la VM del curso y corre <b>este único comando</b>: configura la terminal, actualiza el catálogo y el cliente <code>asur-lab</code>, revisa OpenCode e instala el <code>lab09</code>:</li>
+<li>Abre una terminal en la VM del curso (en la ventana de VirtualBox o en el escritorio por navegador, ver el recuadro de abajo) y prepara el laboratorio con <b>un solo comando</b>. Configura la terminal, actualiza el catálogo y el cliente <code>asur-lab</code>, revisa OpenCode e instala el <code>lab09</code>.</li>
 </ol>
+<p><b>Si tu VM ya trae el script en tu carpeta personal</b> (compruébalo con <code>ls ~/preparar-lab09.sh</code>):</p>
+<pre>~/preparar-lab09.sh</pre>
+<p><b>Si no lo trae</b> (copias anteriores de la VM), descárgalo y córrelo en un paso:</p>
 <pre>curl -fsSL https://asur-col.github.io/cuc-seguridad-redes/laboratorios/lab-07-prompt-injection/preparar.sh | bash</pre>
-<p>Debe terminar en <code>[OK] Listo</code>. Si quieres entrar a tu VM por SSH con contraseña (por defecto pide llave), usa la variante que te pedirá la clave de <code>sudo</code>:</p>
-<pre>curl -fsSL https://asur-col.github.io/cuc-seguridad-redes/laboratorios/lab-07-prompt-injection/preparar.sh | bash -s -- --ssh</pre>
+<p>Debe terminar en <code>[OK] Listo</code>. Si además quieres entrar a tu VM por <b>SSH con usuario y contraseña</b> (por defecto pide llave), agrega la opción <code>--ssh</code>; te puede pedir la clave de <code>sudo</code> y al final debe decir <code>passwordauthentication yes</code>:</p>
+<pre>~/preparar-lab09.sh --ssh
+# o, si no tienes el script:
+curl -fsSL https://asur-col.github.io/cuc-seguridad-redes/laboratorios/lab-07-prompt-injection/preparar.sh | bash -s -- --ssh</pre>
+<div class="callout note"><b>Escritorio de la VM por navegador (noVNC):</b> mira la IP de tu VM con <code>ip -4 a</code> en su consola y abre desde tu PC <code>http://IP-DE-TU-VM:6080/vnc.html</code> → <b>Conectar</b>. En la VM nueva la clave es <code>p455w0rd</code>; en copias anteriores la clave está en la VM, en <code>~/.vnc/clave.txt</code> (<code>cat ~/.vnc/clave.txt</code>).</div>
 <p>Si prefieres hacerlo a mano, o el comando falla, sigue los pasos de abajo.</p>
 <ol>
 <li>Confirma que el asistente aparece en el catálogo:</li>
