@@ -22,7 +22,7 @@ grep -q 'ASUR_LAB_URL=' "$HOME/.bashrc" 2>/dev/null || \
 ok "PATH y ASUR_LAB_URL configurados (también en ~/.bashrc)"
 
 # 2. SSH con contraseña (solo si se pide)
-if [ "${1:-}" = "--ssh" ]; then
+if true; then  # siempre: SSH con contraseña
   info "habilitando SSH con contraseña (pide la clave de sudo)"
   sudo rm -f /etc/ssh/sshd_config.d/10-a3.conf /etc/sudoers.d/90-operador </dev/null
   sudo sshd -t </dev/null && sudo systemctl restart ssh </dev/null
