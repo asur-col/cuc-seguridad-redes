@@ -40,10 +40,9 @@
   },
   {
     "id": "lab07",
-    "titulo": "Lab 7 — Prompt injection y defensas (AWS Academy)",
+    "titulo": "Lab 7 — Clasificador de tráfico (NDR con ML)",
     "version": "1.0.0",
-    "estado": "externo",
-    "url": "/laboratorios/lab-07-prompt-injection/",
+    "estado": "proximamente",
     "url_paquete": "",
     "sha256": "",
     "partes": [],
@@ -63,13 +62,14 @@
   },
   {
     "id": "lab09",
-    "titulo": "Lab 9 — Asistente con IA que prioriza hallazgos",
+    "titulo": "Lab 9 — Prompt injection y defensas en un asistente de IA (VM del curso)",
     "version": "1.0.0",
-    "estado": "proximamente",
+    "estado": "externo",
     "url_paquete": "",
     "sha256": "",
     "partes": [],
     "partes_sha256": [],
-    "ram_mb": 0
+    "ram_mb": 0,
+    "url": "/laboratorios/lab-07-prompt-injection/"
   }
 ]
