@@ -79,6 +79,7 @@
     @page{size:letter;margin:12mm}
     body{background:#fff;color:#000;font-size:9pt;line-height:1.35}
     .no-print{display:none!important}
+    tr{break-inside:avoid} thead{display:table-header-group}
     header.top{margin:0 0 8pt;padding:0 0 8pt;border-bottom:2px solid #000;background:#fff}
     header.top img{height:38pt}
     header.top h1{color:#000;font-size:18pt}
@@ -104,7 +105,7 @@
 <div class="page">
 <header class="top">
   <img src="../assets/logo-cuc.png" alt="Universidad de la Costa" onerror="this.style.display='none'">
-  <div class="badge">Parcial 3 · Rúbrica del docente · uso en vivo</div>
+  <div class="badge">Parcial 3 · Rúbrica de evaluación · pública para el estudiante</div>
   <h1>Rúbrica de evaluación — Detección y mitigación de DoS + acceso no autorizado</h1>
   <p class="sub">Cinco criterios, cuatro niveles, nota de 0,0 a 5,0. La evidencia se observa en el equipo del estudiante durante la sesión; no se califica lo que no se puede ver.</p>
   <div class="accent"></div>
@@ -134,7 +135,7 @@
 <div class="tw"><table class="tight">
   <tr><th>Nivel</th><th>Banda</th><th>Lectura operativa</th></tr>
   <tr><td class="lv-ins">Insuficiente</td><td>0,0 – 2,4</td><td>No logra el resultado o lo logra por accidente sin poder explicarlo. Evidencia ausente, inventada o no verificable.</td></tr>
-  <tr><td class="lv-ace">Aceptable</td><td>2,5 – 3,4</td><td>Logra el resultado con ayuda, con errores corregidos sobre la marcha o con evidencia incompleta.</td></tr>
+  <tr><td class="lv-ace">Aceptable</td><td>2,5 – 3,4</td><td>Logra el resultado con ayuda del docente (tope de cualquier criterio con ayuda), con errores corregidos sobre la marcha o con evidencia incompleta.</td></tr>
   <tr><td class="lv-bue">Bueno</td><td>3,5 – 4,4</td><td>Logra el resultado de forma autónoma, con evidencia suficiente y explicación correcta, con vacíos menores.</td></tr>
   <tr><td class="lv-exc">Excelente</td><td>4,5 – 5,0</td><td>Resultado autónomo, evidencia completa y trazable, explica límites y riesgo residual; distingue lo probado de lo supuesto.</td></tr>
 </table></div>
@@ -213,7 +214,7 @@
   <tr><td>2. Confirmación y análisis</td><td>15%</td><td></td><td></td><td></td></tr>
   <tr><td>3. Mitigación y continuidad</td><td>25%</td><td></td><td></td><td></td></tr>
   <tr><td>4. Acceso no autorizado</td><td>15%</td><td></td><td></td><td></td></tr>
-  <tr><td>5. Oralidad y evidencia</td><td>25%</td><td></td><td></td><td></td></tr>
+  <tr><td>5. Oralidad, línea base y evidencia</td><td>25%</td><td></td><td></td><td></td></tr>
   <tr><td><b>Nota final (0,0–5,0)</b></td><td>100%</td><td colspan="3"><b>Suma de aportes = <span class="fill" style="min-width:90px"></span></b></td></tr>
 </table></div>
 <p class="small">Aporte = puntaje del criterio × peso. Ejemplo: 4,0 en C3 (25%) aporta 1,00. La suma de los cinco aportes es la nota final sobre 5,0. Sobre 100 puntos del examen: nota × 20.</p>
@@ -222,7 +223,7 @@
 <ul>
   <li><b>Se califica lo observado en el equipo</b>, no lo que el estudiante dice que hizo. Si la alerta no está en <code>eve.json</code> o el ruleset no está aplicado, no existe para la nota.</li>
   <li><b>La evidencia debe ser del laboratorio.</b> Capturas de Internet, alertas de otro compañero o salidas fabricadas invalidan el criterio completo.</li>
-  <li><b>Un “drop all” no es mitigación.</b> Si el servicio legítimo cae, el criterio 3 queda en Insuficiente, aunque el ataque se detenga.</li>
+  <li><b>Un “drop all” no es mitigación.</b> Si el cliente legítimo queda por debajo de 90 % de HTTP 200, C3 queda máximo en Aceptable; si cae por completo (0 %), C3 es Insuficiente, aunque el ataque se detenga.</li>
   <li><b>La ayuda del docente se registra.</b> Si el docente corrige la regla o dicta el comando, el criterio máximo es Aceptable.</li>
   <li><b>El tiempo no borra la evidencia.</b> Si se acaba la sesión, se califica lo que esté en el PDF y en el equipo; lo no entregado no se recupera después.</li>
   <li><b>Variante asignada.</b> Una solución de la variante contraria (p. ej. bloquear 22 cuando se asignó B/2222) no cuenta como logro del criterio.</li>
@@ -232,16 +233,16 @@
 <div class="tw"><table class="tight">
   <tr><th>Situación</th><th>Decisión</th></tr>
   <tr><td>El ataque no se lanzó por falla del entorno</td><td>No se penaliza. Se registra la contingencia y se evalúa con la repetición programada o con la evidencia de la línea base y las reglas.</td></tr>
-  <tr><td>El estudiante detecta pero no mitiga</td><td>C1 y C2 pueden ser Bueno/Excelente; C3 y C4 quedan en Insuficiente. La nota refleja el resultado real.</td></tr>
+  <tr><td>El estudiante detecta pero no mitiga</td><td>C1 y C2 pueden ser Bueno/Excelente; C3 Insuficiente; C4 máximo Aceptable si detectó el escaneo o el SSH sin bloquearlos. La nota refleja el resultado real.</td></tr>
   <tr><td>El estudiante mitiga copiando una regla sin entenderla</td><td>C3 puede ser Aceptable; C5 máximo Aceptable. Si no explica, no hay Excelente.</td></tr>
-  <tr><td>El cliente legítimo cae por la mitigación</td><td>C3 Insuficiente (≤ 2,4). No se compensa con las alertas.</td></tr>
+  <tr><td>El cliente legítimo cae por la mitigación</td><td>Por debajo de 90 % de HTTP 200: C3 máximo Aceptable; 0 %: C3 Insuficiente (≤ 2,4). No se compensa con las alertas.</td></tr>
   <tr><td>Evidencia inventada o editada</td><td>El criterio afectado se califica 0,0 y se documenta. Si afecta varios, se aplica el reglamento de fraude académico.</td></tr>
   <tr><td>Nota final con decimales</td><td>Se aproxima a una décima. 3,45 → 3,5; 3,44 → 3,4.</td></tr>
 </table></div>
-<div class="ok"><b>Umbral de aprobación del corte:</b> la nota del examen se pondera al 70%. Un 3,0 en el examen aporta 2,10 al corte. El proyecto (20%) y los laboratorios (10%) se suman aparte; no hay compensación entre evaluaciones.</div>
+<div class="ok"><b>Peso en el corte:</b> la nota del examen se pondera al 70%. Un 3,0 en el examen aporta 2,10 al corte. El proyecto (20%) y los laboratorios (10%) se suman aparte: nota del corte = 0,7 × parcial + 0,2 × proyecto + 0,1 × laboratorios.</div>
 
 <footer>
-  Seguridad en Redes · Universidad de la Costa (CUC) · Periodo 2026-2 · Parcial 3 · Rúbrica del docente · Documento interno
+  Seguridad en Redes · Universidad de la Costa (CUC) · Periodo 2026-2 · Parcial 3 · Rúbrica de evaluación · Documento público
 </footer>
 </main>
 </div>

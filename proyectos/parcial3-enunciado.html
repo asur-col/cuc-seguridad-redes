@@ -75,6 +75,7 @@
     @page{size:letter;margin:16mm}
     body{background:#fff;color:#000;font-size:10.5pt}
     .no-print{display:none!important}
+    tr{break-inside:avoid} thead{display:table-header-group}
     header.top{margin:0 0 12pt;padding:0 0 10pt;border-bottom:2px solid #000;background:#fff}
     header.top img{height:44pt}
     header.top h1{color:#000;font-size:20pt}
@@ -117,7 +118,7 @@
 <h2 id="s1"><span class="n">1</span> Qué se evalúa</h2>
 <p>Que puedas operar el ciclo básico de defensa sobre un entorno que ya conoces: <b>medir una línea base, detectar con Suricata, confirmar con logs y tráfico, mitigar con nftables, verificar que el servicio legítimo sigue funcionando y explicar por qué cada decisión es correcta</b>. No se evalúa memorizar comandos: se evalúa que los uses con criterio y que sepas qué evidencia produce cada uno.</p>
 <p><b>Resultados observables:</b> al final de la sesión debes poder mostrar (1) una alerta de Suricata con su <code>sid</code> y hora; (2) una captura o salida que confirme el ataque; (3) un ruleset de nftables que limite el ataque sin bloquear al cliente legítimo; (4) una prueba de que el cliente legítimo recibió HTTP 200 durante el ataque; (5) una detección y contención del escaneo/intento SSH; (6) una explicación oral de 5 minutos.</p>
-<p class="small">Este examen es el <b>70% del corte</b>. El 20% es el proyecto de aula del sábado 28 de noviembre y el 10% son los laboratorios de la unidad. No hay compensación entre evaluaciones.</p>
+<p class="small">Este examen es el <b>70% del corte</b>. El 20% es el proyecto de aula del sábado 28 de noviembre y el 10% son los laboratorios de la unidad. Cada componente se califica por separado: nota del corte = 0,7 × parcial + 0,2 × proyecto + 0,1 × laboratorios.</p>
 
 <h2 id="s2"><span class="n">2</span> Escenario</h2>
 <p><b>VitalIA</b>, el asistente de atención de SaludVital, está en piloto. La clínica reporta lentitud en el servicio web interno y, en paralelo, el monitoreo ve actividad sospechosa desde la red de clientes. Tú eres el analista de guardia. El docente lanzará los ataques; tú no los ejecutas. Tu trabajo es detectar, confirmar, contener y explicar.</p>
@@ -127,7 +128,7 @@
   <tr><td>Servidor víctima</td><td><code>web</code> — nginx en <code>10.30.0.10:80</code>; endpoint de salud <code>/health</code>.</td></tr>
   <tr><td>Cliente legítimo</td><td><code>cliente</code> — <code>10.20.10.21</code>; hace una petición HTTP por segundo a <code>/health</code> y registra el código de respuesta.</td></tr>
   <tr><td>Router / firewall</td><td><code>fw</code> — <code>10.20.10.2</code> (clientes) y <code>10.30.0.2</code> (servidores); nftables.</td></tr>
-  <tr><td>Sensor</td><td><code>ids</code> — Suricata en modo IDS, comparte el namespace de red de <code>fw</code> y observa el tráfico por <code>eth1</code>.</td></tr>
+  <tr><td>Sensor</td><td><code>ids</code> — Suricata en modo IDS, comparte el namespace de red de <code>fw</code> y observa el tráfico por <code>eth0</code> (lado de los clientes).</td></tr>
   <tr><td>Generador</td><td><code>generador</code> — reproduce capturas pregrabadas de SYN flood / HTTP flood contra <code>10.30.0.10</code>, solo dentro del lab.</td></tr>
   <tr><td>Amenaza 1</td><td>DoS contra <code>10.30.0.10:80</code>: SYN flood o HTTP flood, según la variante asignada.</td></tr>
   <tr><td>Amenaza 2</td><td>Escaneo dirigido de puertos y intento de conexión SSH desde la red de clientes. En el Lab 6 no hay SSH publicado: el intento se evidencia como SYN a 22 (variante A) o 2222 (variante B).</td></tr>
@@ -143,6 +144,7 @@
   <li><b>Todo ocurre dentro del laboratorio.</b> No se escanea ni se ataca la red de la CUC, Internet ni sistemas de terceros. El generador solo reproduce tráfico contra <code>10.30.0.10</code>.</li>
   <li><b>No reinicies ni borres el laboratorio</b> sin avisar al docente. Si algo se rompe, se documenta y se recupera con el docente; no se improvisa un ataque externo.</li>
   <li><b>El ataque lo lanza el docente</b> en el momento indicado. Tú puedes repetir la verificación, pero no lanzar ataques por tu cuenta.</li>
+  <li><b>La ayuda del docente se registra.</b> Si el docente corrige tu regla o te dicta un comando, ese criterio queda con nota máxima Aceptable.</li>
   <li><b>Tiempo estricto:</b> 120 minutos. El cronograma de la sección 4 es una guía; el docente avisa a los 30, 60 y 90 minutos.</li>
   <li><b>Evidencia honesta:</b> no inventes salidas, no edites capturas y no presentes una alerta que no ocurrió. Un resultado inventado invalida el criterio.</li>
 </ul>
@@ -155,14 +157,14 @@
   <tr><td>3</td><td><b>Confirmación con logs y tráfico</b></td><td>15 min</td><td>Evidencia de <code>tcpdump</code>, <code>ss</code> y log de nginx; explicación de por qué es ataque y no tráfico normal.</td><td>15</td></tr>
   <tr><td>4</td><td><b>Mitigación con nftables</b></td><td>25 min</td><td>Reglas de tasa por IP, conexiones simultáneas y set dinámico; ataque contenido; cliente legítimo con HTTP 200.</td><td>25</td></tr>
   <tr><td>5</td><td><b>Acceso no autorizado</b></td><td>20 min</td><td>Detección del escaneo y del intento SSH; bloqueo en el firewall; evidencia de que el HTTP legítimo no se afectó.</td><td>15</td></tr>
-  <tr><td>6</td><td><b>Verificación final y evidencia</b></td><td>10 min</td><td>Ruleset final, contadores, prueba de continuidad y carpeta de evidencia ordenada.</td><td>5</td></tr>
-  <tr><td>7</td><td><b>Explicación oral</b></td><td>20 min</td><td>5 minutos por estudiante: decisiones, umbrales, errores y qué harías distinto.</td><td>10</td></tr>
+  <tr><td>6</td><td><b>Verificación final y evidencia</b></td><td>10 min</td><td>Ruleset final, contadores, prueba de continuidad y PDF de evidencia ordenado (sección 5).</td><td>5</td></tr>
+  <tr><td>7</td><td><b>Explicación oral</b></td><td>5 min c/u</td><td>Por turnos mientras los demás trabajan (o en la sesión siguiente si no alcanza): decisiones, umbrales, errores y qué harías distinto.</td><td>10</td></tr>
   <tr><td colspan="3"><b>Total</b></td><td></td><td><b>100</b></td></tr>
 </table></div>
 
 <h3>4.1 · Tarea 1 — Línea base (10 puntos)</h3>
 <ul>
-  <li>Ejecuta <code>./lab base 30</code> y registra <code>pps</code>, <code>SYN-RECV</code> y <code>origenes</code>. No lances ataques durante la medición.</li>
+  <li>Ejecuta <code>./lab base 30</code> y registra <code>pps</code>, <code>SYN-RECV</code> y orígenes (<code>origenes</code>). No lances ataques durante la medición.</li>
   <li>Comprueba el cliente legítimo con <code>curl -s -o /dev/null -w '%{http_code}\n' http://10.30.0.10/health</code> desde <code>cliente</code>.</li>
   <li>Guarda la salida en <code>evidencia/linea-base.txt</code> (el comando ya la escribe) y anota la hora.</li>
   <li><b>Se evalúa:</b> que la línea base sea coherente con el tráfico normal y que sepas explicar por qué un pps alto no siempre es ataque.</li>
@@ -172,6 +174,7 @@
 <ul>
   <li>Escribe al menos una regla de Suricata para el vector asignado (SYN o HTTP) con <b>umbral por origen</b> (<code>threshold</code> o <code>detection_filter</code>).</li>
   <li>Aplica con <code>./lab recargar</code> y confirma que Suricata está leyendo <code>reglas/lab.rules</code>.</li>
+  <li><b>Ojo:</b> cada <code>./lab recargar</code> reinicia Suricata y vacía <code>eve.json</code>. Antes de reiniciar, el lab guarda las alertas previas en <code>evidencia/alertas-HHMMSS.json</code>: úsalas como evidencia de esta tarea.</li>
   <li>Cuando el docente lance el ataque, muestra la alerta en <code>/var/log/suricata/eve.json</code>: <code>event_type</code>, <code>alert.signature</code>, <code>alert.signature_id</code>, <code>src_ip</code>, <code>dest_ip</code>, <code>dest_port</code> y <code>timestamp</code>.</li>
   <li><b>Se evalúa:</b> que la regla dispare con el ataque, que el umbral sea razonable y que no confundas “hay alerta” con “el ataque está mitigado”.</li>
 </ul>
@@ -179,7 +182,8 @@
 <h3>4.3 · Tarea 3 — Confirmación (15 puntos)</h3>
 <ul>
   <li>En <code>fw</code>: captura con <code>tcpdump</code> el tráfico del ataque y cuenta paquetes/orígenes; identifica la bandera dominante o el método HTTP.</li>
-  <li>En <code>web</code>: revisa <code>ss -tan state syn-recv</code> y/o el log de nginx (<code>/var/log/nginx/lab-access.log</code>).</li>
+  <li>En <code>web</code>: revisa <code>ss -tan state syn-recv</code> y, para contrastar, el log de nginx (<code>/var/log/nginx/lab-access.log</code>). El tráfico del ataque es una captura reproducida: puede no aparecer en el log de nginx, que muestra sobre todo al cliente legítimo. Explica qué prueba cada fuente.</li>
+  <li>Después de mitigar, espera ~1 minuto antes de volver a medir SYN-RECV: los sockets del ataque anterior tardan en expirar.</li>
   <li>Responde por escrito: ¿qué diferencia este tráfico del cliente legítimo? ¿Qué métrica se dispara? ¿Qué NO prueba tu evidencia?</li>
   <li><b>Se evalúa:</b> la calidad de la correlación, no la cantidad de capturas. Una captura sin hora, IP o contexto no cuenta.</li>
 </ul>
@@ -214,9 +218,10 @@
 <p>El docente hará 2–3 preguntas de la sección 7 a cada estudiante. No se evalúa que recites comandos: se evalúa que expliques <b>por qué</b> elegiste ese umbral, qué evidencia tienes, qué riesgo residual queda y qué harías distinto en un entorno real.</p>
 
 <h2 id="s5"><span class="n">5</span> Entregable</h2>
-<p>Al finalizar la sesión, sube a la tarea de Teams <b>«Parcial 3 — Evidencia»</b> un PDF de máximo <b>3 páginas</b> con:</p>
+<p>Al minuto 110 de la sesión, sube a la tarea de Teams <b>«Parcial 3 — Evidencia»</b> un PDF de máximo <b>3 páginas</b> con:</p>
 <ol>
   <li><b>Portada:</b> nombre, documento, variante asignada, fecha y hora.</li>
+  <li><b>Línea base:</b> salida de <code>evidencia/linea-base.txt</code> (pps, SYN-RECV, orígenes) y la petición legítima de referencia, con hora.</li>
   <li><b>Línea de tiempo:</b> qué ocurrió, cuándo, qué viste y qué hiciste (hora de cada comando relevante).</li>
   <li><b>Detección:</b> reglas de Suricata (texto) y evidencia de las alertas (captura o extracto con <code>sid</code>, hora, IP y puerto).</li>
   <li><b>Confirmación:</b> salidas de <code>tcpdump</code>, <code>ss</code> y nginx, con una frase que explique qué prueban y qué no.</li>
@@ -225,6 +230,7 @@
   <li><b>Riesgo residual y mejora:</b> qué queda expuesto y qué cambiarías con más tiempo.</li>
 </ol>
 <div class="warn"><b>No incluyas datos reales de pacientes.</b> En este examen no hay datos reales; si usas capturas, que sean del laboratorio. No inventes alertas ni salidas: el docente puede contrastar con el <code>eve.json</code> y con el ruleset del equipo.</div>
+<p class="small"><code>./lab evidencia</code> (tar.gz) es solo un respaldo opcional y <code>./lab check</code> es del Lab 6, no del parcial (5/6 o 4/6 es normal aquí): <b>el entregable es el PDF</b>.</p>
 <p class="small">Nombre del archivo: <code>Parcial3_Apellidos_Nombre.pdf</code>. La entrega cierra al terminar la sesión; el docente indicará la hora exacta en el aula.</p>
 
 <h2 id="s6"><span class="n">6</span> Criterios de aceptación (resumen)</h2>
@@ -234,7 +240,7 @@
   <tr><td><b>2. Confirmación y análisis</b></td><td>15%</td><td>Correlación de al menos dos fuentes (tráfico + log/métrica) y distinción entre ataque y tráfico legítimo.</td></tr>
   <tr><td><b>3. Mitigación y continuidad</b></td><td>25%</td><td>Reglas nftables efectivas, ataque contenido, cliente legítimo ≥ 90% HTTP 200, sin “drop all”.</td></tr>
   <tr><td><b>4. Acceso no autorizado</b></td><td>15%</td><td>Detección de escaneo + SSH, bloqueo, contador y servicio legítimo intacto.</td></tr>
-  <tr><td><b>5. Oralidad y evidencia</b></td><td>25%</td><td>Explicación clara, línea base interpretada, evidencia ordenada, límites de lo probado y riesgo residual.</td></tr>
+  <tr><td><b>5. Oralidad, línea base y evidencia</b></td><td>25%</td><td>Explicación clara, línea base interpretada, evidencia ordenada, límites de lo probado y riesgo residual.</td></tr>
 </table></div>
 <p>La rúbrica completa, con los cuatro niveles y la hoja de calificación, está en <a href="parcial3-rubrica.html">la rúbrica del Parcial 3</a>. El docente la usa en vivo; tú puedes consultarla antes del examen para saber qué se observa.</p>
 
