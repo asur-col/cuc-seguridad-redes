@@ -123,7 +123,7 @@
 <p><b>VitalIA</b>, el asistente de atención de SaludVital, está en piloto. La clínica reporta lentitud en el servicio web interno y, en paralelo, el monitoreo ve actividad sospechosa desde la red de clientes. Tú eres el analista de guardia. El docente lanzará los ataques; tú no los ejecutas. Tu trabajo es detectar, confirmar, contener y explicar.</p>
 <div class="tw"><table>
   <tr><th>Elemento</th><th>Detalle</th></tr>
-  <tr><td>Entorno</td><td>VM del aula con <code>asur-lab</code> y el Lab 6 instalado (<code>~/labs/lab06</code>). Redes Docker internas, sin Internet en tiempo de ejecución.</td></tr>
+  <tr><td>Entorno</td><td>VM del aula con <code>asur-lab</code> y el Lab 6 instalado (<code>~/labs/lab06</code>). Descarga la VM (OVA) desde <a href="https://drive.google.com/drive/folders/1Ozi7T9XvWjP2Yx8XAMb7k3648gcnGc-n" target="_blank" rel="noopener">la carpeta del curso en Google Drive</a> e impórtala en VirtualBox antes del examen. Redes Docker internas, sin Internet en tiempo de ejecución.</td></tr>
   <tr><td>Servidor víctima</td><td><code>web</code> — nginx en <code>10.30.0.10:80</code>; endpoint de salud <code>/health</code>.</td></tr>
   <tr><td>Cliente legítimo</td><td><code>cliente</code> — <code>10.20.10.21</code>; hace una petición HTTP por segundo a <code>/health</code> y registra el código de respuesta.</td></tr>
   <tr><td>Router / firewall</td><td><code>fw</code> — <code>10.20.10.2</code> (clientes) y <code>10.30.0.2</code> (servidores); nftables.</td></tr>
