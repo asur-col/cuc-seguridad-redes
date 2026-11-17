@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcial 3 — Enunciado del estudiante · Seguridad en Redes CUC</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  :root{
+    --bg:#FBF8F3; --surface:#FFFFFF; --surface-2:#F4EEE3;
+    --ink:#2A2A2A; --ink-soft:#6B6259;
+    --vino:#A6192E; --vino-strong:#7E1223; --vino-tint:#FBEBEC;
+    --dorado:#A9791C; --dorado-tint:#FBF3DE;
+    --line:#E5DCCB; --code-bg:#F1EADA; --code-ink:#4A4030;
+    --ok:#0E7A4B; --ok-tint:#E8F5EE;
+    --shadow:0 1px 3px rgba(42,26,20,.05),0 8px 24px rgba(42,26,20,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#181411; --surface:#221D18; --surface-2:#2B2520;
+      --ink:#EFE7D9; --ink-soft:#B3A896;
+      --vino:#E2536B; --vino-strong:#F0748A; --vino-tint:#3A1E22;
+      --dorado:#E4BC5C; --dorado-tint:#3B321C;
+      --line:#3D352A; --code-bg:#1F1914; --code-ink:#E4D9C3;
+      --ok:#5BD69E; --ok-tint:#1D3328;
+      --shadow:0 2px 4px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.5);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:15.5px;line-height:1.65}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif;text-wrap:balance}
+  .page{max-width:1000px;margin:0 auto;padding:0 22px 70px}
+  header.top{background:var(--surface);border-bottom:1px solid var(--line);padding:40px 28px 32px;text-align:center;margin:0 -22px 26px}
+  header.top img{height:64px;max-width:100%;margin:0 auto 16px;display:block}
+  .badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--vino);background:var(--vino-tint);padding:4px 14px;border-radius:999px;margin-bottom:14px}
+  header.top h1{color:var(--vino);font-size:clamp(24px,4vw,34px);line-height:1.2;margin:0 0 10px}
+  header.top .sub{color:var(--ink-soft);max-width:64ch;margin:0 auto 16px;font-size:16px}
+  .accent{width:160px;height:4px;margin:0 auto 18px;border-radius:2px;background:linear-gradient(90deg,var(--vino),var(--dorado))}
+  .meta{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px;font-size:13px;color:var(--ink-soft)}
+  .meta strong{color:var(--ink)}
+  main{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:30px 34px}
+  h2{font-size:22px;margin:30px 0 8px;color:var(--vino-strong);display:flex;align-items:center;gap:10px}
+  h2 .n{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--vino);color:#fff;border-radius:8px;padding:3px 10px;flex:none}
+  h3{font-size:16.5px;margin:22px 0 6px;color:var(--ink)}
+  p,li,td{overflow-wrap:break-word}
+  ul,ol{padding-left:24px} li{margin:5px 0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:14px 0}
+  th{text-align:left;background:var(--surface-2);padding:9px 11px;border:1px solid var(--line);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+  td{padding:8px 11px;border:1px solid var(--line);vertical-align:top}
+  .tw{overflow-x:auto}
+  code{font-family:'IBM Plex Mono',monospace;font-size:.9em;background:var(--code-bg);color:var(--code-ink);border:1px solid var(--line);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}
+  pre{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--code-bg);color:var(--code-ink);border:1px solid var(--line);border-radius:8px;padding:12px 15px;overflow-x:auto;line-height:1.55}
+  .note,.warn,.danger,.ok{border-left:4px solid;border-radius:8px;padding:12px 15px;margin:16px 0;font-size:14.5px}
+  .note{border-color:var(--dorado);background:var(--dorado-tint)}
+  .warn{border-color:#B23A3A;background:#FBE9E7}
+  .danger{border-color:var(--vino);background:var(--vino-tint)}
+  .ok{border-color:var(--ok);background:var(--ok-tint)}
+  .note::before{content:"NOTA — ";font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--dorado)}
+  .warn::before{content:"ATENCIÓN — ";font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#B23A3A}
+  .danger::before{content:"REGLA — ";font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--vino)}
+  .ok::before{content:"BIEN — ";font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--ok)}
+  .pill{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin:0 4px 4px 0;color:var(--ink-soft)}
+  .score{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--vino)}
+  .small{font-size:12.5px;color:var(--ink-soft)}
+  .toc{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);margin:8px 0 0}
+  .toc a{color:var(--vino);text-decoration:none;border-bottom:1px dotted var(--vino)}
+  footer{margin-top:26px;padding:18px 0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);border-top:1px solid var(--line)}
+  @media(max-width:560px){
+    main{padding:22px 16px}
+    header.top{padding:30px 16px 24px}
+    h2{font-size:19px;flex-wrap:wrap}
+  }
+  @media print{
+    @page{size:letter;margin:16mm}
+    body{background:#fff;color:#000;font-size:10.5pt}
+    .no-print{display:none!important}
+    header.top{margin:0 0 12pt;padding:0 0 10pt;border-bottom:2px solid #000;background:#fff}
+    header.top img{height:44pt}
+    header.top h1{color:#000;font-size:20pt}
+    .badge{color:#000;background:#fff;border:1px solid #000}
+    .accent{background:#000}
+    main{border:0;box-shadow:none;padding:0}
+    h2{color:#000;font-size:14pt;margin-top:16pt;page-break-after:avoid}
+    h2 .n{background:#000;color:#fff}
+    h3{color:#000;page-break-after:avoid}
+    table{font-size:9pt;page-break-inside:auto}
+    tr{page-break-inside:avoid}
+    .note,.warn,.danger,.ok{background:#fff;border-left:3px solid #000;page-break-inside:avoid}
+    .note::before,.warn::before,.danger::before,.ok::before{color:#000}
+    a{color:#000;text-decoration:none}
+    pre{background:#f4f4f4;color:#000;border:1px solid #999;white-space:pre-wrap}
+    code{background:#f4f4f4;color:#000;border:1px solid #bbb}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top">
+  <img src="../assets/logo-cuc.png" alt="Universidad de la Costa" onerror="this.style.display='none'">
+  <div class="badge">Parcial 3 · Examen práctico en vivo · 70% del corte</div>
+  <h1>Detección y mitigación de un ataque DoS y un intento de acceso no autorizado</h1>
+  <p class="sub">Trabajas sobre la VM del aula y el laboratorio 6. No hay receta: hay un ataque en curso, un servicio legítimo que debe seguir vivo y evidencia que tienes que producir.</p>
+  <div class="accent"></div>
+  <div class="meta">
+    <span><strong>Curso:</strong> Seguridad en Redes</span>
+    <span><strong>Docente:</strong> Ing. Rodolfo Cañas Cervantes</span>
+    <span><strong>Fecha:</strong> miércoles 18 de noviembre de 2026</span>
+    <span><strong>Duración:</strong> 120 minutos</span>
+    <span><strong>Modalidad:</strong> individual</span>
+  </div>
+</header>
+
+<main>
+<p class="toc no-print">Contenido: <a href="#s1">1. Qué se evalúa</a> · <a href="#s2">2. Escenario</a> · <a href="#s3">3. Reglas</a> · <a href="#s4">4. Tareas y tiempos</a> · <a href="#s5">5. Entregable</a> · <a href="#s6">6. Criterios</a> · <a href="#s7">7. Preguntas orales</a> · <a href="#s8">8. Si algo falla</a></p>
+
+<h2 id="s1"><span class="n">1</span> Qué se evalúa</h2>
+<p>Que puedas operar el ciclo básico de defensa sobre un entorno que ya conoces: <b>medir una línea base, detectar con Suricata, confirmar con logs y tráfico, mitigar con nftables, verificar que el servicio legítimo sigue funcionando y explicar por qué cada decisión es correcta</b>. No se evalúa memorizar comandos: se evalúa que los uses con criterio y que sepas qué evidencia produce cada uno.</p>
+<p><b>Resultados observables:</b> al final de la sesión debes poder mostrar (1) una alerta de Suricata con su <code>sid</code> y hora; (2) una captura o salida que confirme el ataque; (3) un ruleset de nftables que limite el ataque sin bloquear al cliente legítimo; (4) una prueba de que el cliente legítimo recibió HTTP 200 durante el ataque; (5) una detección y contención del escaneo/intento SSH; (6) una explicación oral de 5 minutos.</p>
+<p class="small">Este examen es el <b>70% del corte</b>. El 20% es el proyecto de aula del sábado 28 de noviembre y el 10% son los laboratorios de la unidad. No hay compensación entre evaluaciones.</p>
+
+<h2 id="s2"><span class="n">2</span> Escenario</h2>
+<p><b>VitalIA</b>, el asistente de atención de SaludVital, está en piloto. La clínica reporta lentitud en el servicio web interno y, en paralelo, el monitoreo ve actividad sospechosa desde la red de clientes. Tú eres el analista de guardia. El docente lanzará los ataques; tú no los ejecutas. Tu trabajo es detectar, confirmar, contener y explicar.</p>
+<div class="tw"><table>
+  <tr><th>Elemento</th><th>Detalle</th></tr>
+  <tr><td>Entorno</td><td>VM del aula con <code>asur-lab</code> y el Lab 6 instalado (<code>~/labs/lab06</code>). Redes Docker internas, sin Internet en tiempo de ejecución.</td></tr>
+  <tr><td>Servidor víctima</td><td><code>web</code> — nginx en <code>10.30.0.10:80</code>; endpoint de salud <code>/health</code>.</td></tr>
+  <tr><td>Cliente legítimo</td><td><code>cliente</code> — <code>10.20.10.21</code>; hace una petición HTTP por segundo a <code>/health</code> y registra el código de respuesta.</td></tr>
+  <tr><td>Router / firewall</td><td><code>fw</code> — <code>10.20.10.2</code> (clientes) y <code>10.30.0.2</code> (servidores); nftables.</td></tr>
+  <tr><td>Sensor</td><td><code>ids</code> — Suricata en modo IDS, comparte el namespace de red de <code>fw</code> y observa el tráfico por <code>eth1</code>.</td></tr>
+  <tr><td>Generador</td><td><code>generador</code> — reproduce capturas pregrabadas de SYN flood / HTTP flood contra <code>10.30.0.10</code>, solo dentro del lab.</td></tr>
+  <tr><td>Amenaza 1</td><td>DoS contra <code>10.30.0.10:80</code>: SYN flood o HTTP flood, según la variante asignada.</td></tr>
+  <tr><td>Amenaza 2</td><td>Escaneo dirigido de puertos y intento de conexión SSH desde la red de clientes. En el Lab 6 no hay SSH publicado: el intento se evidencia como SYN a 22 (variante A) o 2222 (variante B).</td></tr>
+</table></div>
+<div class="note"><b>No confundas “no hay servicio SSH” con “no hay incidente”.</b> El intento de acceso no autorizado se detecta por el tráfico y por la alerta, aunque el puerto esté cerrado. La ausencia de un banner SSH no es la ausencia de un ataque.</div>
+
+<p class="warn"><strong>Antes de empezar:</strong> si hiciste el lab B3, borra sus redes con <code>docker network rm b3_interna b3_lan</code>; si no, <code>./lab up</code> del Lab 6 fallará con «Pool overlaps».</p>
+
+<h2 id="s3"><span class="n">3</span> Reglas del examen</h2>
+<ul>
+  <li><b>Individual.</b> No se permite trabajo en equipo ni compartir reglas, capturas o respuestas entre compañeros. El docente asigna variante A o B de forma alternada.</li>
+  <li><b>Sin asistentes de IA</b> durante el examen. Puedes usar la documentación del curso, <code>man</code>, <code>--help</code> y tus apuntes. La oralidad y la observación directa son parte de la evaluación.</li>
+  <li><b>Todo ocurre dentro del laboratorio.</b> No se escanea ni se ataca la red de la CUC, Internet ni sistemas de terceros. El generador solo reproduce tráfico contra <code>10.30.0.10</code>.</li>
+  <li><b>No reinicies ni borres el laboratorio</b> sin avisar al docente. Si algo se rompe, se documenta y se recupera con el docente; no se improvisa un ataque externo.</li>
+  <li><b>El ataque lo lanza el docente</b> en el momento indicado. Tú puedes repetir la verificación, pero no lanzar ataques por tu cuenta.</li>
+  <li><b>Tiempo estricto:</b> 120 minutos. El cronograma de la sección 4 es una guía; el docente avisa a los 30, 60 y 90 minutos.</li>
+  <li><b>Evidencia honesta:</b> no inventes salidas, no edites capturas y no presentes una alerta que no ocurrió. Un resultado inventado invalida el criterio.</li>
+</ul>
+
+<h2 id="s4"><span class="n">4</span> Tareas, tiempos y puntaje</h2>
+<div class="tw"><table>
+  <tr><th>#</th><th>Tarea</th><th>Tiempo</th><th>Qué debes producir</th><th>Puntos</th></tr>
+  <tr><td>1</td><td><b>Línea base</b></td><td>10 min</td><td>pps, SYN-RECV, orígenes y una petición legítima de referencia antes del ataque.</td><td>10</td></tr>
+  <tr><td>2</td><td><b>Detección del DoS con Suricata</b></td><td>20 min</td><td>Regla(s) con umbral por origen, recarga del sensor y alerta en <code>eve.json</code> con <code>sid</code>, hora y origen.</td><td>20</td></tr>
+  <tr><td>3</td><td><b>Confirmación con logs y tráfico</b></td><td>15 min</td><td>Evidencia de <code>tcpdump</code>, <code>ss</code> y log de nginx; explicación de por qué es ataque y no tráfico normal.</td><td>15</td></tr>
+  <tr><td>4</td><td><b>Mitigación con nftables</b></td><td>25 min</td><td>Reglas de tasa por IP, conexiones simultáneas y set dinámico; ataque contenido; cliente legítimo con HTTP 200.</td><td>25</td></tr>
+  <tr><td>5</td><td><b>Acceso no autorizado</b></td><td>20 min</td><td>Detección del escaneo y del intento SSH; bloqueo en el firewall; evidencia de que el HTTP legítimo no se afectó.</td><td>15</td></tr>
+  <tr><td>6</td><td><b>Verificación final y evidencia</b></td><td>10 min</td><td>Ruleset final, contadores, prueba de continuidad y carpeta de evidencia ordenada.</td><td>5</td></tr>
+  <tr><td>7</td><td><b>Explicación oral</b></td><td>20 min</td><td>5 minutos por estudiante: decisiones, umbrales, errores y qué harías distinto.</td><td>10</td></tr>
+  <tr><td colspan="3"><b>Total</b></td><td></td><td><b>100</b></td></tr>
+</table></div>
+
+<h3>4.1 · Tarea 1 — Línea base (10 puntos)</h3>
+<ul>
+  <li>Ejecuta <code>./lab base 30</code> y registra <code>pps</code>, <code>SYN-RECV</code> y <code>origenes</code>. No lances ataques durante la medición.</li>
+  <li>Comprueba el cliente legítimo con <code>curl -s -o /dev/null -w '%{http_code}\n' http://10.30.0.10/health</code> desde <code>cliente</code>.</li>
+  <li>Guarda la salida en <code>evidencia/linea-base.txt</code> (el comando ya la escribe) y anota la hora.</li>
+  <li><b>Se evalúa:</b> que la línea base sea coherente con el tráfico normal y que sepas explicar por qué un pps alto no siempre es ataque.</li>
+</ul>
+
+<h3>4.2 · Tarea 2 — Detección del DoS (20 puntos)</h3>
+<ul>
+  <li>Escribe al menos una regla de Suricata para el vector asignado (SYN o HTTP) con <b>umbral por origen</b> (<code>threshold</code> o <code>detection_filter</code>).</li>
+  <li>Aplica con <code>./lab recargar</code> y confirma que Suricata está leyendo <code>reglas/lab.rules</code>.</li>
+  <li>Cuando el docente lance el ataque, muestra la alerta en <code>/var/log/suricata/eve.json</code>: <code>event_type</code>, <code>alert.signature</code>, <code>alert.signature_id</code>, <code>src_ip</code>, <code>dest_ip</code>, <code>dest_port</code> y <code>timestamp</code>.</li>
+  <li><b>Se evalúa:</b> que la regla dispare con el ataque, que el umbral sea razonable y que no confundas “hay alerta” con “el ataque está mitigado”.</li>
+</ul>
+
+<h3>4.3 · Tarea 3 — Confirmación (15 puntos)</h3>
+<ul>
+  <li>En <code>fw</code>: captura con <code>tcpdump</code> el tráfico del ataque y cuenta paquetes/orígenes; identifica la bandera dominante o el método HTTP.</li>
+  <li>En <code>web</code>: revisa <code>ss -tan state syn-recv</code> y/o el log de nginx (<code>/var/log/nginx/lab-access.log</code>).</li>
+  <li>Responde por escrito: ¿qué diferencia este tráfico del cliente legítimo? ¿Qué métrica se dispara? ¿Qué NO prueba tu evidencia?</li>
+  <li><b>Se evalúa:</b> la calidad de la correlación, no la cantidad de capturas. Una captura sin hora, IP o contexto no cuenta.</li>
+</ul>
+
+<h3>4.4 · Tarea 4 — Mitigación (25 puntos)</h3>
+<ul>
+  <li>Edita <code>reglas/nftables.fw</code> y aplica con <code>./lab recargar</code>. Debes incluir, como mínimo: <b>límite de tasa por IP de origen</b> para el vector, <b>límite de conexiones simultáneas</b> y una regla que no corte al cliente legítimo.</li>
+  <li>Muestra <code>nft list ruleset</code> y los contadores de las reglas que descartan tráfico.</li>
+  <li>Repite el ataque (lo lanza el docente) y demuestra que el cliente legítimo sigue recibiendo HTTP 200 (≥ 90% de intentos en la ventana).</li>
+  <li>Explica el efecto de <code>limit rate over</code> y qué pasaría si quitaras <code>over</code>.</li>
+  <li><b>Se evalúa:</b> que el ataque quede contenido y que la mitigación no sea un “drop all”. Si el cliente legítimo cae, la tarea no está lograda.</li>
+</ul>
+
+<h3>4.5 · Tarea 5 — Acceso no autorizado (15 puntos)</h3>
+<ul>
+  <li>Escribe al menos una regla de Suricata para el <b>escaneo dirigido</b> y otra para el <b>intento SSH</b> en el puerto de tu variante.</li>
+  <li>Cuando el docente ejecute el escaneo y el intento, muestra las alertas y explica por qué el puerto cerrado no elimina el incidente.</li>
+  <li>Bloquea en nftables el acceso no autorizado (nuevas conexiones al puerto SSH y puertos no publicados) sin afectar el HTTP legítimo.</li>
+  <li>Muestra el contador de la regla de bloqueo y una prueba de que el cliente sigue recibiendo 200.</li>
+  <li><b>Se evalúa:</b> detección + contención + no afectar el servicio; no basta con “cerré todo”.</li>
+</ul>
+
+<h3>4.6 · Tarea 6 — Verificación y evidencia (5 puntos)</h3>
+<ul>
+  <li>Deja el ruleset final aplicado y ordenado; muestra <code>nft list ruleset</code> completo.</li>
+  <li>Verifica que el cliente legítimo sigue funcionando después de la mitigación.</li>
+  <li>Organiza la evidencia: línea base, alertas, capturas, ruleset, prueba de continuidad y una línea de tiempo.</li>
+  <li>Entrega el informe de incidente (sección 5) antes de terminar la sesión.</li>
+</ul>
+
+<h3>4.7 · Tarea 7 — Explicación oral (10 puntos)</h3>
+<p>El docente hará 2–3 preguntas de la sección 7 a cada estudiante. No se evalúa que recites comandos: se evalúa que expliques <b>por qué</b> elegiste ese umbral, qué evidencia tienes, qué riesgo residual queda y qué harías distinto en un entorno real.</p>
+
+<h2 id="s5"><span class="n">5</span> Entregable</h2>
+<p>Al finalizar la sesión, sube a la tarea de Teams <b>«Parcial 3 — Evidencia»</b> un PDF de máximo <b>3 páginas</b> con:</p>
+<ol>
+  <li><b>Portada:</b> nombre, documento, variante asignada, fecha y hora.</li>
+  <li><b>Línea de tiempo:</b> qué ocurrió, cuándo, qué viste y qué hiciste (hora de cada comando relevante).</li>
+  <li><b>Detección:</b> reglas de Suricata (texto) y evidencia de las alertas (captura o extracto con <code>sid</code>, hora, IP y puerto).</li>
+  <li><b>Confirmación:</b> salidas de <code>tcpdump</code>, <code>ss</code> y nginx, con una frase que explique qué prueban y qué no.</li>
+  <li><b>Mitigación:</b> reglas de nftables, <code>nft list ruleset</code> y contadores; prueba de que el cliente legítimo siguió en HTTP 200.</li>
+  <li><b>Acceso no autorizado:</b> alertas del escaneo/SSH, regla de bloqueo y evidencia de contención.</li>
+  <li><b>Riesgo residual y mejora:</b> qué queda expuesto y qué cambiarías con más tiempo.</li>
+</ol>
+<div class="warn"><b>No incluyas datos reales de pacientes.</b> En este examen no hay datos reales; si usas capturas, que sean del laboratorio. No inventes alertas ni salidas: el docente puede contrastar con el <code>eve.json</code> y con el ruleset del equipo.</div>
+<p class="small">Nombre del archivo: <code>Parcial3_Apellidos_Nombre.pdf</code>. La entrega cierra al terminar la sesión; el docente indicará la hora exacta en el aula.</p>
+
+<h2 id="s6"><span class="n">6</span> Criterios de aceptación (resumen)</h2>
+<div class="tw"><table>
+  <tr><th>Criterio</th><th>Peso</th><th>Qué debe verse</th></tr>
+  <tr><td><b>1. Detección del DoS</b></td><td>20%</td><td>Regla con umbral por origen, alerta real, <code>sid</code> y explicación de por qué dispara.</td></tr>
+  <tr><td><b>2. Confirmación y análisis</b></td><td>15%</td><td>Correlación de al menos dos fuentes (tráfico + log/métrica) y distinción entre ataque y tráfico legítimo.</td></tr>
+  <tr><td><b>3. Mitigación y continuidad</b></td><td>25%</td><td>Reglas nftables efectivas, ataque contenido, cliente legítimo ≥ 90% HTTP 200, sin “drop all”.</td></tr>
+  <tr><td><b>4. Acceso no autorizado</b></td><td>15%</td><td>Detección de escaneo + SSH, bloqueo, contador y servicio legítimo intacto.</td></tr>
+  <tr><td><b>5. Oralidad y evidencia</b></td><td>25%</td><td>Explicación clara, línea base interpretada, evidencia ordenada, límites de lo probado y riesgo residual.</td></tr>
+</table></div>
+<p>La rúbrica completa, con los cuatro niveles y la hoja de calificación, está en <a href="parcial3-rubrica.html">la rúbrica del Parcial 3</a>. El docente la usa en vivo; tú puedes consultarla antes del examen para saber qué se observa.</p>
+
+<h2 id="s7"><span class="n">7</span> Preguntas orales (banco)</h2>
+<p>El docente elegirá 2–3. No hay respuestas “de memoria”: se espera que las conectes con tu evidencia.</p>
+<ol>
+  <li>¿Por qué usaste <code>limit rate over</code> y no <code>limit rate</code>? ¿Qué le pasa al cliente legítimo si te equivocas?</li>
+  <li>¿Qué diferencia hay entre una alerta de Suricata y una mitigación? ¿Puede existir una sin la otra?</li>
+  <li>¿Qué métrica te dice que el servidor está sufriendo un SYN flood: pps, SYN-RECV, conexiones establecidas o latencia? ¿Por qué?</li>
+  <li>¿Por qué un umbral fijo puede ser peligroso en producción? ¿Cómo lo ajustarías con la línea base?</li>
+  <li>¿Qué aporta un set dinámico con <code>timeout</code> frente a un <code>drop</code> estático?</li>
+  <li>Si el atacante falsifica direcciones de origen, ¿qué pasa con tu límite por IP? ¿Qué alternativa existe?</li>
+  <li>¿Por qué bloqueas el intento SSH si el puerto 22 está cerrado? ¿No sería suficiente con que no haya servicio?</li>
+  <li>¿Cómo demuestras que el cliente legítimo no se cayó? ¿Qué evidencia aceptarías y cuál no?</li>
+  <li>¿Qué parte de tu evidencia no prueba lo que afirmas? Sé específico.</li>
+  <li>¿Qué harías distinto si el ataque fuera volumétrico y saturara el enlace antes de llegar al firewall?</li>
+  <li>¿Qué regla implementarías primero en producción y por qué?</li>
+  <li>¿Qué riesgo residual queda después de tu mitigación?</li>
+</ol>
+
+<h2 id="s8"><span class="n">8</span> Si algo falla</h2>
+<div class="tw"><table>
+  <tr><th>Qué ves</th><th>Qué hacer</th></tr>
+  <tr><td><code>./lab up</code> falla con «Pool overlaps with other one on this address space»</td><td>Quedaron creadas las redes del lab B3, que usan la misma red del servidor. Antes de empezar, ejecuta en la VM:<br><code>docker network rm b3_interna b3_lan</code><br>y luego <code>cd ~/labs/lab06 &amp;&amp; ./lab up</code>. No pierde nada: solo borra las redes vacías del B3.</td></tr>
+  <tr><td>El lab no está arriba o un contenedor no responde</td><td>Avisa al docente. No ejecutes <code>./lab down</code> ni borres carpetas. Se revisa con <code>./lab estado</code>.</td></tr>
+  <tr><td>Suricata no alerta</td><td>Revisa que la regla tenga <code>sid</code> único, umbral y que hayas ejecutado <code>./lab recargar</code>. Verifica la ruta <code>/lab06/reglas/lab.rules</code> y el log <code>/var/log/suricata/suricata.log</code>.</td></tr>
+  <tr><td>El ataque llega completo al servidor</td><td>Revisa que la regla de nftables esté en la cadena <code>forward</code> y que el ruleset se haya aplicado; muestra <code>nft list ruleset</code>.</td></tr>
+  <tr><td>El cliente legítimo cae</td><td>Tus reglas son demasiado estrictas. Revisa <code>over</code>, el umbral y si estás descartando tráfico establecido. Relaja y vuelve a probar.</td></tr>
+  <tr><td>No puedes entrar al contenedor</td><td>Usa <code>./lab shell &lt;nodo&gt;</code> desde la carpeta del lab. No uses Docker directamente si no es necesario.</td></tr>
+  <tr><td>Se acaba el tiempo</td><td>Prioriza: una mitigación que funciona y una explicación honesta valen más que cinco reglas a medias. Entrega lo que tengas con la línea de tiempo.</td></tr>
+</table></div>
+
+<div class="ok"><b>La regla más importante:</b> el objetivo no es “que el ataque desaparezca”, es <b>demostrar que tu defensa contiene el ataque y que el paciente legítimo sigue siendo atendido</b>. Un firewall que bloquea todo también “detiene” el ataque; no es una defensa, es una segunda caída.</div>
+
+<footer>
+  Seguridad en Redes · Universidad de la Costa (CUC) · Periodo 2026-2 · Parcial 3 · Examen práctico en vivo · Documento del estudiante
+</footer>
+</main>
+</div>
+</body>
+</html>
