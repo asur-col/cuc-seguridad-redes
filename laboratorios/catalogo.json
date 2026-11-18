@@ -113,10 +113,10 @@
   {
     "id": "rubrica-c3",
     "titulo": "Rúbrica Corte 3 — Detección y mitigación de DoS (20 %)",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "estado": "activo",
     "url_paquete": "/laboratorios/lab-rubrica-c3/paquete/paquete.tar.gz",
-    "sha256": "0b8a76374b0ea2e49ae184bbd72bc2fd9ce84ffaa39aab88669cd18b1569f200",
+    "sha256": "561c6e88cb499071f823f9b94e68a9a20c984d5687d9f80615e9628633f99594",
     "partes": [],
     "partes_sha256": [],
     "ram_mb": 600,

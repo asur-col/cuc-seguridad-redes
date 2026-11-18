@@ -57,7 +57,7 @@ echo A > ~/labs/rubrica-c3/variante    # par = A, impar = B
 # 4. Capturar confirmación del ataque en fw (genera evidencia/confirmacion.txt)
 #    Lanza el ataque de tu variante y captura simultáneamente con tcpdump:
 ./lab ataque syn    # (o: ./lab ataque http  si eres variante B)
-docker exec rubrica-c3-fw timeout 8 tcpdump -nn -i eth0 -c 50 'tcp port 80' > evidencia/confirmacion.txt
+docker exec rubrica-c3-fw timeout 8 tcpdump -nn -i any -c 50 'tcp port 80' > evidencia/confirmacion.txt
 
 # 5. Editar tus reglas de mitigación
 nano reglas/nftables.fw   # nftables: limit rate over, ct count over
