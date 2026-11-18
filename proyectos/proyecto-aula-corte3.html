@@ -87,7 +87,7 @@
   <h2><span class="paso">1</span> Entorno y descarga de la VM</h2>
   <p>Descarga la máquina virtual del curso desde:</p>
   <p><a class="ext" href="https://drive.google.com/drive/folders/1Ozi7T9XvWjP2Yx8XAMb7k3648gcnGc-n" target="_blank">https://drive.google.com/drive/folders/1Ozi7T9XvWjP2Yx8XAMb7k3648gcnGc-n</a></p>
-  <p>Acceso a la VM: <code>ssh -i ~/.ssh/id_ed25519_vm_seguridad cuc@172.10.20.162</code> (Ubuntu <code>ubuntu-s12</code>). Usa <code>timeout</code> en cada ssh.</p>
+  <p>Acceso a la VM: desde la consola de VirtualBox o por SSH desde tu equipo con <code>ssh cuc@IP_DE_TU_VM</code>. La IP la ves en la consola de la VM con <code>ip -4 a</code>.</p>
   <p>El cliente de laboratorios se instala una sola vez en la VM:</p>
   <pre>ASUR_LAB_URL=http://127.0.0.1:8088 bash instalar-asur-lab.sh</pre>
   <p>Hoy usa el catálogo local <code>~/catalogo-2027-1</code> (servicio <code>asur-catalogo</code>).</p>
@@ -171,7 +171,11 @@ nano reglas/lab.rules     # Suricata: threshold track by_src + tu sid
     <li><code>evidencia.tar.gz</code> — generado con <code>./lab evidencia</code>.</li>
     <li><code>evidencia/resultado-rubrica.txt</code> — firmado por el check (sha256 de evidencia + variante + hash del documento).</li>
   </ul>
-  <p>Entrega ambos archivos por Teams en la tarea «Rúbrica Corte 3» antes del <b>sábado 28 de noviembre de 2026, 23:59</b>.</p>
+  <p><b>Cómo bajar los archivos de la VM a tu equipo (scp).</b> En la VM, corre <code>./lab check</code> y luego <code>./lab evidencia</code>. Mira la IP de la VM con <code>ip -4 a</code>. Después, en una terminal de <b>tu equipo</b> (PowerShell en Windows, Terminal en macOS/Linux), no en la VM:</p>
+  <pre>scp cuc@IP_DE_TU_VM:labs/rubrica-c3/evidencia.tar.gz .
+scp cuc@IP_DE_TU_VM:labs/rubrica-c3/evidencia/resultado-rubrica.txt .</pre>
+  <p>Usa la misma clave del usuario <code>cuc</code> de la VM. Los archivos quedan en la carpeta donde abriste la terminal. Si <code>evidencia.tar.gz</code> no aparece en esa ruta, búscalo en la VM con <code>ls ~/labs/rubrica-c3</code>.</p>
+  <p>Sube ambos archivos a la actividad «Rúbrica Corte 3» de Teams antes del <b>sábado 28 de noviembre de 2026, 23:59</b>. Puedes repetir el check y reenviar; cuenta el último resultado firmado.</p>
 </section>
 
 <footer>
