@@ -6,7 +6,7 @@ lista de {id, ok, mensaje, pista} y soporta --json vía run.py.
 El check lanza él mismo el ataque de la variante, mide continuidad y escanea;
 dura < 3 min y deja el lab como estaba.
 """
-import hashlib, os, re, time
+import hashlib, json, os, re, time
 from .base import falla, ok
 
 ID = "rubrica-c3"
@@ -23,6 +23,9 @@ CONFIRMACION = os.path.join(EVIDENCIA_DIR, "confirmacion.txt")
 EVIDENCIA_TGZ = os.path.join(EVIDENCIA_DIR, "..", "evidencia.tar.gz")
 RESULTADO = os.path.join(EVIDENCIA_DIR, "resultado-rubrica.txt")
 
+# Sal fija para control de integridad del archivo resultado-rubrica.txt
+SAL_CONTROL = "asur-cuc-segredes-2026-corte3-integ"
+
 # Contenedores del compose rubrica-c3 (nombre exacto de Docker).
 CONT = {
     "web": "rubrica-c3-web",
@@ -37,12 +40,14 @@ VARIANTES = {
     "A": {
         "ssh": 22,
         "ataque": "syn",
+        "atacante_ip": "10.20.10.71",
         "escaneo": [22, 443, 3306, 5432, 8080],
         "set": "bloqueados",
     },
     "B": {
         "ssh": 2222,
         "ataque": "http",
+        "atacante_ip": "10.20.10.91",
         "escaneo": [2222, 3306, 5432, 6379, 8080, 8443, 9000, 9200, 11211, 27017],
         "set": "escaneo",
     },
@@ -50,6 +55,45 @@ VARIANTES = {
 
 WEB_IP = "10.30.0.10"
 FW_IP = "10.20.10.2"
+
+
+def calcular_control(nota_str, variante, h_doc, sha_evidencia, fecha):
+    """Calcula sha256(nota|variante|documento_hash|sha256_evidencia|fecha|sal)."""
+    cadena = "%s|%s|%s|%s|%s|%s" % (nota_str, variante, h_doc, sha_evidencia, fecha, SAL_CONTROL)
+    return hashlib.sha256(cadena.encode("utf-8")).hexdigest()
+
+
+def verificar_resultado_archivo(ruta):
+    """Comprueba la integridad de un archivo resultado-rubrica.txt entregado."""
+    if not os.path.isfile(ruta):
+        print("ERROR: el archivo '%s' no existe" % ruta)
+        return False
+    campos = {}
+    with open(ruta, "r", encoding="utf-8", errors="ignore") as f:
+        for linea in f:
+            linea = linea.strip()
+            if "=" in linea:
+                k, v = linea.split("=", 1)
+                campos[k.strip()] = v.strip()
+
+    control_guardado = campos.get("control", "")
+    nota = campos.get("nota", "")
+    variante = campos.get("variante", "")
+    doc_hash = campos.get("documento_hash", "")
+    sha_evid = campos.get("sha256_evidencia", "")
+    fecha = campos.get("fecha", "")
+
+    if not (control_guardado and nota and variante and doc_hash and sha_evid and fecha):
+        print("RECHAZADO: faltan campos obligatorios en '%s'" % ruta)
+        return False
+
+    esperado = calcular_control(nota, variante, doc_hash, sha_evid, fecha)
+    if control_guardado.lower() == esperado.lower():
+        print("OK: control de integridad verificado (nota: %s, variante: %s, doc_hash: %s)" % (nota, variante, doc_hash))
+        return True
+    else:
+        print("RECHAZADO: control de integridad no coincide (el archivo fue modificado)")
+        return False
 
 
 def _leer_archivo(ctx, ruta):
@@ -93,24 +137,48 @@ def _sid_de_reglas(reglas_texto):
     return m.group(1) if m else None
 
 
-def _tiene_alertas_eve(ctx, segundos_espera=25):
-    """Cuenta alertas en eve.json del contenedor ids tras un ataque."""
+def _obtener_todas_alertas(ctx):
+    """Devuelve una lista de dicts con todas las alertas en eve.json
+    y en evidencia/alertas-*.json (guardadas al recargar Suricata)."""
+    alertas = []
     ids = CONT["ids"]
     c, out = _ejecutar(ctx,
-        "docker exec %s sh -c 'grep -c \"event_type.*alert\" /var/log/suricata/eve.json 2>/dev/null || echo 0'" % ids,
-        timeout=segundos_espera)
-    try:
-        return int(out.strip().splitlines()[-1]) if out.strip() else 0
-    except ValueError:
-        return 0
-
-
-def _contenido_eve(ctx):
-    ids = CONT["ids"]
-    c, out = _ejecutar(ctx,
-        "docker exec %s sh -c 'grep \"event_type.*alert\" /var/log/suricata/eve.json 2>/dev/null || true'" % ids,
+        "docker exec %s cat /var/log/suricata/eve.json 2>/dev/null || true" % ids,
         timeout=25)
-    return out
+    for linea in out.splitlines():
+        linea = linea.strip()
+        if not linea:
+            continue
+        try:
+            d = json.loads(linea)
+            if d.get("event_type") == "alert":
+                alertas.append(d)
+        except Exception:
+            pass
+
+    # Alertas preservadas en evidencia/alertas-*.json
+    if os.path.isdir(EVIDENCIA_DIR):
+        try:
+            for nom in sorted(os.listdir(EVIDENCIA_DIR)):
+                if nom.startswith("alertas-") and nom.endswith(".json"):
+                    ruta = os.path.join(EVIDENCIA_DIR, nom)
+                    try:
+                        with open(ruta, "r", encoding="utf-8", errors="ignore") as f:
+                            for linea in f:
+                                linea = linea.strip()
+                                if not linea:
+                                    continue
+                                try:
+                                    d = json.loads(linea)
+                                    if d.get("event_type") == "alert":
+                                        alertas.append(d)
+                                except Exception:
+                                    pass
+                    except OSError:
+                        pass
+        except OSError:
+            pass
+    return alertas
 
 
 def _contar_lineas_cliente(ctx):
@@ -141,15 +209,36 @@ def _segmento_200(ctx, antes, despues):
 
 
 def _scaneo_desde_cliente(ctx, puertos):
-    """Escanear desde cliente hacia web (10.30.0.10) cada puerto; devuelve dict puerto->estado."""
+    """Escanear desde cliente hacia web (10.30.0.10) cada puerto usando bash.
+    Realiza 2 pasadas para asegurar que las reglas Suricata con umbral capturen paquetes."""
     cli = CONT["cliente"]
     resultados = {}
+    p_str = " ".join(str(p) for p in puertos)
+    cmd = (
+        "docker exec %s bash -c '"
+        "for iter in 1 2; do "
+        "  for p in %s; do "
+        "    if timeout 0.2 bash -c \"echo > /dev/tcp/%s/\\$p\" 2>/dev/null; then "
+        "      [ \\$iter -eq 1 ] && echo \"\\$p:abierto\"; "
+        "    else "
+        "      [ \\$iter -eq 1 ] && echo \"\\$p:cerrado\"; "
+        "    fi; "
+        "  done; "
+        "done'"
+        % (cli, p_str, WEB_IP)
+    )
+    c, out = _ejecutar(ctx, cmd, timeout=15)
+    for linea in out.splitlines():
+        linea = linea.strip()
+        if ":" in linea:
+            p_val, est = linea.split(":", 1)
+            try:
+                resultados[int(p_val)] = est.strip()
+            except ValueError:
+                pass
     for p in puertos:
-        c, out = _ejecutar(ctx,
-            "docker exec %s sh -c '(echo > /dev/tcp/%s/%d) 2>/dev/null && echo abierto || echo cerrado'" % (cli, WEB_IP, p),
-            timeout=5)
-        estado = "abierto" if "abierto" in out.lower() else "cerrado"
-        resultados[p] = estado
+        if p not in resultados:
+            resultados[p] = "cerrado"
     return resultados
 
 
@@ -158,7 +247,6 @@ def _contador_drop_fw(ctx):
     fw = CONT["fw"]
     c, out = _ejecutar(ctx,
         "docker exec %s nft list ruleset 2>/dev/null" % fw, timeout=15)
-    # Busca los contadores de drop (packets N bytes M drop)
     total = 0
     for m in re.finditer(r'counter\s+packets\s+(\d+)', out):
         total += int(m.group(1))
@@ -166,7 +254,7 @@ def _contador_drop_fw(ctx):
 
 
 def _firmar_resultado(ctx, nota, variante, estudiante):
-    """Calcula sha256 de la evidencia y escribe resultado-rubrica.txt."""
+    """Calcula sha256 de la evidencia y escribe resultado-rubrica.txt con línea control."""
     sha_evidencia = ""
     if os.path.exists(EVIDENCIA_TGZ):
         try:
@@ -175,7 +263,6 @@ def _firmar_resultado(ctx, nota, variante, estudiante):
         except OSError:
             sha_evidencia = "error-leyendo-evidencia"
     elif os.path.isdir(EVIDENCIA_DIR):
-        # Hash recursivo del contenido de evidencia/ (sin el resultado propio)
         h = hashlib.sha256()
         for root, _dirs, files in os.walk(EVIDENCIA_DIR):
             for nombre in sorted(files):
@@ -192,14 +279,18 @@ def _firmar_resultado(ctx, nota, variante, estudiante):
         sha_evidencia = "sin-evidencia"
 
     h_doc = hashlib.sha256((estudiante or "desconocido").encode()).hexdigest()[:16]
+    fecha_str = time.strftime("%Y-%m-%d %H:%M:%S")
+    nota_str = "%.2f" % nota
+    control_hash = calcular_control(nota_str, variante, h_doc, sha_evidencia, fecha_str)
 
     lineas = [
         "resultado-rubrica — rúbrica Corte 3",
         "variante=%s" % variante,
         "documento_hash=%s" % h_doc,
-        "nota=%.2f" % nota,
+        "nota=%s" % nota_str,
         "sha256_evidencia=%s" % sha_evidencia,
-        "fecha=%s" % time.strftime("%Y-%m-%d %H:%M:%S"),
+        "fecha=%s" % fecha_str,
+        "control=%s" % control_hash,
     ]
     try:
         with open(RESULTADO, "w", encoding="utf-8") as f:
@@ -216,19 +307,38 @@ def revisar(ctx):
     variante = _leer_archivo(ctx, VARIANTE_FILE)
     estudiante = _leer_archivo(ctx, ESTUDIANTE_FILE)
 
-    if variante not in ("A", "B"):
-        r.append(falla("variante",
-            "falta ~/labs/rubrica-c3/variante (escribe A o B)",
-            "echo A > ~/labs/rubrica-c3/variante   (o B si tu documento termina en dígito impar)"))
-        return r
     if not estudiante:
         r.append(falla("estudiante",
             "falta ~/labs/rubrica-c3/estudiante (escribe solo el número de documento)",
             "echo 12345678 > ~/labs/rubrica-c3/estudiante"))
         return r
 
-    vd = VARIANTES[variante]
+    digitos = [c for c in estudiante if c.isdigit()]
+    if not digitos:
+        r.append(falla("estudiante",
+            "el archivo estudiante no contiene dígitos válidos",
+            "echo 12345678 > ~/labs/rubrica-c3/estudiante"))
+        return r
+
+    ult_dig = int(digitos[-1])
+    variante_esperada = "A" if (ult_dig % 2 == 0) else "B"
+
+    variante_invalida = False
+    if variante not in ("A", "B"):
+        variante_invalida = True
+        r.append(falla("variante",
+            "falta ~/labs/rubrica-c3/variante o valor inválido (escribe A o B)",
+            "echo %s > ~/labs/rubrica-c3/variante" % variante_esperada))
+    elif variante != variante_esperada:
+        variante_invalida = True
+        r.append(falla("variante",
+            "rechazo de variante: declaraste variante %s pero tu documento %s (último dígito %d) exige variante %s"
+            % (variante, estudiante, ult_dig, variante_esperada),
+            "Corrige tu archivo: echo %s > ~/labs/rubrica-c3/variante" % variante_esperada))
+
+    vd = VARIANTES.get(variante, VARIANTES[variante_esperada])
     ataque_modo = vd["ataque"]
+    ip_atacante = vd["atacante_ip"]
     puertos_escaneo = vd["escaneo"]
     ssh_puerto = vd["ssh"]
     set_nombre = vd["set"]
@@ -249,7 +359,12 @@ def revisar(ctx):
     tiene_umbral = "track by_src" in reglas_texto
     sid_estudiante = _sid_de_reglas(reglas_texto)
 
-    if not tiene_umbral:
+    if variante_invalida:
+        r.append(falla("c1-deteccion",
+            "rechazo de variante: declaraste variante %s pero el documento %s termina en %d (nota 0)"
+            % (variante, estudiante, ult_dig),
+            "Escribe la variante correcta en ~/labs/rubrica-c3/variante"))
+    elif not tiene_umbral:
         r.append(falla("c1-deteccion",
             "la regla Suricata no tiene umbral por origen (falta «track by_src»)",
             "Agrega threshold: type threshold, track by_src, count N, seconds M en reglas/lab.rules"))
@@ -263,19 +378,17 @@ def revisar(ctx):
             "docker exec -d %s /usr/local/bin/reproducir.sh %s" % (nombres["generador"], ataque_modo),
             timeout=10)
         time.sleep(22)
-        eve = _contenido_eve(ctx)
-        n_alertas = eve.count('"event_type":"alert"')
+        alertas = _obtener_todas_alertas(ctx)
+        alertas_atacante = [a for a in alertas if a.get("src_ip") == ip_atacante or a.get("dest_port") == 80]
+        alerta_con_sid = any(a.get("alert", {}).get("signature_id") == int(sid_estudiante) for a in alertas_atacante)
 
-        alerta_con_sid = False
-        if sid_estudiante:
-            alerta_con_sid = ('"signature_id":%d' % int(sid_estudiante)) in eve
-
-        if n_alertas > 0 and alerta_con_sid:
+        if alertas_atacante and alerta_con_sid:
             r.append(ok("c1-deteccion",
-                "regla con umbral por origen activa y alerta con sid %s del atacante (%d alerta(s))" % (sid_estudiante, n_alertas)))
-        elif n_alertas > 0:
+                "regla con umbral por origen activa y alerta con sid %s del atacante (%d alerta(s))"
+                % (sid_estudiante, len(alertas_atacante))))
+        elif alertas_atacante:
             r.append(falla("c1-deteccion",
-                "hubo %d alerta(s) pero ninguna con el sid %s de tus reglas" % (n_alertas, sid_estudiante),
+                "hubo %d alerta(s) pero ninguna con el sid %s de tus reglas" % (len(alertas_atacante), sid_estudiante),
                 "Revisa que el sid de tus reglas coincida con el que aparece en las alertas de eve.json"))
         else:
             r.append(falla("c1-deteccion",
@@ -288,15 +401,28 @@ def revisar(ctx):
     lb = _leer_archivo(ctx, LINEA_BASE)
     conf = _leer_archivo(ctx, CONFIRMACION)
     lb_valida = bool(lb) and "pps=" in lb and "SYN-RECV=" in lb
-    conf_valida = bool(conf) and ("tcpdump" in conf.lower() or "10.30.0" in conf or "ss" in conf.lower())
+
+    # C2 exige: confirmacion.txt con >= 5 lineas tipo tcpdump (IP 10.20.10.x.PUERTO > 10.30.0.10.80)
+    # que incluyan la IP del atacante de la variante (A 10.20.10.71, B 10.20.10.91).
+    lineas_tcpdump = re.findall(r'IP\s+10\.20\.10\.\d+[\.\d]*\s*>\s*10\.30\.0\.10\.(?:80|http)', conf)
+    conf_tiene_ip = ip_atacante in conf
+    conf_valida = bool(conf) and len(lineas_tcpdump) >= 5 and conf_tiene_ip
 
     if lb_valida and conf_valida:
         r.append(ok("c2-linea-base",
             "línea base y confirmación presentes con salida real de tcpdump/ss"))
-    elif lb_valida or conf_valida:
+    elif lb_valida or bool(conf):
+        faltas_c2 = []
+        if not lb_valida:
+            faltas_c2.append("linea-base.txt incompleta (falta pps= o SYN-RECV=)")
+        if not conf_valida:
+            if len(lineas_tcpdump) < 5:
+                faltas_c2.append("confirmacion.txt no tiene al menos 5 líneas tcpdump del ataque")
+            if not conf_tiene_ip:
+                faltas_c2.append("confirmacion.txt no incluye la IP del atacante %s" % ip_atacante)
         r.append(falla("c2-linea-base",
-            "falta uno de los dos archivos (línea base o confirmación) o están incompletos",
-            "Corre ./lab base 30 SIN mitigación y genera evidencia/confirmacion.txt con tcpdump en fw y ss en web"))
+            "evidencia de línea base o confirmación inválida: %s" % "; ".join(faltas_c2),
+            "Corre ./lab base 30 y genera confirmacion.txt con tcpdump en fw durante ./lab ataque %s" % ataque_modo))
     else:
         r.append(falla("c2-linea-base",
             "no existen evidencia/linea-base.txt ni evidencia/confirmacion.txt",
@@ -315,7 +441,7 @@ def revisar(ctx):
             "el ruleset nftables no tiene limit rate over ni ct count over",
             "Agrega límite de tasa por origen y límite de conexiones simultáneas en reglas/nftables.fw, luego ./lab recargar"))
     else:
-        # Medir continuidad durante el ataque: cliente legítimo ≥ 90% HTTP 200 (30 peticiones)
+        # Medir continuidad durante el ataque: cliente legítimo >= 90% HTTP 200
         antes = _contar_lineas_cliente(ctx)
         _ejecutar(ctx,
             "docker exec -d %s /usr/local/bin/reproducir.sh %s" % (nombres["generador"], ataque_modo),
@@ -326,70 +452,83 @@ def revisar(ctx):
 
         pct = (pos * 100 // total) if total > 0 else 0
 
-        n_drop_despues, _ = _contador_drop_fw(ctx)
+        n_drop_despues, ruleset_despues = _contador_drop_fw(ctx)
         drop_subio = n_drop_despues > n_drop_antes
 
-        # Verificar que el atacante quedó en un set dinámico
-        fw = CONT["fw"]
-        c_set, out_set = _ejecutar(ctx,
-            "docker exec %s nft list set inet rubrica3 %s 2>/dev/null || docker exec %s nft list ruleset 2>/dev/null | grep -A2 '%s'" % (fw, set_nombre, fw, set_nombre),
-            timeout=15)
-        atacante_en_set = bool(out_set.strip()) and ("10.20.10" in out_set or "71" in out_set or "91" in out_set)
+        # Verificar que el atacante quedó contenido en cualquier set con su IP o contador subió
+        atacante_en_set = ip_atacante in ruleset_despues
+        atacante_contenido = atacante_en_set or drop_subio
 
-        if total >= 10 and pct >= 90:
-            msg = "cliente legítimo %d%% HTTP 200 durante el ataque (%d/%d)" % (pct, pos, total)
-            if atacante_en_set or drop_subio:
-                msg += "; atacante contenido (set %s o contador de drop subió)" % set_nombre
-            r.append(ok("c3-mitigacion", msg))
-        elif total >= 10 and pct > 0:
+        if total >= 10 and pct >= 90 and atacante_contenido:
+            r.append(ok("c3-mitigacion",
+                "cliente legítimo %d%% HTTP 200 durante el ataque (%d/%d); atacante contenido (set con su IP o contador de drop subió)"
+                % (pct, pos, total)))
+        elif total >= 10 and pct < 90:
+            if pct > 0:
+                r.append(falla("c3-mitigacion",
+                    "continuidad no cumplida: cliente legítimo cayó al %d%% HTTP 200 (< 90%% requerido) durante el ataque" % pct,
+                    "Tus reglas son demasiado estrictas: el tráfico legítimo se ve afectado"))
+            else:
+                r.append(falla("c3-mitigacion",
+                    "continuidad no cumplida: cliente legítimo sin HTTP 200 durante el ataque (0%%)",
+                    "Regla drop total sin over: corta todo el tráfico. Usa limit rate over / ct count over."))
+        elif not atacante_contenido:
             r.append(falla("c3-mitigacion",
-                "cliente legítimo cayó al %d%% HTTP 200 (< 90%%) durante el ataque" % pct,
-                "Tus reglas son demasiado estrictas: el tráfico legítimo se ve afectado"))
+                "el atacante no quedó contenido: no hay set con su IP ni los contadores de drop aumentaron",
+                "Verifica que nftables contenga al atacante con set dinámico o regla de drop"))
         else:
             r.append(falla("c3-mitigacion",
-                "cliente legítimo sin HTTP 200 durante el ataque (0%%)",
-                "Regla drop total sin over: corta todo el tráfico. Usa limit rate over / ct count over."))
+                "cliente legítimo con muestras insuficientes (%d peticiones)" % total,
+                "Asegúrate de que el cliente legítimo esté enviando peticiones activas"))
 
     # =========================================================================
     # CRITERIO 4 — Acceso no autorizado (1,0)
     # =========================================================================
-    # Escanear desde cliente hacia web los puertos de la variante
-    scan = _scaneo_desde_cliente(ctx, puertos_escaneo)
-    puertos_cerrados = [p for p, est in scan.items() if est == "cerrado"]
-    puertos_abiertos = [p for p, est in scan.items() if est == "abierto"]
-
-    # Verificar alerta de escaneo y SSH en eve.json
-    eve = _contenido_eve(ctx)
-    hay_alerta_escaneo = "escaneo" in eve.lower() or "port" in eve.lower() or "scan" in eve.lower()
-    # Buscar alerta que mencione el puerto SSH
-    hay_alerta_ssh = ("dport:%d" % ssh_puerto) in eve or ("%d" % ssh_puerto) in eve
-
-    # HTTP sigue en 200 (verificar que web responde)
-    c_http, out_http = _ejecutar(ctx,
-        "docker exec %s sh -c 'ss -ltn | grep -q :80 && echo web-escuchando || echo web-silencioso'" % CONT["web"],
-        timeout=10)
-    web_activa = "web-escuchando" in out_http
-
-    n_drop_despues4, _ = _contador_drop_fw(ctx)
-
-    if (not puertos_abiertos) and hay_alerta_escaneo and hay_alerta_ssh and web_activa and n_drop_despues4 > 0:
-        r.append(ok("c4-acceso-no-autorizado",
-            "escaneo detectado, puertos no publicados filtrados, alerta SSH (%d) y HTTP activo" % ssh_puerto))
-    else:
-        faltantes = []
-        if puertos_abiertos:
-            faltantes.append("puertos abiertos: %s" % puertos_abiertos)
-        if not hay_alerta_escaneo:
-            faltantes.append("sin alerta de escaneo")
-        if not hay_alerta_ssh:
-            faltantes.append("sin alerta SSH puerto %d" % ssh_puerto)
-        if not web_activa:
-            faltantes.append("web no responde")
-        if n_drop_despues4 == 0:
-            faltantes.append("contador de drop en 0")
+    if variante_invalida:
         r.append(falla("c4-acceso-no-autorizado",
-            "acceso no autorizado no verificado: %s" % "; ".join(faltantes),
-            "Aplica reglas de filtro en nftables y reglas Suricata de escaneo/SSH, luego ./lab recargar"))
+            "rechazo de variante: discrepancia de variante (nota 0)",
+            "Corrige la variante para que coincida con tu documento"))
+    else:
+        # Escanear desde cliente hacia web los puertos de la variante
+        scan = _scaneo_desde_cliente(ctx, puertos_escaneo)
+        time.sleep(2)
+        puertos_cerrados = [p for p, est in scan.items() if est == "cerrado"]
+        puertos_abiertos = [p for p, est in scan.items() if est == "abierto"]
+
+        todas_alertas = _obtener_todas_alertas(ctx)
+        alertas_ssh = [a for a in todas_alertas if a.get("dest_port") == ssh_puerto]
+        hay_alerta_ssh = len(alertas_ssh) > 0
+
+        puertos_escaneo_distintos = [p for p in puertos_escaneo if p != ssh_puerto]
+        puertos_con_alerta = set(a.get("dest_port") for a in todas_alertas if a.get("dest_port") in puertos_escaneo_distintos)
+        hay_alerta_escaneo = len(puertos_con_alerta) >= 2
+
+        # HTTP sigue en 200 (verificar que web responde)
+        c_http, out_http = _ejecutar(ctx,
+            "docker exec %s sh -c 'ss -ltn | grep -q :80 && echo web-escuchando || echo web-silencioso'" % CONT["web"],
+            timeout=10)
+        web_activa = "web-escuchando" in out_http
+
+        n_drop_despues4, _ = _contador_drop_fw(ctx)
+
+        if (not puertos_abiertos) and hay_alerta_escaneo and hay_alerta_ssh and web_activa and n_drop_despues4 > 0:
+            r.append(ok("c4-acceso-no-autorizado",
+                "escaneo detectado, puertos no publicados filtrados, alerta SSH (%d) y HTTP activo" % ssh_puerto))
+        else:
+            faltantes = []
+            if puertos_abiertos:
+                faltantes.append("puertos abiertos: %s" % puertos_abiertos)
+            if not hay_alerta_escaneo:
+                faltantes.append("sin alerta de escaneo (se requieren >= 2 puertos distintos alertados)")
+            if not hay_alerta_ssh:
+                faltantes.append("sin alerta SSH puerto %d" % ssh_puerto)
+            if not web_activa:
+                faltantes.append("web no responde")
+            if n_drop_despues4 == 0:
+                faltantes.append("contador de drop en 0")
+            r.append(falla("c4-acceso-no-autorizado",
+                "acceso no autorizado no verificado: %s" % "; ".join(faltantes),
+                "Aplica reglas de filtro en nftables y reglas Suricata de escaneo/SSH, luego ./lab recargar"))
 
     # =========================================================================
     # CRITERIO 5 — Evidencia íntegra (1,0)
@@ -421,14 +560,13 @@ def revisar(ctx):
     # =========================================================================
     # CÁLCULO DE NOTA Y BONOS
     # =========================================================================
-    # Contar criterios aprobados
     ok_ids = {x["id"] for x in r if x["ok"]}
     criterios = ["c1-deteccion", "c2-linea-base", "c3-mitigacion", "c4-acceso-no-autorizado", "c5-evidencia"]
     nota = sum(1.0 for c in criterios if c in ok_ids)
 
-    # Bonos
+    # Bonos (solo si la variante es válida)
     bono_ok = False
-    if variante == "A":
+    if variante == "A" and not variante_invalida:
         # Bono A: set dinámico con timeout
         if tiene_set_dinamico and "timeout" in ruleset:
             nota = min(nota + 0.2, 5.0)
@@ -436,24 +574,44 @@ def revisar(ctx):
             r.append(ok("bono-A", "bloqueo de escaneo por set dinámico con timeout (+0,2)"))
         else:
             r.append(falla("bono-A", "set dinámico con timeout no presente en nftables", "Agrega un set con flags dynamic,timeout y update @set en reglas/nftables.fw"))
-    elif variante == "B":
+    elif variante == "B" and not variante_invalida:
         # Bono B: dos firmas HTTP distintas que ambas disparan
-        n_http_firmas = len(re.findall(r'content:"GET ', reglas_texto)) + len(re.findall(r'content:"Host:', reglas_texto))
-        if n_http_firmas >= 2:
+        alertas_todas = _obtener_todas_alertas(ctx)
+        alertas_http = [a for a in alertas_todas if a.get("dest_port") == 80]
+        sids_http = set()
+        for a in alertas_http:
+            sid = a.get("alert", {}).get("signature_id")
+            if sid and sid >= 1000000:
+                sids_http.add(sid)
+        if len(sids_http) >= 2:
             nota = min(nota + 0.3, 5.0)
             bono_ok = True
-            r.append(ok("bono-B", "dos firmas HTTP distintas (GET y Host) con sid diferentes (+0,3)"))
+            r.append(ok("bono-B", "dos firmas HTTP distintas dispararon alertas en el ataque HTTP (sids: %s) (+0,3)" % sorted(sids_http)))
         else:
-            r.append(falla("bono-B", "se requieren dos firmas HTTP distintas que ambas disparen", "Agrega dos reglas alert con content distintas (p. ej. \"GET \" y \"Host:\") y sid diferentes en reglas/lab.rules"))
+            r.append(falla("bono-B", "se requieren dos firmas HTTP distintas que ambas disparen", "Agrega dos reglas alert con content distintas y sid diferentes en reglas/lab.rules"))
 
-    # Re-firmar con la nota final
+    # Re-firmar con la nota final calculada
     _firmar_resultado(ctx, nota, variante, estudiante)
 
-    aprobado = nota >= 3.0
+    aprobado = (nota >= 3.0) and (not variante_invalida)
+    if variante_invalida:
+        msg = "NOTA FINAL: %.2f / 5,0  NO APROBADO (rechazo de variante)" % nota
+    elif aprobado:
+        msg = "NOTA FINAL: %.2f / 5,0  APROBADO" % nota
+    else:
+        msg = "NOTA FINAL: %.2f / 5,0  NO APROBADO (mínimo 3,0)" % nota
+
     r.append({
         "id": "resultado-final",
         "ok": aprobado,
-        "mensaje": "NOTA FINAL: %.2f / 5,0  %s" % (nota, "APROBADO" if aprobado else "NO APROBADO (mínimo 3,0)"),
+        "mensaje": msg,
         "pista": "Intentos ilimitados hasta el plazo (28-nov-2026 23:59). Cuenta el último resultado firmado.",
     })
     return r
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) >= 3 and sys.argv[1] == "--verificar":
+        ok_verif = verificar_resultado_archivo(sys.argv[2])
+        sys.exit(0 if ok_verif else 1)

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# D2 — Filtro de entrada del asistente de SaludVital.
+# Activación:  cp defensas/d2-filtro-entrada.sh.ejemplo defensas/d2-filtro-entrada.sh
+#              chmod +x defensas/d2-filtro-entrada.sh
+# La pregunta llega por la entrada estándar. Si sale con código 1, la pregunta no llega al modelo.
+# ESTA PLANTILLA ES UN PUNTO DE PARTIDA: ajústala con lo que observes en tus ataques.
+
+t=$(cat)
+
+# Patrones típicos de secuestro de instrucciones (mayúsculas o minúsculas).
+patron='ignora|olvida|desobedece|instrucciones anteriores|a partir de ahora eres|nuevo rol|modo diagn|system prompt|decodifica|base64|imprime la variable|cup[oó]n interno'
+
+if printf '%s' "$t" | grep -qiE "$patron"; then
+  exit 1    # bloqueada
+fi
+exit 0

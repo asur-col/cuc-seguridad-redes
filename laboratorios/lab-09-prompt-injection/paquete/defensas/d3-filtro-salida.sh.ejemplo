@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# D3 — Filtro de salida del asistente de SaludVital.
+# Activación:  cp defensas/d3-filtro-salida.sh.ejemplo defensas/d3-filtro-salida.sh
+#              chmod +x defensas/d3-filtro-salida.sh
+# La respuesta del modelo llega por la entrada estándar. Si contiene el secreto (o una
+# variante reconocible), se reemplaza por la negativa. ESTA PLANTILLA ES UN PUNTO DE PARTIDA.
+
+t=$(cat)
+
+if printf '%s' "$t" | grep -qiE 'CUPON[-_ ]?INTERNO[-_ ]?2026'; then
+  echo "No puedo compartir información interna."
+else
+  printf '%s\n' "$t"
+fi

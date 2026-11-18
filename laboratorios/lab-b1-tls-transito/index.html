@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio B1 &mdash; TLS y t&uacute;nel entre dos sedes &middot; CUC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px;
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
+    pre {
+      position: relative;
+      background: var(--code-bg); color: var(--code-ink);
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid var(--line);
+    }
+
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
+    }
+
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .rubric-weight { font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--vino); }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin: 14px 0 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagram-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .diagram-card svg { width: 100%; height: auto; display: block; }
+
+    .diagram-caption {
+      font-size: 12.5px; color: var(--ink-soft);
+      text-align: center; margin-top: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    figure.ref {
+      margin: 14px 0 24px;
+      max-width: 640px;
+    }
+
+    figure.ref img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: block;
+      background: #fff;
+    }
+
+    figure.ref img.logo-img {
+      max-width: 180px;
+      margin: 0 auto;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    figure.ref figcaption {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.5;
+    }
+
+    figure.ref figcaption a { color: var(--ink-soft); text-decoration: underline; }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    @media print {
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
+
+<div class="shell">
+  <nav class="toc" id="toc">
+    <p class="toc-label">Contenido</p>
+    <a href="#intro"><span class="badge">·</span> Introducci&oacute;n</a>
+    <a href="#parteA"><span class="badge">A</span> TLS con CA propia en el laboratorio</a>
+    <a href="#parteB"><span class="badge">B</span> Un servicio interno que solo responde por el túnel</a>
+    <a href="#entrega"><span class="badge">&#10003;</span> Entregable y comprobaci&oacute;n</a>
+  </nav>
+
+  <div>
+    <header class="top portada">
+      <img class="portada-logo"
+           src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
+           onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
+           alt="Logo Universidad de la Costa (CUC)">
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes</div>
+      <h1>Laboratorio 1: Segmentación de Redes y Zero Trust</h1>
+      <p class="sub">VirtualBox + OPNsense + Alpine Linux: tres zonas de servicio aisladas, una zona de administración con escritorio gráfico, NAT de salida, una aplicación web real con su base de datos protegida, y publicación controlada del servicio por NAT/PAT</p>
+      <div class="accent-bar"></div>
+      <div class="author-block">
+        <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
+        <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
+        <span>📅 <strong>Unidad 2 · Actividad 1 (10%) · Corte 2 · 2027-1</strong></span>
+      </div>
+    </header>
+
+    <main><section id="intro">
+<h1>Laboratorio B1 &mdash; Cifrado en tr&aacute;nsito: TLS y t&uacute;nel entre dos sedes</h1>
+<p class="lead"><strong>Objetivo.</strong> Al terminar, dos contenedores de tu m&aacute;quina se hablan por un canal TLS con una CA propia y,
+adem&aacute;s, un servicio interno solo responde a trav&eacute;s de un t&uacute;nel entre dos redes. Todo dentro de la VM.</p>
+<table class="datos"><tbody>
+<tr><th>Curso</th><td>Seguridad en Redes &middot; Corte 2 &middot; 10 % de la nota</td></tr>
+<tr><th>Tiempo estimado</th><td>2 h 30 min (con la VM ya encendida)</td></tr>
+<tr><th>Prerrequisitos</th><td>VM del curso arrancada, Docker y Docker Compose instalados, usuario con sudo, y el paquete del laboratorio en ~/labs/b1, que descarga <code class="inline">asur-lab iniciar b1</code> Si el cat&aacute;logo publicado no responde, el curso entrega una copia local del cat&aacute;logo y de los paquetes: <code>export ASUR_LAB_URL=file://$HOME/catalogo-2027-1</code>. Ademas, el cliente <code>asur-lab</code> comprueba el catalogo al instalar: si hay una version nueva, se actualiza solo; con una copia local en <code>file://</code> no puede actualizarse y lo avisa y se repite el mismo comando.</td></tr>
+<tr><th>Entorno</th><td>Aislado: solo redes 10.20.0.0/24 y 172.16.0.0/24 dentro de la VM. Sin salidas a internet.</td></tr><tr><th>Paquete</th><td>El laboratorio se baja del cat&aacute;logo de la plataforma con <code class="inline">asur-lab iniciar b1</code>. Si el cliente responde que el laboratorio todav&iacute;a no est&aacute; activo, su paquete se est&aacute; publicando: no es un error del ejercicio.</td></tr>
+</tbody></table>
+<div class="callout note"><p>Las capturas de esta gu&iacute;a se toman durante la prueba de la Fase 5. Cada paso indica <em>qu&eacute; debe mostrar</em> la captura; si no ves eso, el paso no est&aacute; hecho.</p></div>
+</section>
+<section class="part" id="parteA">
+<h2>Parte A &mdash; TLS con CA propia en el laboratorio</h2>
+<h3 class="sub">A.1 Comprobar el entorno</h3>
+<ol class="steps">
+<li>Verifica que Docker responde y que no hay contenedores del laboratorio anteriores.<pre>docker version --format &quot;{{.Server.Version}}&quot;
+docker compose version
+docker ps --filter name=lab-b1 --format &quot;{{.Names}}&quot;</pre>
+        <div class="callout note"><b>Captura prevista para la prueba de la Fase 5: pantalla del paso «A.1 Comprobar el entorno» con la salida real. Se guarda en <code class="inline">imagenes/B1-01.png</code>.</b></div><figure class="captura"><img src="imagenes/B1-01.png" alt="Captura real del B1-01 del laboratorio, tomada en la VM del curso" width="960"><figcaption>Captura real del B1-01, tomada en la VM del curso.</figcaption></figure></div></li>
+<li>Crea la carpeta de trabajo y entra en ella.</li>
+</ol>
+<pre>mkdir -p ~/labs/b1/web ~/labs/b1/wireguard/sede1 ~/labs/b1/wireguard/sede2 && cd ~/labs/b1</pre>
+<p>Salida esperada: una versi&oacute;n de Docker (por ejemplo <code>27.3.1</code>), la versi&oacute;n de Compose y
+la lista vac&iacute;a de contenedores. Captura: la terminal con los tres comandos y la lista vac&iacute;a.</p>
+<h3 class="sub">A.2 Autoridad certificadora propia</h3>
+<ol class="steps">
+<li>Genera la clave y el certificado de la CA (10 a&ntilde;os).<pre>openssl req -x509 -newkey rsa:4096 -days 3650 -nodes -keyout ca.key -out ca.crt -subj &quot;/C=CO/O=CUC/OU=Laboratorio/CN=CA del laboratorio B1&quot;</pre>
+        <div class="callout note"><b>Captura prevista para la prueba de la Fase 5: pantalla del paso «A.2 Autoridad certificadora propia» con la salida real. Se guarda en <code class="inline">imagenes/B1-02.png</code>.</b></div><figure class="captura"><img src="imagenes/B1-02.png" alt="Captura real del B1-02 del laboratorio, tomada en la VM del curso" width="960"><figcaption>Captura real del B1-02, tomada en la VM del curso.</figcaption></figure></div></li>
+<li>Revisa lo que acabas de crear.<pre>openssl x509 -in ca.crt -noout -subject -dates -fingerprint -sha256</pre></li>
+</ol>
+<p>Salida esperada: <code>subject=C = CO, O = CUC, OU = Laboratorio, CN = CA del laboratorio B1</code>, una ventana de
+validez de 10 a&ntilde;os y una huella SHA256. Captura: el bloque con subject, dates y fingerprint.</p>
+<h3 class="sub">A.3 Certificado del servidor con nombre alternativo</h3>
+<ol class="steps">
+<li>Crea la petici&oacute;n con el nombre que usar&aacute; el cliente (<code>web.lab</code>) y una extensi&oacute;n SAN.<pre>openssl req -newkey rsa:2048 -nodes -keyout servidor.key -out servidor.csr -subj &quot;/C=CO/O=CUC/CN=web.lab&quot;</pre></li>
+<li>Firma el certificado con la CA indicando el SAN.<pre>openssl x509 -req -in servidor.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out servidor.crt -days 365 -sha256 -extfile &lt;(printf &quot;subjectAltName=DNS:web.lab,IP:10.20.0.10
+extendedKeyUsage=serverAuth
+&quot;)</pre></li>
+<li>Comprueba el SAN y que la cadena valida contra la CA.<pre>openssl x509 -in servidor.crt -noout -ext subjectAltName
+openssl verify -CAfile ca.crt servidor.crt</pre>
+<pre>cp servidor.crt web/web.crt
+cp servidor.key web/web.key</pre></li>
+</ol>
+<p>Salida esperada: <code>X509v3 Subject Alternative Name: DNS:web.lab, IP Address:10.20.0.10</code> y <code>servidor.crt: OK</code>.
+Captura: el SAN y el <code>OK</code> de la verificaci&oacute;n.</p>
+<div class="callout warn"><p>Si <code>openssl verify</code> falla, no sigas: significa que el certificado no lo firm&oacute; tu CA o que el SAN no coincide con el nombre que vas a usar.</p></div>
+<h3 class="sub">A.4 Servicio web con TLS moderno</h3>
+<ol class="steps">
+<li>El paquete ya trae <code>docker-compose.yml</code> con los servicios <code>web</code>, <code>interno</code>, <code>sede1</code> y <code>sede2</code>, y el archivo <code>web/nginx.conf</code> con TLS 1.2 y 1.3. No los reescribas: si los cambias pierdes los servicios del t&uacute;nel. Mira lo que trae con <code>cat docker-compose.yml</code> y <code>cat web/nginx.conf</code>.</li>
+</ol>
+
+
+<ol class="steps">
+<li>Levanta el servicio y espera a que responda.<pre>docker compose -p b1 up -d web interno
+docker compose -p b1 ps</pre></li>
+<li>Pide la p&aacute;gina por HTTPS confiando en tu CA y con el nombre del certificado.<pre>curl -sS --cacert ca.crt --resolve web.lab:443:10.20.0.10 https://web.lab/ -o /dev/null -w &quot;%{http_code} %{ssl_verify_result}\n&quot;</pre></li>
+</ol>
+<p>Salida esperada: <code>200 0</code> (c&oacute;digo HTTP 200 y resultado de verificaci&oacute;n 0 = certificado v&aacute;lido).
+Captura: el <code>200 0</code> y <code>docker compose ps</code> con el servicio arriba.</p>
+<h3 class="sub">A.5 Que el canal sea el que crees</h3>
+<ol class="steps">
+<li>Negocia con el servidor y mira protocolo y cifrado.<pre>openssl s_client -connect 10.20.0.10:443 -servername web.lab -CAfile ca.crt &lt;/dev/null 2&gt;/dev/null | grep -E &quot;Protocol|Cipher|Verify return code&quot;</pre></li>
+<li>Intenta forzar una versi&oacute;n antigua: debe fallar.<pre>openssl s_client -connect 10.20.0.10:443 -tls1_1 &lt;/dev/null; echo &quot;salida=$?&quot;</pre></li>
+<li>Pide la p&aacute;gina sin CA: debe avisar de que no puede verificar.<pre>curl -sS https://web.lab/ --resolve web.lab:443:10.20.0.10 -o /dev/null; echo &quot;salida=$?&quot;</pre></li>
+</ol>
+<p>Salida esperada: <code>Protocol: TLSv1.3</code> (o TLSv1.2), un cifrado de la familia AEAD y
+<code>Verify return code: 0 (ok)</code>; el intento con TLS 1.1 termina con error y c&oacute;digo distinto de cero; y el <code>curl</code> sin CA falla
+con un mensaje de certificado no verificado. Captura: los tres comandos con sus salidas.</p>
+<div class="callout note"><p>El tercer comando es el que demuestra que el cifrado sirve para algo: sin la CA, el cliente no acepta el canal. Si ese <code>curl</code> devuelve la p&aacute;gina, el certificado no se est&aacute; usando.</p></div>
+</section>
+<section class="part" id="parteB">
+<h2>Parte B &mdash; Un servicio interno que solo responde por el t&uacute;nel</h2>
+<h3 class="sub">B.1 Dos redes y un servicio que no se publica</h3>
+<ol class="steps">
+<li>El <code>docker-compose.yml</code> del paquete ya define el servicio <code>interno</code>, que vive en una segunda red y no publica ningun puerto. No lo reescribas: si lo haces, se pierden las sedes del tunel.</li>
+<li>El cliente es el contenedor <code>web</code>, que vive en la red <code>lan</code>: desde ahi el servicio interno no responde, porque vive en otra red y no publica puertos.<pre>docker exec lab-b1-web wget -T 3 -qO- http://10.30.0.20/ ; echo "salida=$?"</pre>
+        <div class="callout note"><b>Captura prevista para la prueba de la Fase 5: pantalla del paso «B.1 Dos redes y un servicio que no se publica» con la salida real. Se guarda en <code class="inline">imagenes/B1-03.png</code>.</b></div><figure class="captura"><img src="imagenes/B1-03.png" alt="Captura real del B1-03 del laboratorio, tomada en la VM del curso" width="960"><figcaption>Captura real del B1-03, tomada en la VM del curso.</figcaption></figure></div></li>
+</ol>
+
+<p>Salida esperada: el <code>wget</code> falla (c&oacute;digo distinto de cero) porque el servicio interno vive en otra red y no publica puertos.
+Captura: el fallo y <code>docker compose ps</code> con los dos servicios.</p>
+<h3 class="sub">B.2 T&uacute;nel entre las dos sedes</h3>
+<ol class="steps">
+<li>El paquete ya trae los servicios <code>sede1</code> y <code>sede2</code> con la imagen de WireGuard: <code>sede1</code> est&aacute; en la red <code>lan</code> (10.20.0.1) y <code>sede2</code> tiene una pierna en la red interna (10.30.0.2) y hace la salida NAT. Tu trabajo es escribir el <code>wg0.conf</code> de cada sede.</li>
+<li><li>Las utilidades de WireGuard no vienen en la VM: inst&aacute;lalas una vez con apt.</li>
+<li>Genera un par de claves por sede y anota solo la p&uacute;blica.<pre>sudo apt-get install -y wireguard-tools
+umask 077
+wg genkey | tee sede-a.key | wg pubkey &gt; sede-a.pub
+wg genkey | tee sede-b.key | wg pubkey &gt; sede-b.pub
+cat sede-a.pub sede-b.pub</pre>
+<pre>cat > wireguard/sede1/wg0.conf &lt;&lt;EOF
+[Interface]
+Address = 10.99.0.1/24
+ListenPort = 51820
+PrivateKey = $(cat sede-a.key)
+
+[Peer]
+PublicKey = $(cat sede-b.pub)
+AllowedIPs = 10.99.0.2/32, 10.30.0.0/24
+Endpoint = 10.20.0.2:51820
+PersistentKeepalive = 25
+EOF
+cat > wireguard/sede2/wg0.conf &lt;&lt;EOF
+[Interface]
+Address = 10.99.0.2/24
+ListenPort = 51820
+PrivateKey = $(cat sede-b.key)
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING ! -o wg0 -j MASQUERADE
+
+[Peer]
+PublicKey = $(cat sede-a.pub)
+AllowedIPs = 10.99.0.1/32
+Endpoint = 10.20.0.1:51820
+PersistentKeepalive = 25
+EOF</pre></li>
+<li>Escribe la configuraci&oacute;n de cada lado con las direcciones del t&uacute;nel 10.99.0.1/24 y 10.99.0.2/24.</li>
+<li>Levanta las dos sedes y comprueba el <em>handshake</em>.<pre>docker compose -p b1 up -d --force-recreate sede1 sede2
+docker exec lab-b1-sede1 wg show</pre></li>
+<li>Comprueba que las dos sedes se ven por el t&uacute;nel.<pre>docker exec lab-b1-sede1 ping -c 2 -W 2 10.99.0.2
+docker exec lab-b1-sede2 wg show</pre></li>
+<li>Comprueba que el servicio interno se ve por el t&uacute;nel y no por la red del cliente.<pre>docker exec lab-b1-sede1 wget -T 4 -qO- http://10.30.0.20/ | head -3
+docker exec lab-b1-web wget -T 3 -qO- http://10.30.0.20/ ; echo "salida=$?"</pre></li>
+</ol>
+<p>Salida esperada: <code>wg show</code> con <code>latest handshake</code> de hace segundos y <code>transfer</code> distinto de cero, el <code>ping</code> entre las sedes con dos respuestas y la p&aacute;gina del servicio interno servida por <code>sede1</code> a trav&eacute;s del t&uacute;nel. Captura: el <code>wg show</code> completo, la respuesta del <code>ping</code> y la del servicio interno.</p>
+<div class="callout warn"><p>Las claves privadas del t&uacute;nel son de este laboratorio. No las reutilices fuera de &eacute;l ni las subas al repositorio; el entregable solo lleva las p&uacute;blicas y las capturas.</p></div>
+<h3 class="sub">B.3 Qu&eacute; demuestra el montaje</h3>
+<table class="datos"><thead><tr><th>Situaci&oacute;n</th><th>Resultado esperado</th><th>Por qu&eacute;</th></tr></thead><tbody>
+<tr><td>Cliente de la red <code>lan</code> pide el servicio interno</td><td>Falla</td><td>No hay ruta: son redes distintas y no se publica el puerto</td></tr>
+<tr><td>Sede a trav&eacute;s del t&uacute;nel pide el servicio interno</td><td>Responde</td><td>El t&uacute;nel enruta 10.99.0.0/24 y la salida NAT de <code>sede2</code> entrega el tr&aacute;fico a la red interna</td></tr>
+<tr><td>Cliente sin la CA pide <code>https://web.lab</code></td><td>Falla</td><td>El certificado no se puede verificar</td></tr>
+<tr><td>Cliente con TLS 1.1</td><td>Falla</td><td>El servidor solo acepta versiones actuales</td></tr>
+</tbody></table>
+</section>
+<section class="part" id="entrega">
+<h2>Entregable y comprobaci&oacute;n</h2>
+<p>Entrega un <code>informe-b1.md</code> con: la salida de <code>openssl verify</code>, el <code>curl</code> con <code>200 0</code>, el <code>s_client</code> con protocolo y cifrado, el fallo con TLS 1.1, el fallo sin CA, el <code>wg show</code> con handshake, el ping entre las sedes por el t&uacute;nel y la respuesta del servicio interno por el t&uacute;nel. Cada bloque con el comando que lo produjo.</p>
+<p>La comprobaci&oacute;n autom&aacute;tica <code>asur-lab check b1-tls</code> (desde el directorio del laboratorio: el verificador lee <code>ca.crt</code> y <code>servidor.crt</code> de donde se ejecuta) revisa que el certificado del servidor valide contra la CA del laboratorio, que el canal no acepte versiones antiguas, que el servicio interno no se alcance desde la red del cliente y que exista un handshake reciente en el t&uacute;nel. No dice el valor esperado de ninguno de los cuatro: si algo falla, indica qu&eacute; paso revisar.</p>
+<p><strong>Calificaci&oacute;n.</strong> Los criterios y los pesos de esta actividad est&aacute;n <b>por definir</b>: los decide el docente. Esta gu&iacute;a fija qu&eacute; se entrega y qu&eacute; comprueba el verificador; no fija niveles ni porcentajes.</p>
+        <h2>Errores frecuentes</h2>
+<table class="datos"><thead><tr><th>S&iacute;ntoma</th><th>Causa habitual</th><th>Qu&eacute; revisar</th></tr></thead><tbody>
+<tr><td><code>curl: (60) SSL certificate problem</code></td><td>Se us&oacute; el certificado sin la CA o el nombre no coincide</td><td><code>--cacert</code> con <code>ca.crt</code> y <code>--resolve</code> con el nombre del SAN</td></tr>
+<tr><td><code>s_client</code> conecta pero el cifrado es antiguo</td><td>El servidor no limita las versiones</td><td>La l&iacute;nea <code>ssl_protocols</code> y reiniciar el contenedor</td></tr>
+<tr><td>El t&uacute;nel no levanta</td><td>Claves cruzadas o direcciones repetidas</td><td>Que cada lado apunte a la p&uacute;blica del otro y que 10.99.0.1 y 10.99.0.2 no se repitan</td></tr>
+<tr><td>El servicio interno responde desde el cliente</td><td>Se public&oacute; un puerto o se uni&oacute; a la red equivocada</td><td>Que no haya <code>ports:</code> y que solo est&eacute; en <code>interna</code></td></tr>
+</tbody></table>
+</section></main>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toggleBackToTop();
+
+  const tocToggle = document.getElementById('toc-toggle');
+  const tocNav = document.getElementById('toc');
+  if (tocToggle && tocNav) {
+    tocToggle.addEventListener('click', () => {
+      tocNav.classList.toggle('mobile-open');
+      tocToggle.textContent = tocNav.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+    tocNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      tocNav.classList.remove('mobile-open');
+      tocToggle.textContent = '☰';
+    }));
+  }
+
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.type = 'button';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => {
+      const text = pre.innerText.replace(/Copiar$|Copiado ✓$/, '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copiado ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+    pre.appendChild(btn);
+  });
+
+  const checklistItems = document.querySelectorAll('.checklist li');
+  const storageKey = 'cuc-lab-segmentacion-natpat-chk';
+  let savedState = {};
+  try { savedState = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch (e) { savedState = {}; }
+  checklistItems.forEach((li, idx) => {
+    if (savedState[idx]) li.classList.add('done');
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+      savedState[idx] = li.classList.contains('done');
+      localStorage.setItem(storageKey, JSON.stringify(savedState));
+    });
+  });
+</script>
+
+</body>
+</html>

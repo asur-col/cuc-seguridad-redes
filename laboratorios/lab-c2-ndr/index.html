@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio C2 &mdash; Clasificador NDR &middot; CUC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #FBF8F3;
+      --surface: #FFFFFF;
+      --surface-2: #F4EEE3;
+      --ink: #2A2A2A;
+      --ink-soft: #6B6259;
+      --vino: #A6192E;
+      --vino-strong: #7E1223;
+      --vino-tint: #FBEBEC;
+      --dorado: #A9791C;
+      --dorado-tint: #FBF3DE;
+      --line: #E5DCCB;
+      --code-bg: #F1EADA;
+      --code-ink: #4A4030;
+      --shadow: 0 1px 3px rgba(42,26,20,.05), 0 8px 24px rgba(42,26,20,.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #181411;
+        --surface: #221D18;
+        --surface-2: #2B2520;
+        --ink: #EFE7D9;
+        --ink-soft: #B3A896;
+        --vino: #E2536B;
+        --vino-strong: #F0748A;
+        --vino-tint: #3A1E22;
+        --dorado: #E4BC5C;
+        --dorado-tint: #3B321C;
+        --line: #3D352A;
+        --code-bg: #1F1914;
+        --code-ink: #E4D9C3;
+        --shadow: 0 2px 4px rgba(0,0,0,.4), 0 8px 28px rgba(0,0,0,.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+      font-size: 15.5px;
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; text-wrap: balance; color: var(--ink); }
+    a { color: var(--vino); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; }
+
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3.5px; width: 0%;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+      z-index: 1000; transition: width .1s ease-out;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      nav.toc { display: none; }
+    }
+
+    header.top.portada {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 44px 36px 36px;
+      text-align: center;
+    }
+
+    .portada-logo {
+      height: 72px;
+      width: auto;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .portada-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-weight: 700;
+      color: var(--vino);
+      background: var(--vino-tint);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    header.top h1 {
+      color: var(--vino);
+      font-size: clamp(26px, 3.8vw, 36px);
+      margin: 0 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    header.top .sub {
+      font-size: 17px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      max-width: 62ch;
+      margin-inline: auto;
+    }
+
+    .accent-bar {
+      width: 200px;
+      height: 4px;
+      margin: 0 auto 22px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .author-block {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      padding-top: 4px;
+    }
+
+    .author-block span { display: inline-flex; align-items: center; gap: 6px; }
+    .author-block strong { color: var(--ink); }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 32px 18px 40px;
+      border-right: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    nav.toc .toc-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--ink-soft);
+      margin: 0 0 14px 8px;
+      font-weight: 700;
+    }
+
+    nav.toc a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 3px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    nav.toc a:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+    nav.toc a.active { background: var(--vino-tint); color: var(--vino); font-weight: 600; }
+
+    nav.toc a .badge {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--surface-2); color: var(--ink-soft);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    nav.toc a.active .badge { background: var(--vino); color: #fff; }
+
+    main { padding: 40px 48px 90px; min-width: 0; }
+
+    @media (max-width: 650px) {
+      main { padding: 24px 18px 70px; }
+      header.top.portada { padding: 32px 18px 24px; }
+    }
+
+    .lede { font-size: 16.5px; color: var(--ink-soft); max-width: 72ch; margin: 16px 0 24px; }
+    .lede b, .lede strong { color: var(--ink); }
+
+    section.part {
+      padding-top: 44px;
+      margin-top: 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 24px;
+    }
+
+    section.part:first-of-type { border-top: none; padding-top: 10px; }
+
+    .part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+    .part-badge {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--vino); color: #fff;
+      display: grid; place-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700; font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(166,25,46,.25);
+    }
+
+    .part-head h2 { margin: 0; font-size: 24px; font-weight: 600; }
+
+    h3.sub {
+      font-size: 16.5px;
+      margin: 32px 0 12px;
+      color: var(--vino);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    p { margin: 0 0 14px; max-width: 74ch; }
+
+    .docref {
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      margin: -4px 0 18px;
+    }
+    .docref a { color: var(--vino); text-decoration: underline; }
+
+    ol.steps { list-style: none; margin: 8px 0 20px; padding: 0; counter-reset: step; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 2px 0 18px 38px;
+      max-width: 72ch;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 2px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12.5px; font-weight: 700;
+      display: grid; place-items: center;
+      border: 1.5px solid var(--vino);
+      box-shadow: var(--shadow);
+    }
+
+    ol.steps > li:not(:last-child)::after {
+      content: "";
+      position: absolute; left: 12.5px; top: 30px; bottom: 0;
+      width: 1.5px; background: var(--line);
+    }
+
+    ul.plain { padding-left: 20px; margin: 6px 0 14px; }
+    ul.plain li { margin-bottom: 6px; max-width: 68ch; }
+
+    pre {
+      position: relative;
+      background: var(--code-bg); color: var(--code-ink);
+      border-radius: 10px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-size: 13.5px; line-height: 1.55;
+      margin: 8px 0 16px;
+      border: 1px solid var(--line);
+    }
+
+    code.inline {
+      background: var(--surface-2); color: var(--code-ink);
+      padding: 2px 7px; border-radius: 5px;
+      font-size: 13px; border: 1px solid var(--line);
+    }
+
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+      background: var(--surface); color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 9px; cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { color: var(--vino); border-color: var(--vino); }
+    .copy-btn.copied { color: var(--dorado); border-color: var(--dorado); opacity: 1; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+      max-width: 72ch;
+      line-height: 1.6;
+    }
+
+    .callout.warn { background: var(--vino-tint); border-left: 4px solid var(--vino); color: var(--ink); }
+    .callout.warn b, .callout.warn strong { color: var(--vino); }
+    .callout.note { background: var(--dorado-tint); border-left: 4px solid var(--dorado); color: var(--ink); }
+    .callout.note b, .callout.note strong { color: var(--dorado); }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin: 10px 0 22px;
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13.5px; text-align: left; }
+    th { background: var(--vino); color: #fff; padding: 11px 14px; font-weight: 600; letter-spacing: .02em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--surface-2); }
+
+    .rubric-weight { font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--vino); }
+
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin: 14px 0 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .diagram-card::before {
+      content: "";
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, var(--vino), var(--dorado));
+    }
+
+    .diagram-card svg { width: 100%; height: auto; display: block; }
+
+    .diagram-caption {
+      font-size: 12.5px; color: var(--ink-soft);
+      text-align: center; margin-top: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    figure.ref {
+      margin: 14px 0 24px;
+      max-width: 640px;
+    }
+
+    figure.ref img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: block;
+      background: #fff;
+    }
+
+    figure.ref img.logo-img {
+      max-width: 180px;
+      margin: 0 auto;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    figure.ref figcaption {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1.5;
+    }
+
+    figure.ref figcaption a { color: var(--ink-soft); text-decoration: underline; }
+
+    .checklist {
+      list-style: none; padding: 0; margin: 12px 0 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer; user-select: none;
+      transition: background .15s ease;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li:hover { background: var(--surface-2); }
+
+    .checklist .box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--ink-soft);
+      border-radius: 4px;
+      margin-top: 2px; flex-shrink: 0;
+      background: var(--surface);
+      transition: all .15s ease;
+    }
+
+    .checklist li.done { opacity: .6; }
+    .checklist li.done .box { background: var(--vino); border-color: var(--vino); position: relative; }
+    .checklist li.done .box::after {
+      content: "";
+      position: absolute; left: 5px; top: 1px;
+      width: 5px; height: 10px;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      transform: rotate(40deg);
+    }
+    .checklist li.done span.text { text-decoration: line-through; }
+
+    #back-to-top {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--vino); color: #fff; border: none;
+      display: grid; place-items: center; cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 998; font-size: 16px;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: auto; }
+    #back-to-top:hover { transform: translateY(-2px); }
+
+    #toc-toggle {
+      display: none;
+      position: fixed; bottom: 24px; left: 24px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface); color: var(--vino);
+      border: 1px solid var(--line);
+      z-index: 998; box-shadow: var(--shadow);
+      cursor: pointer; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      #toc-toggle { display: flex; }
+      nav.toc.mobile-open {
+        display: block; position: fixed; inset: 0;
+        height: 100vh; width: 85vw; max-width: 320px;
+        background: var(--surface); z-index: 997;
+        box-shadow: var(--shadow);
+        border-right: 1px solid var(--line);
+      }
+    }
+
+    footer.page {
+      max-width: 74ch;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-soft);
+      text-align: center;
+    }
+
+    @media print {
+      nav.toc, #progress-bar, #back-to-top, #toc-toggle, .copy-btn { display: none !important; }
+      .shell { grid-template-columns: 1fr !important; }
+      section.part { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="toc-toggle" aria-label="Abrir contenido">☰</button>
+<button id="back-to-top" aria-label="Volver arriba">↑</button>
+
+<div class="shell">
+  <nav class="toc" id="toc">
+    <p class="toc-label">Contenido</p>
+    <a href="#intro"><span class="badge">·</span> Introducci&oacute;n</a>
+    <a href="#parteA"><span class="badge">A</span> Los datos antes del modelo</a>
+    <a href="#parteB"><span class="badge">B</span> Entrenar, medir y decidir</a>
+    <a href="#entrega"><span class="badge">&#10003;</span> Entregable y comprobaci&oacute;n</a>
+  </nav>
+
+  <div>
+    <header class="top portada">
+      <img class="portada-logo"
+           src="https://upload.wikimedia.org/wikipedia/commons/1/1a/Logo_cuc.png"
+           onerror="this.onerror=null;this.src='https://commons.wikimedia.org/wiki/Special:Redirect/file/Logo_cuc.png';"
+           alt="Logo Universidad de la Costa (CUC)">
+      <div class="portada-badge">Ingeniería de Sistemas · Seguridad en Redes</div>
+      <h1>Laboratorio 1: Segmentación de Redes y Zero Trust</h1>
+      <p class="sub">VirtualBox + OPNsense + Alpine Linux: tres zonas de servicio aisladas, una zona de administración con escritorio gráfico, NAT de salida, una aplicación web real con su base de datos protegida, y publicación controlada del servicio por NAT/PAT</p>
+      <div class="accent-bar"></div>
+      <div class="author-block">
+        <span>👨‍🏫 Docente: <strong>Ing. Rodolfo Cañas Cervantes</strong></span>
+        <span>🏛️ <strong>Universidad de la Costa (CUC)</strong></span>
+        <span>📅 <strong>Unidad 3 · Actividad 2 (10%) · Corte 3 · 2027-1</strong></span>
+      </div>
+    </header>
+
+    <main><section id="intro">
+<h1>Laboratorio C2 &mdash; Clasificador NDR: separar tr&aacute;fico normal de tr&aacute;fico de ataque</h1>
+<p class="lead"><strong>Objetivo.</strong> Al terminar tienes un clasificador entrenado con datos sint&eacute;ticos, sus m&eacute;tricas medidas sobre un conjunto
+que no vio al entrenar, y una decisi&oacute;n razonada sobre qu&eacute; error te cuesta m&aacute;s: dejar pasar un ataque o molestar con una falsa alarma.</p>
+<table class="datos"><tbody>
+<tr><th>Curso</th><td>Seguridad en Redes &middot; Corte 3 &middot; 10 % de la nota</td></tr>
+<tr><th>Tiempo estimado</th><td>3 h (con la VM ya encendida)</td></tr>
+<tr><th>Prerrequisitos</th><td>VM del curso, Python 3, el paquete del laboratorio en <code>~/labs/lab07</code>, que descarga <code>asur-lab iniciar lab07</code> con sus ruedas de instalaci&oacute;n sin internet Si el cat&aacute;logo publicado no responde, el curso entrega una copia local del cat&aacute;logo y de los paquetes: <code>export ASUR_LAB_URL=file://$HOME/catalogo-2027-1</code>. Ademas, el cliente <code>asur-lab</code> comprueba el catalogo al instalar: si hay una version nueva, se actualiza solo; con una copia local en <code>file://</code> no puede actualizarse y lo avisa y se repite el mismo comando.</td></tr>
+<tr><th>Entorno</th><td>Aislado. Los datos son <b>sint&eacute;ticos</b>: no provienen de ninguna red real ni de ninguna empresa.</td></tr><tr><th>Paquete</th><td>El laboratorio se baja del cat&aacute;logo de la plataforma con <code class="inline">asur-lab iniciar lab07</code>. Si el cliente responde que el laboratorio todav&iacute;a no est&aacute; activo, su paquete se est&aacute; publicando: no es un error del ejercicio.</td></tr>
+</tbody></table>
+<div class="callout note"><p>Los datos se generan con un script del paquete, as&iacute; que se puede repetir el experimento y comparar. No se usan capturas de tr&aacute;fico reales de terceros: no hacen falta para aprender el m&eacute;todo y no ser&iacute;a &eacute;tico usarlas sin permiso.</p></div>
+</section>
+<section class="part" id="parteA">
+<h2>Parte A &mdash; Los datos antes del modelo</h2>
+<h3 class="sub">A.1 Entorno sin internet</h3>
+<ol class="steps">
+<li>Copia el paquete y entra.<pre>asur-lab iniciar lab07 &amp;&amp; cp -r ~/labs/lab07 ~/lab-c2 &amp;&amp; cd ~/lab-c2</pre>
+        <div class="callout note"><b>Captura prevista para la prueba de la Fase 5: pantalla del paso «A.1 Entorno sin internet» con la salida real. Se guarda en <code class="inline">imagenes/C2-01.png</code>.</b></div><figure class="captura"><img src="imagenes/C2-01.png" alt="Captura real del C2-01 del laboratorio, tomada en la VM del curso" width="960"><figcaption>Captura real del C2-01, tomada en la VM del curso.</figcaption></figure></div></li>
+<li>Crea el entorno e instala desde las ruedas locales.<pre>sudo apt-get install -y python3-venv</pre>
+<pre>python3 -m venv --system-site-packages .venv &amp;&amp; . .venv/bin/activate
+pip list | grep -i numpy</pre></li>
+<li>Comprueba las versiones.<pre>python3 -c &quot;import numpy; print(numpy.__version__)&quot;</pre></li>
+</ol>
+<p>Salida esperada: la instalaci&oacute;n termina sin errores y se imprimen dos versiones. Captura: la instalaci&oacute;n y las versiones.</p>
+<h3 class="sub">A.2 Generar el conjunto sint&eacute;tico</h3>
+<ol class="steps">
+<li>Genera entrenamiento y prueba con el script del paquete.<pre>python3 generar_datos.py --filas 4000 --prueba 1000 --semilla 2027 --salida datos</pre>
+        <div class="callout note"><b>Captura prevista para la prueba de la Fase 5: pantalla del paso «A.2 Generar el conjunto sint&eacute;tico» con la salida real. Se guarda en <code class="inline">imagenes/C2-02.png</code>.</b></div><figure class="captura"><img src="imagenes/C2-02.png" alt="Captura real del C2-02 del laboratorio, tomada en la VM del curso" width="960"><figcaption>Captura real del C2-02, tomada en la VM del curso.</figcaption></figure></div></li>
+<li>Cuenta las filas y la proporci&oacute;n de clases de cada archivo.<pre>python3 - &lt;&lt;&#x27;PY&#x27;
+import csv, collections
+for f in ("datos/entrenamiento.csv", "datos/prueba.csv"):
+    with open(f, newline="", encoding="utf-8") as a:
+        filas = list(csv.DictReader(a))
+    print(f, len(filas), dict(collections.Counter(x["etiqueta"] for x in filas)))
+PY</pre></li>
+</ol>
+<p>Salida esperada: dos archivos con 4000 filas en total y una proporci&oacute;n de clases que no sea 99 a 1.
+Captura: los dos conteos.</p>
+<div class="callout warn"><p>Si una clase tiene el 99 % de las filas, un modelo que diga siempre &laquo;normal&raquo; acierta casi todo y no sirve para nada. Antes de mirar el modelo, mira el reparto.</p></div>
+<h3 class="sub">A.3 Qu&eacute; separa a las dos clases</h3>
+<ol class="steps">
+<li>Compara las medias de las variables por clase y anota las tres que m&aacute;s se diferencian.<pre>python3 - &lt;&lt;&#x27;PY&#x27;
+import csv, numpy as np
+with open("datos/entrenamiento.csv", newline="", encoding="utf-8") as f:
+    filas = list(csv.DictReader(f))
+cols = [c for c in filas[0] if c != "etiqueta"]
+for etiqueta in ("normal", "ataque"):
+    sub = [x for x in filas if x["etiqueta"] == etiqueta]
+    print(etiqueta, {c: round(float(np.mean([float(x[c]) for x in sub])), 1) for c in cols})
+PY</pre></li>
+</ol>
+<p>Salida esperada: una tabla de medias por clase donde al menos tres variables muestran diferencia clara.
+Captura: la tabla y las tres variables que elegiste.</p>
+</section>
+<section class="part" id="parteB">
+<h2>Parte B &mdash; Entrenar, medir y decidir</h2>
+<h3 class="sub">B.1 Entrenar con una parte y medir con la otra</h3>
+<ol class="steps">
+<li>Entrena el modelo y gu&aacute;rdalo.<pre>python3 entrenar.py --entrada datos/entrenamiento.csv --modelo modelo.json</pre>
+        <div class="callout note"><b>Captura prevista para la prueba de la Fase 5: pantalla del paso «B.1 Entrenar con una parte y medir con la otra» con la salida real. Se guarda en <code class="inline">imagenes/C2-03.png</code>.</b></div><figure class="captura"><img src="imagenes/C2-03.png" alt="Captura real del C2-03 del laboratorio, tomada en la VM del curso" width="960"><figcaption>Captura real del C2-03, tomada en la VM del curso.</figcaption></figure></div></li>
+<li>Predice el conjunto de prueba y guarda las predicciones.<pre>python3 predecir.py --modelo modelo.json --entrada datos/prueba.csv --salida predicciones.csv</pre></li>
+<li>Calcula la matriz de confusi&oacute;n y las m&eacute;tricas por clase.<pre>python3 evaluar.py --real datos/prueba.csv --predicciones predicciones.csv --salida metricas.json</pre></li>
+</ol>
+<p>Salida esperada: <code>modelo.json</code>, <code>predicciones.csv</code> y <code>metricas.json</code> con exactitud, precisi&oacute;n, sensibilidad y F1 por clase.
+Captura: la salida de <code>evaluar.py</code> con la matriz.</p>
+<div class="callout warn"><p>Una exactitud alta no basta: si el 95 % del tr&aacute;fico es normal, acertar el 95 % puede significar no detectar nada. Mira siempre la sensibilidad de la clase &laquo;ataque&raquo;.</p></div>
+<h3 class="sub">B.2 Mover el umbral y pagar el precio</h3>
+<ol class="steps">
+<li>Vuelve a evaluar con tres umbrales distintos.<pre>for u in 0.2 0.5 0.8; do python3 evaluar.py --real datos/prueba.csv --predicciones predicciones.csv --umbral $u --salida metricas-$u.json; done</pre></li>
+<li>Compara los tres resultados en una tabla.<pre>python3 - &lt;&lt;&#x27;PY&#x27;
+import json
+for u in (&quot;0.2&quot;, &quot;0.5&quot;, &quot;0.8&quot;):
+    m = json.load(open(&quot;metricas-%s.json&quot; % u))
+    print(u, m[&quot;matriz&quot;], m[&quot;sensibilidad&quot;], m[&quot;f1&quot;])
+PY</pre></li>
+</ol>
+<p>Salida esperada: al bajar el umbral sube la detecci&oacute;n y suben las falsas alarmas; al subirlo, lo contrario.
+Captura: la tabla de los tres umbrales.</p>
+<h3 class="sub">B.3 Decidir con argumentos</h3>
+<p>Escribe en el informe qu&eacute; umbral eliges y por qu&eacute;, con estas tres ideas: cu&aacute;ntas alertas puede revisar una persona al d&iacute;a,
+qu&eacute; cuesta un ataque no detectado y qu&eacute; pasa con la confianza del equipo cuando la mayor&iacute;a de las alertas son falsas.</p>
+</section>
+<section class="part" id="entrega">
+<h2>Entregable y comprobaci&oacute;n</h2>
+<p>Entrega <code>informe-c2.md</code> con: el reparto de clases de los dos archivos, las tres variables que separan, la matriz de confusi&oacute;n,
+la tabla de los tres umbrales, el umbral elegido con su justificaci&oacute;n y una frase sobre qu&eacute; har&iacute;as para conseguir m&aacute;s datos de ataque sin inventarlos.</p>
+<p><code>asur-lab check c2-ndr</code> comprueba que los dos archivos existen con el n&uacute;mero de filas declarado, que el modelo carga, que las predicciones
+cubren todo el conjunto de prueba, que las m&eacute;tricas del informe coinciden con las recalculadas por el verificador a partir de tus propios archivos y que el modelo no
+predice una sola clase. No publica el valor esperado de las m&eacute;tricas: se&ntilde;ala qu&eacute; paso revisar.</p>
+<p><strong>Calificaci&oacute;n.</strong> Los criterios y los pesos de esta actividad est&aacute;n <b>por definir</b>: los decide el docente. Esta gu&iacute;a fija qu&eacute; se entrega y qu&eacute; comprueba el verificador; no fija niveles ni porcentajes.</p>
+        <h2>Errores frecuentes</h2>
+<table class="datos"><thead><tr><th>S&iacute;ntoma</th><th>Causa habitual</th><th>Qu&eacute; revisar</th></tr></thead><tbody>
+<tr><td>Exactitud del 99 % y ninguna detecci&oacute;n</td><td>Clases desbalanceadas y modelo que siempre dice &laquo;normal&raquo;</td><td>La matriz de confusi&oacute;n y la sensibilidad de la clase ataque</td></tr>
+<tr><td>Las m&eacute;tricas del informe no cuadran</td><td>Se midi&oacute; sobre el conjunto de entrenamiento</td><td>Que <code>evaluar.py</code> use <code>datos/prueba.csv</code></td></tr>
+<tr><td><code>predicciones.csv</code> tiene menos filas que la prueba</td><td>Se filtraron filas al leer</td><td>El n&uacute;mero de l&iacute;neas de los dos archivos</td></tr>
+<tr><td>El umbral no cambia nada</td><td>Se est&aacute; comparando la clase y no la probabilidad</td><td>Que el modelo guarde <code>predict_proba</code></td></tr>
+</tbody></table>
+</section></main>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll('nav.toc a');
+  const targets = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector('nav.toc a[href="#' + e.target.id + '"]');
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t));
+
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const backToTop = document.getElementById('back-to-top');
+  function toggleBackToTop() {
+    if (!backToTop) return;
+    if (window.scrollY > 400) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }
+  document.addEventListener('scroll', toggleBackToTop, { passive: true });
+  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toggleBackToTop();
+
+  const tocToggle = document.getElementById('toc-toggle');
+  const tocNav = document.getElementById('toc');
+  if (tocToggle && tocNav) {
+    tocToggle.addEventListener('click', () => {
+      tocNav.classList.toggle('mobile-open');
+      tocToggle.textContent = tocNav.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+    tocNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      tocNav.classList.remove('mobile-open');
+      tocToggle.textContent = '☰';
+    }));
+  }
+
+  document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.type = 'button';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => {
+      const text = pre.innerText.replace(/Copiar$|Copiado ✓$/, '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copiado ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+    pre.appendChild(btn);
+  });
+
+  const checklistItems = document.querySelectorAll('.checklist li');
+  const storageKey = 'cuc-lab-segmentacion-natpat-chk';
+  let savedState = {};
+  try { savedState = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch (e) { savedState = {}; }
+  checklistItems.forEach((li, idx) => {
+    if (savedState[idx]) li.classList.add('done');
+    li.addEventListener('click', () => {
+      li.classList.toggle('done');
+      savedState[idx] = li.classList.contains('done');
+      localStorage.setItem(storageKey, JSON.stringify(savedState));
+    });
+  });
+</script>
+
+</body>
+</html>

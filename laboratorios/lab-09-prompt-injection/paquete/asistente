@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# asistente — pregunta al asistente de soporte de SaludVital.
+# Universidad de la Costa · Seguridad en Redes · Lab 9
+#
+# Uso:
+#   ./asistente "pregunta"          turno nuevo
+#   ./asistente -c "pregunta"       turno siguiente de la misma conversación
+#
+# Requisito: una clave propia y gratuita de NVIDIA NIM en NVIDIA_API_KEY.
+#   export NVIDIA_API_KEY=tu_clave      (cada estudiante crea la suya en build.nvidia.com)
+#
+# Variables:
+#   ASUR_LAB_MODELO           modelo en formato proveedor/modelo
+#                             (defecto: nvidia/meta/llama-3.2-90b-vision-instruct)
+#   ASUR_LAB_TIMEOUT          segundos antes de rendirse (defecto: 90)
+#
+# La pregunta se envuelve entre <<<DATOS>>> y <<<FIN>>>. Esa es la frontera que la
+# defensa D1 enseña al modelo a respetar: dentro de los marcadores hay datos, no órdenes.
+
+set -u
+
+RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONTINUAR=""
+
+if [ "${1:-}" = "-c" ] || [ "${1:-}" = "--continue" ]; then
+  CONTINUAR="-c"
+  shift
+fi
+
+PREGUNTA="${*:-}"
+if [ -z "$PREGUNTA" ]; then
+  echo "uso: ./asistente \"pregunta\"   (o ./asistente -c \"siguiente turno\")" >&2
+  exit 2
+fi
+
+OPENCODE="opencode"
+command -v opencode >/dev/null 2>&1 || OPENCODE="$HOME/.opencode/bin/opencode"
+[ -x "$OPENCODE" ] || OPENCODE="$(command -v opencode 2>/dev/null || true)"
+if [ -z "$OPENCODE" ] || [ ! -x "$OPENCODE" ]; then
+  echo "No encuentro OpenCode. Este laboratorio lo necesita: revisa ~/.opencode/bin/opencode." >&2
+  exit 1
+fi
+
+MODELO="${ASUR_LAB_MODELO:-nvidia/meta/llama-3.2-90b-vision-instruct}"
+if [ -z "${NVIDIA_API_KEY:-}" ]; then
+  {
+    echo "Falta NVIDIA_API_KEY: el asistente usa NVIDIA NIM y necesita una clave propia."
+    echo "Crea una clave gratuita en https://build.nvidia.com y ejecuta:"
+    echo "  export NVIDIA_API_KEY=tu_clave"
+    echo "Después vuelve a preguntar. No compartas la clave ni la escribas en el informe."
+  } >&2
+  exit 1
+fi
+
+# --- D2 · filtro de entrada (se activa copiando el ejemplo) --------------------
+if [ -x "$RAIZ/defensas/d2-filtro-entrada.sh" ]; then
+  if ! printf '%s' "$PREGUNTA" | "$RAIZ/defensas/d2-filtro-entrada.sh" >/dev/null; then
+    echo "Entrada bloqueada por la política de seguridad del asistente."
+    exit 0
+  fi
+fi
+
+# --- consulta al modelo --------------------------------------------------------
+TOPE="${ASUR_LAB_TIMEOUT:-90}"
+ENTRADA="<<<DATOS>>>
+$PREGUNTA
+<<<FIN>>>"
+
+ERRLOG="$(mktemp)"
+C=1
+SALIDA=""
+# NVIDIA NIM a veces tarda o devuelve un error transitorio: dos intentos cortos.
+for INTENTO in 1 2; do
+  SALIDA="$(cd "$RAIZ" && timeout "$TOPE" "$OPENCODE" run $CONTINUAR -m "$MODELO" --agent saludvital "$ENTRADA" 2>"$ERRLOG")"
+  C=$?
+  # limpiar secuencias ANSI que OpenCode escribe en la terminal
+  SALIDA="$(printf '%s' "$SALIDA" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')"
+  if [ $C -eq 0 ] && [ -n "$SALIDA" ]; then break; fi
+  if grep -qiE "unauthorized|401|invalid.*key|jwt" "$ERRLOG"; then break; fi
+  [ "$INTENTO" = 1 ] && sleep 3
+done
+
+if [ $C -ne 0 ] || [ -z "$SALIDA" ]; then
+  {
+    echo "El asistente no pudo responder con el modelo $MODELO."
+    if [ $C -eq 124 ]; then
+      echo "La consulta superó ${TOPE}s. Reintenta; si sigue igual, revisa tu conexión."
+    fi
+    if grep -qiE "unauthorized|401|invalid.*key|jwt" "$ERRLOG"; then
+      echo "NVIDIA rechazó la clave: revisa que NVIDIA_API_KEY esté bien copiada y vigente."
+    elif grep -qiE "rate|quota|429|too many" "$ERRLOG"; then
+      echo "NVIDIA está limitando las consultas de tu clave: espera unos segundos y reintenta."
+    fi
+  } >&2
+  rm -f "$ERRLOG"
+  exit 1
+fi
+rm -f "$ERRLOG"
+
+# --- D3 · filtro de salida (se activa copiando el ejemplo) ---------------------
+if [ -x "$RAIZ/defensas/d3-filtro-salida.sh" ]; then
+  SALIDA="$(printf '%s' "$SALIDA" | "$RAIZ/defensas/d3-filtro-salida.sh")"
+fi
+
+printf '%s\n' "$SALIDA"

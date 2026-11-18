@@ -16,10 +16,11 @@ mal()  { printf '\033[31m[ERROR]\033[0m %s\n' "$*" >&2; }
 
 # 1. Variables fijas en la terminal y en las próximas
 export PATH="$HOME/.local/bin:$HOME/.opencode/bin:$PATH"
-export ASUR_LAB_URL="$LOCAL"
+export ASUR_LAB_URL="$SITIO"
+sed -i 's|http://127.0.0.1:8088|https://asur-col.github.io/cuc-seguridad-redes|g' "$HOME/.bashrc" 2>/dev/null || true
 grep -q 'ASUR_LAB_URL=' "$HOME/.bashrc" 2>/dev/null || \
-  echo 'export PATH=$HOME/.local/bin:$HOME/.opencode/bin:$PATH; export ASUR_LAB_URL=http://127.0.0.1:8088' >> "$HOME/.bashrc"
-ok "PATH y ASUR_LAB_URL configurados (también en ~/.bashrc)"
+  echo 'export PATH=$HOME/.local/bin:$HOME/.opencode/bin:$PATH; export ASUR_LAB_URL=https://asur-col.github.io/cuc-seguridad-redes' >> "$HOME/.bashrc"
+ok "PATH y ASUR_LAB_URL configurados (https://asur-col.github.io/cuc-seguridad-redes en ~/.bashrc)"
 
 # 2. SSH con contraseña (solo si se pide)
 if true; then  # siempre: SSH con contraseña

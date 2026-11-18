@@ -27,12 +27,17 @@ def main(argv=None):
     ap.add_argument("--json", action="store_true", help="salida en JSON")
     ap.add_argument("--dir", help="carpeta del laboratorio (defecto: la actual)")
     ap.add_argument("--lista", action="store_true", help="laboratorios con verificador")
+    ap.add_argument("--verificar", help="comprueba la integridad de un archivo resultado-rubrica.txt")
     a = ap.parse_args(argv)
 
-    if a.lista or not a.id:
+    if a.lista or (not a.id and not a.verificar):
         for k in sorted(MODULOS):
             print(k)
         return 0
+
+    if not a.id and a.verificar:
+        a.id = "rubrica-c3"
+
     if a.id not in MODULOS:
         print("no existe el laboratorio %s. Disponibles: %s" % (a.id, ", ".join(sorted(MODULOS))), file=sys.stderr)
         return 2
@@ -45,6 +50,15 @@ def main(argv=None):
             return 2
 
     mod = importlib.import_module(MODULOS[a.id])
+
+    if a.verificar:
+        if hasattr(mod, "verificar_resultado_archivo"):
+            ok_v = mod.verificar_resultado_archivo(a.verificar)
+            return 0 if ok_v else 1
+        else:
+            print("el módulo %s no implementa --verificar" % a.id, file=sys.stderr)
+            return 2
+
     ctx = Contexto.desde_fixture(a.fixture) if a.fixture else Contexto(real=True)
     resultados = mod.revisar(ctx)
     fallos = [x for x in resultados if not x["ok"]]

@@ -99,26 +99,34 @@
 # 1. Instalar el lab de la rúbrica (usa imágenes del Lab 6, no las duplica)
 asur-lab iniciar rubrica-c3
 
-# 2. Configurar tu variante (A o B) y tu documento (solo el número)
-echo A > ~/labs/rubrica-c3/variante      # si tu documento termina en dígito par
-echo B > ~/labs/rubrica-c3/variante      # si termina en dígito impar
+# 2. Configurar tu documento y tu variante (calculada del último dígito)
 echo 12345678 > ~/labs/rubrica-c3/estudiante   # solo el número de documento
+echo A > ~/labs/rubrica-c3/variante            # si termina en par (0,2,4,6,8)
+# (o: echo B > ~/labs/rubrica-c3/variante      # si termina en impar 1,3,5,7,9)
 
-# 3. Línea base SIN mitigación
+# 3. Línea base SIN mitigación (genera evidencia/linea-base.txt)
 ./lab base 30
 
-# 4. Editar tus reglas de mitigación
+# 4. Capturar confirmación del ataque en fw (genera evidencia/confirmacion.txt)
+#    Lanza el ataque de tu variante y captura simultáneamente con tcpdump:
+./lab ataque syn    # (o: ./lab ataque http  si eres variante B)
+docker exec rubrica-c3-fw timeout 8 tcpdump -nn -i eth0 -c 50 'tcp port 80' > evidencia/confirmacion.txt
+
+# 5. Editar tus reglas de mitigación
 nano reglas/nftables.fw   # limit rate over, ct count over, set dinámico (bono A)
 nano reglas/lab.rules     # Suricata: threshold track by_src + tu sid
 
-# 5. Aplicar reglas y reiniciar Suricata
+# 6. Aplicar reglas y reiniciar Suricata
 ./lab recargar
 
-# 6. Ejecutar el verificador (5 criterios + bonos; ~2-3 min)
+# 7. Ejecutar el verificador (5 criterios + bonos; ~2-3 min)
 ./lab check          # o: asur-lab check rubrica-c3
 
-# 7. Empaquetar la evidencia
+# 8. Empaquetar la evidencia
 ./lab evidencia
+
+# 9. (Opcional) Comprobar integridad de resultado-rubrica.txt entregado
+./lab verificar evidencia/resultado-rubrica.txt
   </pre>
 </section>
 

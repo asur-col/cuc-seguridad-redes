@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# lab — ciclo de vida del Lab 9 (asistente con prompt injection)
+# Universidad de la Costa · Seguridad en Redes · 2027-1
+#
+# Uso: ./lab up|down|status|ayuda
+# El cliente asur-lab ejecuta "./lab up" al iniciar el laboratorio y "./lab down" al detenerlo,
+# así que este script sale con código 0 cuando el laboratorio queda listo.
+# No usa Docker: el asistente corre sobre el OpenCode instalado en la VM.
+
+set -u
+
+RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+ok()   { printf '[OK]   %s\n' "$*"; }
+mal()  { printf '[FAIL] %s\n' "$*"; }
+aviso(){ printf '[AVISO] %s\n' "$*"; }
+info() { printf '[INFO] %s\n' "$*"; }
+
+OPENCODE="opencode"
+command -v opencode >/dev/null 2>&1 || OPENCODE="$HOME/.opencode/bin/opencode"
+
+case "${1:-}" in
+  up)
+    [ -x "$RAIZ/asistente" ] || { mal "falta ./asistente en el paquete"; exit 1; }
+    chmod +x "$RAIZ/asistente" "$RAIZ/bateria.py" 2>/dev/null
+    if [ ! -x "$OPENCODE" ] && ! command -v opencode >/dev/null 2>&1; then
+      mal "no encuentro OpenCode (se esperaba en $HOME/.opencode/bin/opencode)"
+      exit 1
+    fi
+    ok "OpenCode disponible: $OPENCODE"
+    [ -f "$RAIZ/.opencode/agent/saludvital.md" ] || { mal "falta el agente saludvital"; exit 1; }
+    ok "agente de SaludVital listo (todas las herramientas desactivadas)"
+    [ -f "$RAIZ/.opencode/opencode.json" ] || { mal "falta la configuración del proyecto"; exit 1; }
+    ok "permisos del proyecto en deny"
+    if [ -n "${NVIDIA_API_KEY:-}" ]; then
+      ok "clave NVIDIA NIM presente en esta sesión"
+    else
+      aviso "falta NVIDIA_API_KEY: crea tu clave gratuita en https://build.nvidia.com"
+      aviso "y ejecútala con:  export NVIDIA_API_KEY=tu_clave"
+    fi
+    info "sin contenedores: este laboratorio no usa Docker"
+    echo
+    echo "  Empieza con:  cd $RAIZ"
+    echo "  ./asistente \"¿Cuál es el horario de la sede Centro?\""
+    ;;
+  down)
+    info "nada que detener: el laboratorio no levanta servicios"
+    ;;
+  status)
+    if command -v opencode >/dev/null 2>&1 || [ -x "$HOME/.opencode/bin/opencode" ]; then
+      ok "opencode presente"
+    else
+      aviso "opencode no encontrado"
+    fi
+    [ -f "$RAIZ/.opencode/agent/saludvital.md" ] && ok "agente presente" || aviso "agente ausente"
+    activas=""
+    grep -q '<<<DATOS>>>' "$RAIZ/.opencode/agent/saludvital.md" 2>/dev/null && activas="$activas D1"
+    [ -x "$RAIZ/defensas/d2-filtro-entrada.sh" ] && activas="$activas D2"
+    [ -x "$RAIZ/defensas/d3-filtro-salida.sh" ] && activas="$activas D3"
+    [ -n "$activas" ] && info "defensas activas:$activas" || info "sin defensas activadas todavía"
+    [ -n "${NVIDIA_API_KEY:-}" ] && info "NVIDIA_API_KEY presente en esta sesión" \
+      || info "NVIDIA_API_KEY no configurada: el asistente no responderá hasta configurarla"
+    ;;
+  ayuda|--help|-h)
+    echo "uso: ./lab up|down|status|ayuda"
+    echo "  up       deja el asistente listo"
+    echo "  down     no hay servicios que detener"
+    echo "  status   estado del laboratorio"
+    ;;
+  "")
+    echo "uso: ./lab up|down|status|ayuda" >&2
+    exit 2
+    ;;
+  *)
+    mal "comando desconocido: $1"
+    echo "uso: ./lab up|down|status|ayuda"
+    exit 2
+    ;;
+esac
+exit 0

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "edit": "deny",
+    "bash": { "*": "deny" },
+    "webfetch": "deny"
+  },
+  "provider": {
+    "nvidia": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "NVIDIA NIM (clave propia del estudiante)",
+      "options": {
+        "baseURL": "https://integrate.api.nvidia.com/v1",
+        "apiKey": "{env:NVIDIA_API_KEY}"
+      },
+      "models": {
+        "meta/llama-3.2-90b-vision-instruct": {
+          "name": "Llama 3.2 90B (NVIDIA NIM)"
+        }
+      }
+    }
+  }
+}

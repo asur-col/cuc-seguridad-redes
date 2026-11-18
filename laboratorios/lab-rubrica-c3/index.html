@@ -34,8 +34,11 @@
 
 <h2>2. Antes de empezar</h2>
 <ul>
-  <li>Escribe tu variante en <code>~/labs/rubrica-c3/variante</code> (<code>A</code> o <code>B</code>).</li>
-  <li>Escribe tu documento en <code>~/labs/rubrica-c3/estudiante</code> (solo el número).</li>
+  <li>Escribe tu documento en <code>~/labs/rubrica-c3/estudiante</code> (solo el número):<br>
+      <code>echo 12345678 > ~/labs/rubrica-c3/estudiante</code></li>
+  <li>La variante se calcula a partir del último dígito del documento: <b>par = A</b>, <b>impar = B</b>.<br>
+      Escribe tu variante en <code>~/labs/rubrica-c3/variante</code> (debe coincidir con tu documento):<br>
+      <code>echo A > ~/labs/rubrica-c3/variante</code> (o <code>echo B > ~/labs/rubrica-c3/variante</code>)</li>
   <li>El lab reusa imágenes del Lab 6: asegúrate de tener <code>lab06</code> instalado (<code>asur-lab iniciar lab06</code>).</li>
 </ul>
 
@@ -44,25 +47,33 @@
 # 1. Levantar el lab (imágenes de lab06, sin reconstruir)
 ./lab up
 
-# 2. Escribir variante y documento
-echo A > ~/labs/rubrica-c3/variante
+# 2. Escribir documento y variante (calculada del último dígito)
 echo 12345678 > ~/labs/rubrica-c3/estudiante
+echo A > ~/labs/rubrica-c3/variante    # par = A, impar = B
 
-# 3. Línea base SIN mitigación
+# 3. Línea base SIN mitigación (genera evidencia/linea-base.txt)
 ./lab base 30
 
-# 4. Editar tus reglas de mitigación
+# 4. Capturar confirmación del ataque en fw (genera evidencia/confirmacion.txt)
+#    Lanza el ataque de tu variante y captura simultáneamente con tcpdump:
+./lab ataque syn    # (o: ./lab ataque http  si eres variante B)
+docker exec rubrica-c3-fw timeout 8 tcpdump -nn -i eth0 -c 50 'tcp port 80' > evidencia/confirmacion.txt
+
+# 5. Editar tus reglas de mitigación
 nano reglas/nftables.fw   # nftables: limit rate over, ct count over
 nano reglas/lab.rules      # Suricata: threshold track by_src + tu sid
 
-# 5. Aplicar reglas y reiniciar Suricata
+# 6. Aplicar reglas y reiniciar Suricata
 ./lab recargar
 
-# 6. Ejecutar el verificador (5 criterios + bonos)
+# 7. Ejecutar el verificador (5 criterios + bonos; ~2-3 min)
 ./lab check          # o: asur-lab check rubrica-c3
 
-# 7. Empaquetar la evidencia
+# 8. Empaquetar la evidencia
 ./lab evidencia
+
+# 9. (Opcional) Comprobar integridad de resultado-rubrica.txt entregado
+./lab verificar evidencia/resultado-rubrica.txt
 </pre>
 
 <h2>4. Criterios (5 × 1,0, aprobado 3,0)</h2>

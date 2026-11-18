@@ -20,13 +20,20 @@ set -u
 : "${ASUR_LAB_URL:=https://asur-col.github.io/cuc-seguridad-redes}"
 CATALOGO_PATH="laboratorios/catalogo.json"
 LABS_DIR="$HOME/labs"
-ASUR_LAB_VERSION="${ASUR_LAB_VERSION:-1.0.3}"
+ASUR_LAB_VERSION="${ASUR_LAB_VERSION:-1.0.4}"
 mkdir -p "$LABS_DIR"
 
 ok()   { printf '\033[32m[OK]\033[0m   %s\n' "$*"; }
 mal()  { printf '\033[31m[ERROR]\033[0m %s\n' "$*" >&2; }
 aviso(){ printf '\033[33m[AVISO]\033[0m %s\n' "$*"; }
 info() { printf '\033[36m[INFO]\033[0m %s\n' "$*"; }
+
+lab_tiene_contenedores() {
+  local id="$1"
+  local c
+  c=$(docker ps -q --filter "label=com.docker.compose.project=$id" 2>/dev/null; docker ps -q --filter "name=^/${id}" 2>/dev/null)
+  [ -n "$c" ]
+}
 
 http_get() { # http_get <url> <salida>
   if command -v curl >/dev/null 2>&1; then
@@ -49,10 +56,18 @@ catalogo_tmp=$(mktemp)
 trap 'rm -f "$catalogo_tmp"' EXIT
 
 cargar_catalogo() {
-  http_get "${ASUR_LAB_URL}/${CATALOGO_PATH}" "$catalogo_tmp" || {
-    mal "no se pudo leer el catálogo desde ${ASUR_LAB_URL}/${CATALOGO_PATH}"
-    return 1
-  }
+  if http_get "${ASUR_LAB_URL}/${CATALOGO_PATH}" "$catalogo_tmp"; then
+    return 0
+  fi
+  aviso "sin conexión a ${ASUR_LAB_URL}; buscando catálogo de respaldo..."
+  if [ -f "$HOME/catalogo-2027-1/catalogo.json" ]; then
+    cp "$HOME/catalogo-2027-1/catalogo.json" "$catalogo_tmp" && { ok "usando catálogo local ~/catalogo-2027-1"; return 0; }
+  fi
+  if http_get "http://127.0.0.1:8088/${CATALOGO_PATH}" "$catalogo_tmp"; then
+    ok "usando catálogo local en http://127.0.0.1:8088"; return 0
+  fi
+  mal "no se pudo leer el catálogo desde ${ASUR_LAB_URL}/${CATALOGO_PATH} ni respaldos locales"
+  return 1
 }
 
 # Extrae un campo JSON simple (sin jq): campo de un objeto por id.
@@ -116,6 +131,16 @@ descargar_parte() { # descargar_parte <url> <destino>
   if http_get "$1" "$2.part"; then
     mv "$2.part" "$2"; return 0
   fi
+  # Respaldo en catálogo local de la VM
+  local rel="${1#$ASUR_LAB_URL}"
+  if [ -n "$rel" ] && [ "$rel" != "$1" ]; then
+    if [ -f "$HOME/catalogo-2027-1$rel" ]; then
+      cp "$HOME/catalogo-2027-1$rel" "$2" && return 0
+    fi
+    if http_get "http://127.0.0.1:8088$rel" "$2.part"; then
+      mv "$2.part" "$2"; return 0
+    fi
+  fi
   return 1
 }
 
@@ -155,13 +180,20 @@ cmd_iniciar() {
   [ "$estado" = "archivado" ] && { aviso "lab '$id' está archivado (sin paquete público)"; return 1; }
   [ "$estado" = "activo" ] || { aviso "lab '$id' no está activo todavía (estado: ${estado:-desconocido})"; return 1; }
 
-  # Solo un lab activo a la vez
+  # Solo un lab activo a la vez (limpia marcas huérfanas sin contenedores)
   local activo=""
   for d in "$LABS_DIR"/*/; do
     [ -d "$d" ] || continue
     local nombre; nombre=$(basename "$d")
-    if [ -f "$d/.asur-lab-activo" ] && [ "$nombre" != "$id" ]; then
-      activo="$nombre"; break
+    if [ -f "$d/.asur-lab-activo" ]; then
+      if ! lab_tiene_contenedores "$nombre"; then
+        rm -f "$d/.asur-lab-activo"
+        aviso "marca huérfana de lab activo eliminada en '$nombre' (sin contenedores)"
+        continue
+      fi
+      if [ "$nombre" != "$id" ]; then
+        activo="$nombre"; break
+      fi
     fi
   done
   if [ -n "$activo" ]; then
@@ -351,9 +383,15 @@ descargar_verificadores() { # deja la ruta de run.py en VERIFICADOR
   mkdir -p "$destino" || { mal "no pude crear $destino"; return 1; }
   for f in "${VERIFICADORES[@]}"; do
     if ! http_get "${ASUR_LAB_URL}/laboratorios/verificadores/$f" "$destino/$f"; then
-      mal "no pude descargar $f desde ${ASUR_LAB_URL}/laboratorios/verificadores/"
-      mal "sin verificadores no hay comprobacion: revisa la conexion o avisa al docente"
-      return 1
+      if [ -f "$HOME/catalogo-2027-1/laboratorios/verificadores/$f" ]; then
+        cp "$HOME/catalogo-2027-1/laboratorios/verificadores/$f" "$destino/$f" || true
+      elif http_get "http://127.0.0.1:8088/laboratorios/verificadores/$f" "$destino/$f"; then
+        true
+      else
+        mal "no pude descargar $f desde ${ASUR_LAB_URL}/laboratorios/verificadores/ ni respaldo local"
+        mal "sin verificadores no hay comprobacion: revisa la conexion o avisa al docente"
+        return 1
+      fi
     fi
   done
   VERIFICADOR="$destino/run.py"
