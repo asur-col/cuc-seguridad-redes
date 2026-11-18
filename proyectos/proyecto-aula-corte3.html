@@ -93,7 +93,7 @@
     <li><b>Red en modo puente</b> (antes de encenderla): selecciona la VM → <i>Configuración → Red → Adaptador 1</i> → «Conectado a: <b>Adaptador puente</b>» y en «Nombre» elige la tarjeta con la que tu equipo tiene Internet (Wi-Fi o cable). Acepta.</li>
     <li><b>Enciéndela</b> y entra en la consola de VirtualBox con usuario <code>cuc</code> y clave <code>cuc</code>.</li>
     <li><b>Mira su IP</b> con <code>ip -4 a</code> (la de la misma red de tu equipo, por ejemplo <code>192.168.1.50</code>; ignora <code>127.0.0.1</code> y las <code>172.x</code> de Docker). Esa es tu <code>IP_DE_TU_VM</code>.</li>
-    <li><b>Conéctate desde tu equipo</b> (más cómodo que la consola): en PowerShell o Terminal, <code>ssh cuc@IP_DE_TU_VM</code> con la misma clave. Si prefieres escritorio gráfico, abre en el navegador <code>http://IP_DE_TU_VM:6080</code>.</li>
+    <li><b>Conéctate desde tu equipo</b> (más cómodo que la consola): en PowerShell o Terminal, <code>ssh cuc@IP_DE_TU_VM</code> con la misma clave. Si prefieres <b>escritorio gráfico</b>, abre en el navegador de tu equipo <code>http://IP_DE_TU_VM:6080/vnc.html</code>, pulsa <i>Conectar</i> y escribe la clave <code>cuc</code>; ahí tienes una terminal para seguir los pasos.</li>
     <li><b>Actualiza</b> los laboratorios (la VM lo hace sola al minuto de encender si tiene Internet; para forzarlo): <code>asur-lab actualizar</code>.</li>
   </ol>
   <p>Con eso la VM está lista: sigue con el paso 2 en la terminal de la VM (por SSH o consola).</p>
