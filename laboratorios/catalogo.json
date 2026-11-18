@@ -2,10 +2,10 @@
   {
     "id": "asur-lab",
     "titulo": "Cliente asur-lab (auto-actualización del cliente)",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "estado": "cliente",
     "url": "/laboratorios/asur-lab",
-    "sha256": "87817dfa45f5aea688305dc2cc75a23df36c20b020a8c76c0069848815cebbba",
+    "sha256": "956c4cedb51f345403efd4f39e0b15fcefa4bd7e8ec25cbbbe1df4f8ef25bcfd",
     "partes": [],
     "partes_sha256": [],
     "ram_mb": 0
@@ -13,18 +13,12 @@
   {
     "id": "lab06",
     "titulo": "Lab 6 — Detección y mitigación de tráfico anómalo (DoS/DDoS)",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "estado": "activo",
     "url_paquete": "/laboratorios/lab-06-deteccion-dos/paquete/paquete.tar.gz",
-    "sha256": "0fa7d08e0062f75c97b6be178944a0571e2dc4a344780fd564924afa09373ce2",
-    "partes": [
-      "/laboratorios/lab-06-deteccion-dos/paquete/imagenes.tar.gz.part-aa",
-      "/laboratorios/lab-06-deteccion-dos/paquete/imagenes.tar.gz.part-ab"
-    ],
-    "partes_sha256": [
-      "f2b228ce6dd85bb8fce22db7ff61846ed3ac961c5d1eea174b4a3f955e3ff423",
-      "925337f3753d736bf6b456650881e837d0fed9e9e49df9618cf786ce7bd5535e"
-    ],
+    "sha256": "1b882909922bcaceb4b1dab936d1424d1e57544141e9d315aed8f71dd8f3d7a4",
+    "partes": [],
+    "partes_sha256": [],
     "ram_mb": 600
   },
   {
@@ -71,5 +65,17 @@
     "partes_sha256": [],
     "ram_mb": 0,
     "url": "/laboratorios/lab-07-prompt-injection/"
+  },
+  {
+    "id": "rubrica-c3",
+    "titulo": "Rúbrica Corte 3 — Detección y mitigación de DoS (20 %)",
+    "version": "1.0.0",
+    "estado": "activo",
+    "url_paquete": "/laboratorios/lab-rubrica-c3/paquete/paquete.tar.gz",
+    "sha256": "4fd034e73cb3646a2b9835d8696c3428b443e683530f9766365074c65524f0ef",
+    "partes": [],
+    "partes_sha256": [],
+    "ram_mb": 600,
+    "nota": "Reutiliza imágenes del Lab 6 (depende de lab06 instalado). Incluye verificador rubrica_c3.py."
   }
 ]

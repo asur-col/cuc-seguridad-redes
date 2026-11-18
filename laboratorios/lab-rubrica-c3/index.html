@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lab — Rúbrica Corte 3 · Seguridad en Redes (CUC 2026-2)</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.6;color:#222}
+  h1{font-size:24px;border-bottom:2px solid #a6192e;padding-bottom:8px}
+  h2{font-size:20px;margin-top:28px;color:#7e1223}
+  code{background:#f4eee3;padding:2px 6px;border-radius:4px;border:1px solid #e5dccb;font-family:ui-monospace,monospace}
+  pre{background:#f4eee3;border:1px solid #e5dccb;border-radius:8px;padding:12px 16px;overflow-x:auto}
+  ul{padding-left:22px}
+  li{margin:6px 0}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px}
+  th,td{border:1px solid #e5dccb;padding:8px 12px;text-align:left}
+  th{background:#f4eee3}
+  .warn{border-left:4px solid #a9791c;background:#fbf3de;padding:12px 16px;margin:16px 0}
+  .ok{border-left:4px solid #0e7a4b;background:#e8f5ee;padding:12px 16px;margin:16px 0}
+</style>
+</head>
+<body>
+<h1>Rúbrica Corte 3 — Detección y mitigación de DoS (20 %)</h1>
+<p>Curso Seguridad en Redes, CUC 2026-2 · Docente: Ing. Rodolfo Cañas Cervantes · Grupo 23865</p>
+<p>Esta es la <b>única actividad del Corte 3</b>. Plazo máximo: <b>sábado 28 de noviembre de 2026, 23:59</b>. Entrega por Teams: <code>evidencia.tar.gz</code> + <code>resultado-rubrica.txt</code>.</p>
+
+<h2>1. Variantes (por último dígito del documento)</h2>
+<table>
+  <tr><th>Elemento</th><th>A (par)</th><th>B (impar)</th></tr>
+  <tr><td>Vector principal</td><td>SYN flood → 10.30.0.10:80</td><td>HTTP flood → 10.30.0.10:80</td></tr>
+  <tr><td>SSH del servidor</td><td>puerto 22</td><td>puerto 2222</td></tr>
+  <tr><td>Puertos del escaneo</td><td>22, 443, 3306, 5432, 8080</td><td>2222, 3306, 5432, 6379, 8080, 8443, 9000, 9200, 11211, 27017</td></tr>
+  <tr><td>Set dinámico</td><td><code>bloqueados</code> (timeout 10 min)</td><td><code>escaneo</code> (timeout 15 min)</td></tr>
+</table>
+
+<h2>2. Antes de empezar</h2>
+<ul>
+  <li>Escribe tu variante en <code>~/labs/rubrica-c3/variante</code> (<code>A</code> o <code>B</code>).</li>
+  <li>Escribe tu documento en <code>~/labs/rubrica-c3/estudiante</code> (solo el número).</li>
+  <li>El lab reusa imágenes del Lab 6: asegúrate de tener <code>lab06</code> instalado (<code>asur-lab iniciar lab06</code>).</li>
+</ul>
+
+<h2>3. Flujo de trabajo</h2>
+<pre>
+# 1. Levantar el lab (imágenes de lab06, sin reconstruir)
+./lab up
+
+# 2. Escribir variante y documento
+echo A > ~/labs/rubrica-c3/variante
+echo 12345678 > ~/labs/rubrica-c3/estudiante
+
+# 3. Línea base SIN mitigación
+./lab base 30
+
+# 4. Editar tus reglas de mitigación
+nano reglas/nftables.fw   # nftables: limit rate over, ct count over
+nano reglas/lab.rules      # Suricata: threshold track by_src + tu sid
+
+# 5. Aplicar reglas y reiniciar Suricata
+./lab recargar
+
+# 6. Ejecutar el verificador (5 criterios + bonos)
+./lab check          # o: asur-lab check rubrica-c3
+
+# 7. Empaquetar la evidencia
+./lab evidencia
+</pre>
+
+<h2>4. Criterios (5 × 1,0, aprobado 3,0)</h2>
+<table>
+  <tr><th>#</th><th>Criterio</th><th>Peso</th></tr>
+  <tr><td>1</td><td>Detección: regla Suricata con <code>threshold … track by_src</code> y alerta con tu sid</td><td>1,0</td></tr>
+  <tr><td>2</td><td>Línea base y confirmación: <code>evidencia/linea-base.txt</code> y <code>evidencia/confirmacion.txt</code></td><td>1,0</td></tr>
+  <tr><td>3</td><td>Mitigación con continuidad: ≥ 90 % HTTP 200 del cliente legítimo durante el ataque</td><td>1,0</td></tr>
+  <tr><td>4</td><td>Acceso no autorizado: alerta de escaneo y SSH, puertos filtrados, HTTP en 200</td><td>1,0</td></tr>
+  <tr><td>5</td><td>Evidencia íntegra: <code>evidencia.tar.gz</code> y <code>resultado-rubrica.txt</code> firmado</td><td>1,0</td></tr>
+</table>
+
+<h2>5. Bonos (tope 5,0)</h2>
+<ul>
+  <li><b>A (+0,2):</b> bloqueo de escaneo por set dinámico con timeout.</li>
+  <li><b>B (+0,3):</b> dos firmas HTTP distintas (GET y Host) con sid diferentes; ambas disparan.</li>
+</ul>
+
+<div class="warn"><b>Marco ético (Ley 1273 de 2009):</b> el generador solo reproduce capturas pregrabadas contra el servidor interno del lab. Sin puertos publicados, sin salida a Internet.</div>
+
+<div class="ok"><b>Ayuda:</b> <code>./lab ayuda</code> · <code>asur-lab ayuda</code></div>
+</body>
+</html>

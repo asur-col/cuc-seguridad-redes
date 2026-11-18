@@ -7,6 +7,7 @@
 #   asur-lab iniciar <id>                   descarga, verifica, carga, ./lab up
 #   asur-lab detener <id>                   ./lab down
 #   asur-lab borrar <id>                    baja contenedores, imágenes y carpeta
+#   asur-lab check <id> [--json]            comprueba los objetivos del lab en la VM
 #   asur-lab actualizar                     se auto-actualiza desde el catálogo
 #   asur-lab ayuda
 #
@@ -19,7 +20,7 @@ set -u
 : "${ASUR_LAB_URL:=https://asur-col.github.io/cuc-seguridad-redes}"
 CATALOGO_PATH="laboratorios/catalogo.json"
 LABS_DIR="$HOME/labs"
-ASUR_LAB_VERSION="${ASUR_LAB_VERSION:-1.0.0}"
+ASUR_LAB_VERSION="${ASUR_LAB_VERSION:-1.0.3}"
 mkdir -p "$LABS_DIR"
 
 ok()   { printf '\033[32m[OK]\033[0m   %s\n' "$*"; }
@@ -118,10 +119,27 @@ descargar_parte() { # descargar_parte <url> <destino>
   return 1
 }
 
+auto_actualizar() {
+  # Auto-actualizacion del cliente al instalar un laboratorio.
+  # Es una mejora: si la base no es de confianza, no hay red o algo falla, la instalacion sigue.
+  # El trabajo del estudiante no se toca: aqui solo se reemplaza el ejecutable del cliente.
+  local url_cli version_remota
+  url_cli=$(campo_json "$catalogo_tmp" "asur-lab" "url")
+  version_remota=$(campo_json "$catalogo_tmp" "asur-lab" "version")
+  [ -n "$url_cli" ] || return 0
+  url_cli="${ASUR_LAB_URL}${url_cli}"
+  url_confiable "$url_cli" || return 0
+  if [ -n "$version_remota" ] && [ "$version_remota" = "$ASUR_LAB_VERSION" ]; then
+    return 0
+  fi
+  cmd_actualizar || return 0   # si falla, se conserva la version actual
+  return 0
+}
 cmd_iniciar() {
   local id="$1"
   [ -n "$id" ] || { mal "uso: asur-lab iniciar <id>"; return 1; }
   cargar_catalogo || return 1
+  auto_actualizar
 
   local titulo version estado url_paquete sha256 partes partes_sha256 ram_mb
   titulo=$(campo_json "$catalogo_tmp" "$id" "titulo")
@@ -311,6 +329,48 @@ cmd_actualizar() {
   fi
 }
 
+# Los verificadores no viajan dentro del cliente: el cliente instalado es un archivo suelto en
+# ~/.local/bin. Se buscan al lado, en el arbol del curso o en la cache, y si no estan se descargan
+# una vez del catalogo. Sin esto, "asur-lab check" fallaba en la VM con "no encuentro
+# ~/.local/bin/verificadores/run.py".
+VERIFICADORES=(run.py base.py a1_linux.py a3_hardening.py b1_tls.py b2_identidad.py b3_rutas.py c2_ndr.py c3_lab8.py lab09_prompt.py rubrica_c3.py)
+
+buscar_verificadores() { # deja la ruta de run.py en VERIFICADOR
+  local dir candidato
+  dir="$(cd "$(dirname "$0")" && pwd)"
+  for candidato in "$dir/verificadores/run.py"                    "$dir/../verificadores/run.py"                    "$LABS_DIR/verificadores/run.py"                    "${XDG_CACHE_HOME:-$HOME/.cache}/asur-lab/verificadores/run.py"                    "$HOME/.local/share/asur-lab/verificadores/run.py"; do
+    if [ -f "$candidato" ]; then VERIFICADOR="$candidato"; return 0; fi
+  done
+  return 1
+}
+
+descargar_verificadores() { # deja la ruta de run.py en VERIFICADOR
+  local destino f
+  destino="${XDG_CACHE_HOME:-$HOME/.cache}/asur-lab/verificadores"
+  info "primera vez: descargando los verificadores del curso..."
+  mkdir -p "$destino" || { mal "no pude crear $destino"; return 1; }
+  for f in "${VERIFICADORES[@]}"; do
+    if ! http_get "${ASUR_LAB_URL}/laboratorios/verificadores/$f" "$destino/$f"; then
+      mal "no pude descargar $f desde ${ASUR_LAB_URL}/laboratorios/verificadores/"
+      mal "sin verificadores no hay comprobacion: revisa la conexion o avisa al docente"
+      return 1
+    fi
+  done
+  VERIFICADOR="$destino/run.py"
+  ok "verificadores en $destino"
+}
+
+cmd_check() { # cmd_check <id> [--fixture F] [--json]
+  if [ $# -lt 1 ]; then mal "falta el id: asur-lab check <id>"; return 2; fi
+  local id="$1"; shift
+  VERIFICADOR=""
+  if ! buscar_verificadores; then
+    descargar_verificadores || return 2
+  fi
+  if [ ! -f "$VERIFICADOR" ]; then mal "no encuentro $VERIFICADOR"; return 2; fi
+  python3 "$VERIFICADOR" "$id" "$@"
+}
+
 cmd_ayuda() {
   cat <<FIN
 asur-lab — Cliente único de laboratorios ASUR (sin sudo)
@@ -319,6 +379,8 @@ asur-lab — Cliente único de laboratorios ASUR (sin sudo)
   asur-lab iniciar <id>                 descarga, verifica SHA-256, carga imágenes, ./lab up
   asur-lab detener <id>                 para el lab (./lab down)
   asur-lab borrar <id>                  elimina contenedores, imágenes y carpeta del lab
+  asur-lab check <id> [--json]          comprueba los objetivos del lab en esta VM
+                                        (la primera vez descarga los verificadores)
   asur-lab actualizar                   se auto-actualiza verificando SHA-256
   asur-lab ayuda                        esta ayuda
 
@@ -332,6 +394,7 @@ case "${1:-ayuda}" in
   iniciar)   shift; cmd_iniciar "${1:-}";;
   detener)   shift; cmd_detener "${1:-}";;
   borrar)    shift; cmd_borrar "${1:-}";;
+  check)     shift; cmd_check "$@";;
   actualizar) cmd_actualizar;;
   ayuda|help) cmd_ayuda;;
   *)         cmd_ayuda;;
