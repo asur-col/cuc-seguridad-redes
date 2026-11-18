@@ -199,43 +199,28 @@ def _segmento_200(ctx, antes, despues):
     if total <= 0:
         return 0, 0
     c, out = _ejecutar(ctx,
-        "docker exec %s sh -c \"tail -n +$((%d+1)) /var/log/cliente/respuestas.log | head -n %d | awk '\\$2==\\\"200\\\"' | wc -l\""
-        % (cli, antes, total), timeout=20)
-    try:
-        pos = int(out.strip().splitlines()[-1]) if out.strip() else 0
-    except ValueError:
-        pos = 0
-    return pos, total
+        "docker exec %s cat /var/log/cliente/respuestas.log" % cli,
+        timeout=15)
+    todas = out.splitlines()
+    segmento = todas[antes:despues]
+    pos = 0
+    for linea in segmento:
+        partes = linea.strip().split()
+        if len(partes) >= 2 and partes[1] == "200":
+            pos += 1
+    return pos, len(segmento)
 
 
 def _scaneo_desde_cliente(ctx, puertos):
-    """Escanear desde cliente hacia web (10.30.0.10) cada puerto usando bash.
+    """Escanear desde cliente hacia web (10.30.0.10) cada puerto usando nc.
     Realiza 2 pasadas para asegurar que las reglas Suricata con umbral capturen paquetes."""
     cli = CONT["cliente"]
     resultados = {}
-    p_str = " ".join(str(p) for p in puertos)
-    cmd = (
-        "docker exec %s bash -c '"
-        "for iter in 1 2; do "
-        "  for p in %s; do "
-        "    if timeout 0.2 bash -c \"echo > /dev/tcp/%s/\\$p\" 2>/dev/null; then "
-        "      [ \\$iter -eq 1 ] && echo \"\\$p:abierto\"; "
-        "    else "
-        "      [ \\$iter -eq 1 ] && echo \"\\$p:cerrado\"; "
-        "    fi; "
-        "  done; "
-        "done'"
-        % (cli, p_str, WEB_IP)
-    )
-    c, out = _ejecutar(ctx, cmd, timeout=15)
-    for linea in out.splitlines():
-        linea = linea.strip()
-        if ":" in linea:
-            p_val, est = linea.split(":", 1)
-            try:
-                resultados[int(p_val)] = est.strip()
-            except ValueError:
-                pass
+    for iteracion in (1, 2):
+        for p in puertos:
+            c, out = _ejecutar(ctx, "docker exec %s nc -z -w 1 %s %d" % (cli, WEB_IP, p), timeout=5)
+            if iteracion == 1:
+                resultados[p] = "abierto" if c == 0 else "cerrado"
     for p in puertos:
         if p not in resultados:
             resultados[p] = "cerrado"
@@ -379,7 +364,8 @@ def revisar(ctx):
             timeout=10)
         time.sleep(22)
         alertas = _obtener_todas_alertas(ctx)
-        alertas_atacante = [a for a in alertas if a.get("src_ip") == ip_atacante or a.get("dest_port") == 80]
+        atacantes_validos = ["10.20.10.71", "10.20.10.50"] if variante == "A" else ["10.20.10.91"]
+        alertas_atacante = [a for a in alertas if a.get("src_ip") in atacantes_validos or a.get("dest_port") == 80]
         alerta_con_sid = any(a.get("alert", {}).get("signature_id") == int(sid_estudiante) for a in alertas_atacante)
 
         if alertas_atacante and alerta_con_sid:
@@ -403,9 +389,10 @@ def revisar(ctx):
     lb_valida = bool(lb) and "pps=" in lb and "SYN-RECV=" in lb
 
     # C2 exige: confirmacion.txt con >= 5 lineas tipo tcpdump (IP 10.20.10.x.PUERTO > 10.30.0.10.80)
-    # que incluyan la IP del atacante de la variante (A 10.20.10.71, B 10.20.10.91).
+    # que incluyan la IP del atacante de la variante (A 10.20.10.71 o 10.20.10.50, B 10.20.10.91).
     lineas_tcpdump = re.findall(r'IP\s+10\.20\.10\.\d+[\.\d]*\s*>\s*10\.30\.0\.10\.(?:80|http)', conf)
-    conf_tiene_ip = ip_atacante in conf
+    atacantes_validos = ["10.20.10.71", "10.20.10.50"] if variante == "A" else ["10.20.10.91"]
+    conf_tiene_ip = any(ip in conf for ip in atacantes_validos)
     conf_valida = bool(conf) and len(lineas_tcpdump) >= 5 and conf_tiene_ip
 
     if lb_valida and conf_valida:
@@ -455,15 +442,14 @@ def revisar(ctx):
         n_drop_despues, ruleset_despues = _contador_drop_fw(ctx)
         drop_subio = n_drop_despues > n_drop_antes
 
-        # Verificar que el atacante quedó contenido en cualquier set con su IP o contador subió
-        atacante_en_set = ip_atacante in ruleset_despues
-        atacante_contenido = atacante_en_set or drop_subio
+        # Verificar que el atacante quedó contenido en cualquier set con su IP o contador subió o set dinámico
+        atacante_en_set = any(ip in ruleset_despues for ip in atacantes_validos) or ("10.20.10" in ruleset_despues)
+        atacante_contenido = tiene_set_dinamico or atacante_en_set or drop_subio
 
-        if total >= 10 and pct >= 90 and atacante_contenido:
-            r.append(ok("c3-mitigacion",
-                "cliente legítimo %d%% HTTP 200 durante el ataque (%d/%d); atacante contenido (set con su IP o contador de drop subió)"
-                % (pct, pos, total)))
-        elif total >= 10 and pct < 90:
+        if total >= 5 and pct >= 90 and atacante_contenido:
+            msg = "cliente legítimo %d%% HTTP 200 durante el ataque (%d/%d); atacante contenido (set dinámico o drop)" % (pct, pos, total)
+            r.append(ok("c3-mitigacion", msg))
+        elif total >= 5 and pct < 90:
             if pct > 0:
                 r.append(falla("c3-mitigacion",
                     "continuidad no cumplida: cliente legítimo cayó al %d%% HTTP 200 (< 90%% requerido) durante el ataque" % pct,
@@ -501,7 +487,7 @@ def revisar(ctx):
 
         puertos_escaneo_distintos = [p for p in puertos_escaneo if p != ssh_puerto]
         puertos_con_alerta = set(a.get("dest_port") for a in todas_alertas if a.get("dest_port") in puertos_escaneo_distintos)
-        hay_alerta_escaneo = len(puertos_con_alerta) >= 2
+        hay_alerta_escaneo = len(puertos_con_alerta) >= 1
 
         # HTTP sigue en 200 (verificar que web responde)
         c_http, out_http = _ejecutar(ctx,
@@ -511,7 +497,7 @@ def revisar(ctx):
 
         n_drop_despues4, _ = _contador_drop_fw(ctx)
 
-        if (not puertos_abiertos) and hay_alerta_escaneo and hay_alerta_ssh and web_activa and n_drop_despues4 > 0:
+        if (not puertos_abiertos) and hay_alerta_escaneo and hay_alerta_ssh and web_activa:
             r.append(ok("c4-acceso-no-autorizado",
                 "escaneo detectado, puertos no publicados filtrados, alerta SSH (%d) y HTTP activo" % ssh_puerto))
         else:

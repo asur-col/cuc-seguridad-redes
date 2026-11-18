@@ -116,7 +116,7 @@
     "version": "1.0.1",
     "estado": "activo",
     "url_paquete": "/laboratorios/lab-rubrica-c3/paquete/paquete.tar.gz",
-    "sha256": "c7e77d0bc09844fc19e1fc4f701693ae5d75e3c809ba712cdd753ba11da460b2",
+    "sha256": "0b8a76374b0ea2e49ae184bbd72bc2fd9ce84ffaa39aab88669cd18b1569f200",
     "partes": [],
     "partes_sha256": [],
     "ram_mb": 600,
